@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "name": "Hazelnut Latte",
+    "slug": "hazelnut-latte",
+    "category": "Minuman",
+    "image": "/public/images/coffeHazelnut.png",
+    "price": 10000,
+    "originalPrice": 20000,
+    "rating": 5.0,
+    "description": "You can explore the menu that we provide with fun and have their own taste and make your day better.",
+    "isFlashSale": true
+  },
+  {
+    "id": 2,
+    "name": "Hazelnut Latte",
+    "slug": "hazelnut-matcha",
+    "category": "Minuman",
+    "image": "/public/images/coffeHazel2.png",
+    "price": 10000,
+    "originalPrice": 20000,
+    "rating": 5.0,
+    "description": "You can explore the menu that we provide with fun and have their own taste and make your day better.",
+    "isFlashSale": true
+  },
+  {
+    "id": 3,
+    "name": "Hazelnut Latte",
+    "slug": "hazelnut-latte",
+    "category": "Minuman",
+    "image": "/public/images/coffeHazel3.png",
+    "price": 10000,
+    "originalPrice": 20000,
+    "rating": 5.0,
+    "description": "You can explore the menu that we provide with fun and have their own taste and make your day better.",
+    "isFlashSale": true
+  },
+  {
+    "id": 4,
+    "name": "Hazelnut Latte",
+    "slug": "hazelnut-latte",
+    "category": "Minuman",
+    "image": "/public/images/coffeHazel4.jpg",
+    "price": 10000,
+    "originalPrice": 20000,
+    "rating": 5.0,
+    "description": "You can explore the menu that we provide with fun and have their own taste and make your day better.",
+    "isFlashSale": true
+  },
+  {
+    "id": 5,
+    "name": "Hazelnut Latte",
+    "slug": "hazelnut-latte",
+    "category": "Minuman",
+    "image": "/public/images/coffeHazelnut.png",
+    "price": 10000,
+    "originalPrice": 20000,
+    "rating": 5.0,
+    "description": "You can explore the menu that we provide with fun and have their own taste and make your day better.",
+    "isFlashSale": true
+  },
+   {
+    "id": 6,
+    "name": "Hazelnut Latte",
+    "slug": "hazelnut-latte",
+    "category": "Minuman",
+    "image": "/public/images/coffeHazelnut.png",
+    "price": 10000,
+    "originalPrice": 20000,
+    "rating": 5.0,
+    "description": "You can explore the menu that we provide with fun and have their own taste and make your day better.",
+    "isFlashSale": true
+  }
+]
