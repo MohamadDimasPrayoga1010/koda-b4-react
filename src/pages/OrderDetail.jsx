@@ -43,14 +43,7 @@ const OrderDetail = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8 px-6 md:px-16">
-      <Link
-        to="/history-order"
-        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
-      >
-        <MoveLeft size={20} />
-        <span>Back to History Order</span>
-      </Link>
+    <main className="min-h-screen bg-gray-50 py-8 px-6 md:my-30 md:px-16">
 
       <div className=" p-6  mb-6">
         <h1 className="text-3xl font-bold mb-2">Order {order.orderId}</h1>
