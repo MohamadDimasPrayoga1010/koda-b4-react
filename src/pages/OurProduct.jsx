@@ -1,12 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import CoffeImg from "/images/ourproduct.png";
-import { MoveLeft, MoveRight } from "lucide-react";
+import { MoveLeft, MoveRight, Search } from "lucide-react";
 import { ourProductCard } from "../../public/data/products";
 import CardPromo from "../components/CardPromo";
 import Button from "../components/Button";
 import CardProductStock from "../components/CardProductStock";
+import { useSearchParams } from "react-router-dom";
 
 const OurProduct = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState(
+    searchParams.get("search") || ""
+  );
+
+  // Handle search submit
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      setSearchParams({ search: searchInput.trim() });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+ 
+  const handleResetFilter = () => {
+    setSearchInput("");
+    setSearchParams({});
+  };
+
   return (
     <main>
       <section className="relative mt-15 md:mt-0">
@@ -17,6 +43,7 @@ const OurProduct = () => {
           </h1>
         </div>
       </section>
+
       <section className="my-6 mx-12">
         <div className="flex justify-between items-center">
           <h3 className="text-5xl font-medium">
@@ -31,7 +58,7 @@ const OurProduct = () => {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 my-5 ">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 my-5">
           {ourProductCard.map((product) => (
             <CardPromo
               key={product.id}
@@ -49,25 +76,40 @@ const OurProduct = () => {
           Our <span className="text-[#8E6447]">Product</span>
         </h3>
         <div className="flex my-5">
-          <div className="w-[383px] max-h-[900px] bg-black rounded p-5 hidden md:flex flex-col ">
+          <div className="w-[383px] max-h-[900px] bg-black rounded p-5 hidden md:flex flex-col">
             <div className="text-white">
               <div className="flex justify-between mb-3">
                 <p className="text-white font-semibold text-xl">Filter</p>
-                <p className="text-white font-bold text-lg">ResetFilter</p>
+                <button
+                  onClick={handleResetFilter}
+                  className="text-white font-bold text-lg hover:text-[#FF8906] transition"
+                >
+                  ResetFilter
+                </button>
               </div>
               <div>
-                <form className="flex flex-col">
+                <form onSubmit={handleSearch} className="flex flex-col">
                   <label htmlFor="search" className="text-bold text-lg mb-3">
                     Search
                   </label>
-                  <input
-                    type="search"
-                    name="search"
-                    id="search"
-                    className="bg-[#DEDEDE] h-10 pl-3 text-[#696F79]"
-                    autoComplete="off"
-                    placeholder="Search your product.."
-                  />
+                  <div className="relative mb-4">
+                    <input
+                      type="search"
+                      name="search"
+                      id="search"
+                      value={searchInput}
+                      onChange={handleSearchChange}
+                      className="bg-[#DEDEDE] h-10 pl-3 pr-10 text-[#696F79] w-full"
+                      autoComplete="off"
+                      placeholder="Search your product.."
+                    />
+                    <button
+                      type="submit"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-[#FF8906] transition"
+                    >
+                      <Search size={20} />
+                    </button>
+                  </div>
 
                   <div className="my-4">
                     <h1 className="text-white font-bold text-lg">Category</h1>
@@ -181,23 +223,25 @@ const OurProduct = () => {
                   <div className="flex items-center gap-4 my-2">
                     <input
                       type="checkbox"
-                      id="addon"
-                      name="addon"
+                      id="addon2"
+                      name="addon2"
                       className="w-4 h-4 rounded-md border-gray-300 text-orange-500 focus:ring-0 accent-orange-500"
                     />
-                    <label htmlFor="addon" className="text-lg font-normal">
+                    <label htmlFor="addon2" className="text-lg font-normal">
                       Add-On
                     </label>
                   </div>
+
                   <div>
                     <h1 className="text-white font-bold text-lg">
                       Range Price
                     </h1>
                   </div>
                   <div className="my-5">
-                    <input type="range" />
+                    <input type="range" className="w-full" />
                   </div>
-                  <Button>Apply Filter</Button>
+
+                  <Button type="submit">Apply Filter</Button>
                 </form>
               </div>
             </div>
