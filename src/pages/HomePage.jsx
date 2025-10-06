@@ -145,7 +145,7 @@ const HomePage = () => {
               title={product.title}
               description={product.description}
               price={product.price}
-              //   onAddToCart={() => handleAddToCart(product)}
+                // onAddToCart={() => handleAddToCart(product)}
             />
           ))}
         </div>
