@@ -9,6 +9,10 @@ import DetailProduct from "./pages/DetailProduct";
 import PaymentDetails from "./pages/PaymentDetails";
 import HistoryOrder from "./pages/HistoryOrder";
 import OrderDetail from "./pages/OrderDetail";
+import Profile from "./pages/Profile";
+import MainLayoutAdmin from "./layout/MainLayoutAdmin";
+import Dashboard from "./pages/Dashboard";
+import ProductList from "./pages/ProductList";
 
 
 const router = createBrowserRouter([
@@ -39,8 +43,27 @@ const router = createBrowserRouter([
       {
         path: "/order-detail/:id",
         element: <OrderDetail />
+      },
+      {
+        path: "profile",
+        element: <Profile />
+      },
+      {
+        path: "product-list",
+        element: <ProductList />
       }
     ],
+  },
+  
+  {
+    path: "/",
+    element: <MainLayoutAdmin />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <Dashboard />
+      }
+    ]
   },
   {
     path: "/register",
