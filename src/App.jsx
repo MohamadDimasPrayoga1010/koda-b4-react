@@ -1,7 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ForgotPassword from "./pages/ForgotPassword";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import HomaPage from "./pages/HomePage";
@@ -10,6 +8,7 @@ import OurProduct from "./pages/OurProduct";
 import DetailProduct from "./pages/DetailProduct";
 import PaymentDetails from "./pages/PaymentDetails";
 import HistoryOrder from "./pages/HistoryOrder";
+import OrderDetail from "./pages/OrderDetail";
 
 
 const router = createBrowserRouter([
@@ -37,6 +36,10 @@ const router = createBrowserRouter([
         path: "/history-order",
         element: <HistoryOrder />,
       },
+      {
+        path: "/order-detail/:id",
+        element: <OrderDetail />
+      }
     ],
   },
   {
