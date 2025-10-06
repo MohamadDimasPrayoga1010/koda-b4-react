@@ -45,3 +45,7 @@ Aplikasi e-commerce kedai kopi modern dan lengkap yang dibangun dengan React, Ta
 
 ### History
 ![history](/public/images/hystoriorder.png)
+
+### History Order
+![history](/public/images/historyorderdekstop.png)
+![history](/public/images/historyorderdekstop2.png)
