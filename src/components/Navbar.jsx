@@ -52,7 +52,7 @@ const Navbar = () => {
             <Link>
               <img src={SearchIcon} alt="search-icon" className="w-5 h-5" />
             </Link>
-            <Link>
+            <Link to="/payment-details">
               <img src={CartIcon} alt="cart-icon" className="w-5 h-5" />
             </Link>
             <Link to="/login">
