@@ -3,6 +3,7 @@ export const products = [
     id: 1,
     image: "/public/images/coffeHazelnut.png",
     title: "Hazelnut Latte",
+    slug: "hazelnut-latte",
     description:
       "You can explore the menu that we provide with fun and have their own taste and make your day better.",
     price: 20000,
@@ -10,7 +11,8 @@ export const products = [
   {
     id: 2,
     image: "/public/images/coffeHazel2.png",
-    title: "Hazelnut Latte",
+    title: "Hazelnut Latte Special", 
+    slug: "hazelnut-latte-special", 
     description:
       "You can explore the menu that we provide with fun and have their own taste and make your day better.",
     price: 20000,
@@ -18,7 +20,8 @@ export const products = [
   {
     id: 3,
     image: "/public/images/coffeHazel3.png",
-    title: "Hazelnut Latte",
+    title: "Hazelnut Latte Premium", 
+    slug: "hazelnut-latte-premium",
     description:
       "You can explore the menu that we provide with fun and have their own taste and make your day better.",
     price: 20000,
@@ -26,7 +29,8 @@ export const products = [
   {
     id: 4,
     image: "/public/images/coffeHazel4.jpg",
-    title: "Hazelnut Latte",
+    title: "Hazelnut Latte Grande", 
+    slug: "hazelnut-latte-grande",
     description:
       "You can explore the menu that we provide with fun and have their own taste and make your day better.",
     price: 20000,
