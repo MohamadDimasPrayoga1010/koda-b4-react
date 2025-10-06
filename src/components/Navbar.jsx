@@ -20,7 +20,7 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#0B090921] py-5 px-6 md:px-16 lg:px-32">
+      <header className="fixed top-0 left-0 w-full z-50  bg-[#0B0909]/80  py-5 px-6 md:px-16 lg:px-32">
         <nav className="flex justify-between items-center">
           <div className="flex items-center gap-3 md:gap-5">
             <img src={CoffeLogo} alt="coffe-logo" className="h-8 md:h-10" />
