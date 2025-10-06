@@ -71,14 +71,12 @@ const PaymentDetails = () => {
 
     setIsProcessing(true);
 
-    // Generate Order ID
     const generatedOrderId = `#${Math.random()
       .toString(36)
       .substr(2, 5)
       .toUpperCase()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
     setOrderId(generatedOrderId);
 
-    // Create order object
     const newOrder = {
       id: Date.now(),
       orderId: generatedOrderId,
@@ -105,15 +103,11 @@ const PaymentDetails = () => {
     };
 
     setTimeout(() => {
-      // Get existing orders from localStorage
       const existingOrders = JSON.parse(
         localStorage.getItem("orderHistory") || "[]"
       );
 
-      // Add new order to the beginning of array
       const updatedOrders = [newOrder, ...existingOrders];
-
-      // Save to localStorage
       localStorage.setItem("orderHistory", JSON.stringify(updatedOrders));
 
       setIsProcessing(false);

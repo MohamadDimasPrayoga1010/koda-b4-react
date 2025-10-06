@@ -1,16 +1,47 @@
-# React + Vite
+# Aplikasi E-Commerce Kedai Kopi
+Aplikasi e-commerce kedai kopi modern dan lengkap yang dibangun dengan React, Tailwind CSS, dan React Router. Aplikasi ini menyediakan pengalaman berbelanja yang lengkap, mulai dari pencarian produk hingga manajemen pesanan.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Teknologi yang di gunakan
+- React 18 – Library antarmuka pengguna (UI)
+- React Router DOM – Routing sisi klien dengan URL berbasis slug
+- Tailwind CSS – Kerangka kerja CSS berbasis utilitas
+- Lucide React – Library ikon modern
+- LocalStorage API – Penyimpanan data secara lokal (data persistence)
+- Vite – Alat build dan development serverr
 
-Currently, two official plugins are available:
+## Hasil
+### Registrasi
+![regis](/public/images/regis.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Login
+![login](/public/images/logindekstop.png)
 
-## React Compiler
+### Forgot Password
+![forgotpassword](/public/images/forgotdekstop.png)
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Homepage
+![homepage](/public/images/homepage1.png)
+![homepage](/public/images/homepage2.png)
+![homepage](/public/images/homepage3.png)
+![homepage](/public/images/homepage4.png)
+![homepage](/public/images/homepage5.png)
+![homepage](/public/images/footerdekstop.png)
 
-## Expanding the ESLint configuration
+### Product
+![product](/public/images/productdekstop1.png)
+![product](/public/images/productdekstop2.png)
+![product](/public/images/productdekstop3.png)
+![homepage](/public/images/footerdekstop.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Detail Product 
+![detail](/public/images/buydekstop.png)
+![detail](/public/images/buydekstop2.png)
+![detail](/public/images/footerdekstop.png)
+
+### Payment
+![payment](/public/images/paymentdekstop.png)
+![payment](/public/images/paymentdekstop2.png)
+![payment](/public/images/footerdekstop.png)
+
+### History
+![history](/public/images/hystoriorder.png)

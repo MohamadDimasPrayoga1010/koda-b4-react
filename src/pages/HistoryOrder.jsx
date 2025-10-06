@@ -61,7 +61,7 @@ const HistoryOrder = () => {
   };
 
   return (
-    <main className="md:my-30 md:mx-16">
+    <main className="my-30 md:mx-16">
       <div className="flex gap-4 items-center my-9">
         <h1 className="text-5xl">History Order</h1>
         <span className="w-10 h-10 bg-[#E8E8E8] flex items-center justify-center rounded">
@@ -69,9 +69,9 @@ const HistoryOrder = () => {
         </span>
       </div>
 
-      <div className="flex gap-5">
+      <div className="flex gap-5 flex-col md:flex-row">
         <section className="w-[680px]">
-          <div className="flex justify-between gap-5 items-center mb-6">
+          <div className="flex justify-between gap-5  mb-6 flex-col md:flex-row md:items-center">
             <div className="flex justify-between gap-4 items-center bg-[#E8E8E899] p-3 rounded-md">
               <button
                 onClick={() => setFilterStatus("OnProgress")}
@@ -98,7 +98,7 @@ const HistoryOrder = () => {
                 Finish Order
               </button>
             </div>
-            
+
             <div className="bg-[#E8E8E899] p-3 rounded-md relative">
               <div className="flex gap-2 items-center p-2 cursor-pointer">
                 <CalendarDays className="w-5 h-5" />
@@ -111,13 +111,13 @@ const HistoryOrder = () => {
           {filteredOrders.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
               <p className="text-gray-500 mb-2">
-                {orders.length === 0 
-                  ? "No orders yet" 
+                {orders.length === 0
+                  ? "No orders yet"
                   : `No orders found in ${filterStatus}`}
               </p>
               <p className="text-sm text-gray-400 mb-4">
-                {orders.length === 0 
-                  ? "Start shopping to create your first order" 
+                {orders.length === 0
+                  ? "Start shopping to create your first order"
                   : "Try changing the filter"}
               </p>
               <Link to="/our-product">
@@ -133,11 +133,11 @@ const HistoryOrder = () => {
                   <img
                     src={order.items[0]?.image || "/images/coffeHazel4.jpg"}
                     alt="order-img"
-                    className="w-[111px] h-[105px] object-cover rounded-md"
+                    className="w-[111px] h-[105px] object-cover rounded-md hidden md:flex"
                   />
 
                   <div className="flex flex-col bg-[#E8E8E84D] p-4 rounded-md flex-1">
-                    <div className="flex flex-wrap justify-between items-center gap-6">
+                    <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
                       <div className="flex flex-col">
                         <div className="flex items-center gap-2 text-base text-[#4F5665]">
                           <img
@@ -162,7 +162,6 @@ const HistoryOrder = () => {
                         </span>
                       </div>
 
-          
                       <div className="flex flex-col">
                         <p className="flex items-center gap-2 text-base text-[#4F5665]">
                           <Repeat className="w-5 h-5" />
@@ -224,10 +223,13 @@ const HistoryOrder = () => {
         <section>
           <div className="w-[480px] p-4 border border-[#E8E8E8] rounded-lg">
             <img src={Message} alt="message-icon" className="my-4" />
-            <p className="text-lg text-[#4F5665] font-semibold mb-2">Send Us Message</p>
+            <p className="text-lg text-[#4F5665] font-semibold mb-2">
+              Send Us Message
+            </p>
             <p className="text-sm text-[#4F5665] mb-4">
-              If you're unable to find an answer or find your product quickly, please
-              describe your problem and tell us. We will give you a solution.
+              If you're unable to find an answer or find your product quickly,
+              please describe your problem and tell us. We will give you a
+              solution.
             </p>
             <Button className="w-full">Send Message</Button>
           </div>

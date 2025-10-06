@@ -77,7 +77,7 @@ const DetailProduct = () => {
     existingCart.push(newItem);
     localStorage.setItem("cart", JSON.stringify(existingCart));
 
-    alert(`${product.name} added to cart!`);
+    // alert(`${product.name} added to cart!`);
   };
 
   if (loading) {

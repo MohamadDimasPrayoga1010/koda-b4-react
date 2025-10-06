@@ -31,7 +31,7 @@ const OurProduct = () => {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 my-5 ">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 my-5 ">
           {ourProductCard.map((product) => (
             <CardPromo
               key={product.id}
