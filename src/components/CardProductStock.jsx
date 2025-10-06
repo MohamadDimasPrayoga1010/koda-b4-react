@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const CardProductStock = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+  const [searchParams] = useSearchParams();
+
+  const searchQuery = searchParams.get("search") || "";
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch("/data/stockProduct.json");
         const data = await response.json();
-        const flashSaleProducts = data.filter((product) => product.isFlashSale);
-        setProducts(flashSaleProducts);
+        setProducts(data);
         setLoading(false);
       } catch (error) {
         console.error("Error loading products:", error);
@@ -22,6 +24,19 @@ const CardProductStock = () => {
     };
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredProducts(products.filter((product) => product.isFlashSale));
+    } else {
+      const filtered = products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [searchQuery, products]);
 
   const handleAddToCart = (product) => {
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -79,8 +94,26 @@ const CardProductStock = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen px-6">
+      {searchQuery && (
+        <div className="mb-4 text-gray-600">
+          <p>
+            Showing {filteredProducts.length} results for "{searchQuery}"
+          </p>
+        </div>
+      )}
+
+      {filteredProducts.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">
+            {searchQuery
+              ? `No products found for "${searchQuery}"`
+              : "No products available"}
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <div
             key={product.id}
             className="relative shadow-md hover:shadow-lg transition-shadow overflow-visible min-h-[520px] pb-6"
