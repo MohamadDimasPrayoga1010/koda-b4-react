@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CoffeImg from "/images/ourproduct.png";
 import { MoveLeft, MoveRight, Search } from "lucide-react";
 import { ourProductCard } from "../../public/data/products";
 import CardPromo from "../components/CardPromo";
 import Button from "../components/Button";
-import CardProductStock from "../components/CardProductStock";
 import { useSearchParams } from "react-router-dom";
+import CardProduct from "../components/CardProduct";
 
 const OurProduct = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState(
     searchParams.get("search") || ""
   );
+   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
 
-  // Handle search submit
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim()) {
@@ -27,12 +28,49 @@ const OurProduct = () => {
     setSearchInput(e.target.value);
   };
 
- 
   const handleResetFilter = () => {
     setSearchInput("");
     setSearchParams({});
   };
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/data/stockProduct.json");
+        const data = await response.json();
+        setProducts(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading products:", error);
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="col-span-full flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+    const totalPages = Math.ceil(products.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentProducts = products.slice(
+      startIndex,
+      startIndex + itemsPerPage
+    );
+
+    const handlePageChange = (page) => {
+      setCurrentPage(page);
+    };
   return (
     <main>
       <section className="relative mt-15 md:mt-0">
@@ -75,7 +113,7 @@ const OurProduct = () => {
         <h3 className="text-5xl">
           Our <span className="text-[#8E6447]">Product</span>
         </h3>
-        <div className="flex my-5">
+        <div className="flex gap-5 my-5">
           <div className="w-[383px] max-h-[900px] bg-black rounded p-5 hidden md:flex flex-col">
             <div className="text-white">
               <div className="flex justify-between mb-3">
@@ -246,25 +284,55 @@ const OurProduct = () => {
               </div>
             </div>
           </div>
-          <div className="w-full">
-            <CardProductStock />
+          <div className=" w-full gap-5 grid grid-cols-2">
+            {currentProducts.map((product) => (
+              <CardProduct key={product.id} product={product} />
+            ))}
           </div>
         </div>
-        <div className="flex gap-3 justify-center items-center">
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF8906] text-white font-medium">
-            1
+
+        <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
+          {/* Prev */}
+          <button
+            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-medium transition ${
+              currentPage === 1
+                ? "bg-[#E8E8E8] text-[#A0A3BD] cursor-not-allowed opacity-50"
+                : "bg-[#FF8906] text-white hover:bg-[#e67a00]"
+            }`}
+          >
+            <MoveLeft className="w-4 h-4" />
           </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8E8E8] text-[##A0A3BD] font-medium">
-            2
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8E8E8] text-[##A0A3BD] font-medium">
-            3
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8E8E8] text-[##A0A3BD] font-medium">
-            4
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF8906] text-white font-medium">
-            <MoveRight />
+
+          {/* Page Numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-semibold transition ${
+                currentPage === page
+                  ? "bg-[#FF8906] text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-orange-50 hover:text-[#FF8906]"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {/* Next */}
+          <button
+            onClick={() =>
+              handlePageChange(Math.min(currentPage + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-medium transition ${
+              currentPage === totalPages
+                ? "bg-[#E8E8E8] text-[#A0A3BD] cursor-not-allowed opacity-50"
+                : "bg-[#FF8906] text-white hover:bg-[#e67a00]"
+            }`}
+          >
+            <MoveRight className="w-4 h-4" />
           </button>
         </div>
       </section>

@@ -24,7 +24,7 @@ const InputField = ({
         <input
           type={type === "password" && showPassword ? "text" : type}
           placeholder={placeholder}
-          {...register(name)}
+          {...(register ? register(name) : {})} 
           {...rest}
           className={`w-full pl-10 pr-12 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition text-sm bg-white ${
             error

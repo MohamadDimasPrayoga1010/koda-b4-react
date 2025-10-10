@@ -12,8 +12,7 @@ import OrderDetail from "./pages/OrderDetail";
 import Profile from "./pages/Profile";
 import MainLayoutAdmin from "./layout/MainLayoutAdmin";
 import Dashboard from "./pages/Dashboard";
-import ProductList from "./pages/ProductList";
-
+import { AuthProvider } from "./context/AuthContext"; 
 
 const router = createBrowserRouter([
   {
@@ -42,28 +41,24 @@ const router = createBrowserRouter([
       },
       {
         path: "/order-detail/:id",
-        element: <OrderDetail />
+        element: <OrderDetail />,
       },
       {
         path: "profile",
-        element: <Profile />
+        element: <Profile />,
       },
-      {
-        path: "product-list",
-        element: <ProductList />
-      }
     ],
   },
-  
+
   {
     path: "/",
     element: <MainLayoutAdmin />,
     children: [
       {
         path: "/dashboard",
-        element: <Dashboard />
-      }
-    ]
+        element: <Dashboard />,
+      },
+    ],
   },
   {
     path: "/register",
@@ -80,7 +75,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;

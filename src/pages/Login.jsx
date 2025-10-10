@@ -3,16 +3,16 @@ import InputField from "../components/InputField";
 import Button from "../components/Button";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginSchema } from "../utils/loginSchema";
-import { loginUser } from "../utils/localStorange";
 import { Mail } from "lucide-react";
 import PasswordIcon from "/images/Password.svg";
 import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import LoginImg from "/images/LoginImg.png";
 import { X, Check } from "lucide-react";
+import AuthContext from "../context/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +21,8 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { login } = useContext(AuthContext); // pakai context
 
   useEffect(() => {
     if (location.state?.message) {
@@ -44,7 +46,8 @@ const Login = () => {
     setSuccessMessage("");
 
     try {
-      const result = loginUser(data.email, data.password);
+      // pakai context login
+      const result = login(data.email, data.password);
 
       if (result.success) {
         console.log("Logged in user:", result.user);
@@ -54,15 +57,9 @@ const Login = () => {
         }, 1500);
       } else {
         if (result.message.includes("Email")) {
-          setError("email", {
-            type: "manual",
-            message: result.message,
-          });
+          setError("email", { type: "manual", message: result.message });
         } else if (result.message.includes("password")) {
-          setError("password", {
-            type: "manual",
-            message: result.message,
-          });
+          setError("password", { type: "manual", message: result.message });
         } else {
           setErrorMessage(result.message);
         }
@@ -88,7 +85,7 @@ const Login = () => {
         <div className="bg-white w-full max-w-[780px] min-h-[821px] my-10 mx-10 md:mt-60">
           {successMessage && (
             <div className="mb-4 p-4 rounded-lg text-green-700 bg-green-50 border border-green-200 flex items-start gap-3">
-              <Check className="text-green-900"/>
+              <Check className="text-green-900" />
               <div>
                 <p className="font-medium">{successMessage}</p>
                 {isLoading && (

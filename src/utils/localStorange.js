@@ -1,11 +1,11 @@
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
   USER: "user",
   USERS: "users",
   TOKEN: "token",
   IS_LOGGED_IN: "isLoggedIn",
 };
 
-const getFromLocalStorage = (key) => {
+export const getFromLocalStorage = (key) => {
   try {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : null;
@@ -15,7 +15,7 @@ const getFromLocalStorage = (key) => {
   }
 };
 
-const setToLocalStorage = (key, value) => {
+export const setToLocalStorage = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
     return true;
@@ -25,7 +25,7 @@ const setToLocalStorage = (key, value) => {
   }
 };
 
-const checkUserExists = (email) => {
+export const checkUserExists = (email) => {
   const users = getFromLocalStorage(STORAGE_KEYS.USERS) || [];
   return users.some((user) => user.email === email);
 };
@@ -51,7 +51,7 @@ export const saveUser = (userData) => {
   return { success: true, message: "Registration successful", user: newUser };
 };
 
-const saveCurrentUser = (user) => {
+export const saveCurrentUser = (user) => {
   setToLocalStorage(STORAGE_KEYS.USER, user);
   setToLocalStorage(STORAGE_KEYS.IS_LOGGED_IN, true);
 };

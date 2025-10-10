@@ -3,15 +3,15 @@ import CoffeLogo from "/images/CoffeLogo.png";
 import InputField from "../components/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { schema } from "../utils/schema";
-import { saveUser } from "../utils/localStorange";
 import { Mail, User } from "lucide-react";
 import PasswordIcon from "/images/Password.svg";
 import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import Button from "../components/Button";
+import AuthContext  from "../context/AuthContext"; 
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +20,8 @@ const Register = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [failedMessage, setFailedMessage] = useState("");
   const navigate = useNavigate();
+
+  const { register: registerUser } = useContext(AuthContext); 
 
   const {
     register,
@@ -37,7 +39,7 @@ const Register = () => {
     setFailedMessage("");
 
     try {
-      const result = saveUser({
+      const result = registerUser({
         fullName: data.fullName,
         email: data.email,
         password: data.password,
@@ -46,9 +48,11 @@ const Register = () => {
       if (result.success) {
         setSuccessMessage("Registration successful! Please login");
         reset();
-
         console.log("Registered user:", result.user);
-        navigate("/login");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+       
       } else {
         setError("email", {
           type: "manual",

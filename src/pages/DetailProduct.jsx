@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Star, ThumbsUp, MoveLeft } from "lucide-react";
+import { ShoppingCart, Star, ThumbsUp, MoveLeft, MoveRight } from "lucide-react";
 import CardProductStock from "../components/CardProductStock";
+import CardProduct from "../components/CardProduct";
 
 const DetailProduct = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-
-  const [product, setProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("Regular");
   const [selectedTemp, setSelectedTemp] = useState("Ice");
   const [mainImage, setMainImage] = useState(0);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await fetch("/data/stockProduct.json");
         const data = await response.json();
+        setProducts(data)
         const found = data.find((item) => item.slug === slug);
-        setProduct(found || null);
+        setSelectedProduct(found || null);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -31,18 +34,18 @@ const DetailProduct = () => {
   }, [slug]);
 
   const handleBuyNow = () => {
-    if (!product) return;
+    if (!selectedProduct) return;
 
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
     const newItem = {
       id: Date.now(),
-      productId: product.id,
-      name: product.name,
-      image: product.image,
-      price: product.price,
-      originalPrice: product.originalPrice,
-      isFlashSale: product.isFlashSale,
+      productId: selectedProduct.id,
+      name: selectedProduct.name,
+      image: selectedProduct.image,
+      price: selectedProduct.price,
+      originalPrice: selectedProduct.originalPrice,
+      isFlashSale: selectedProduct.isFlashSale,
       quantity,
       size: selectedSize,
       temperature: selectedTemp,
@@ -56,18 +59,18 @@ const DetailProduct = () => {
   };
 
   const handleAddToCart = () => {
-    if (!product) return;
+    if (!selectedProduct) return;
 
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
     const newItem = {
       id: Date.now(),
-      productId: product.id,
-      name: product.name,
-      image: product.image,
-      price: product.price,
-      originalPrice: product.originalPrice,
-      isFlashSale: product.isFlashSale,
+      productId: selectedProduct.id,
+      name: selectedProduct.name,
+      image: selectedProduct.image,
+      price: selectedProduct.price,
+      originalPrice: selectedProduct.originalPrice,
+      isFlashSale: selectedProduct.isFlashSale,
       quantity,
       size: selectedSize,
       temperature: selectedTemp,
@@ -91,7 +94,7 @@ const DetailProduct = () => {
     );
   }
 
-  if (!product) {
+  if (!selectedProduct) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -109,10 +112,20 @@ const DetailProduct = () => {
     );
   }
 
-  const productImages = product.images || [
-    product.image,
-    product.image,
-    product.image,
+
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+
+  };
+
+  const productImages = selectedProduct.images || [
+    selectedProduct.image,
+    selectedProduct.image,
+    selectedProduct.image,
   ];
 
   return (
@@ -128,14 +141,14 @@ const DetailProduct = () => {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-6 shadow-lg">
         <div>
           <div className="relative mb-4">
-            {product.isFlashSale && (
+            {selectedProduct.isFlashSale && (
               <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded z-10">
                 FLASHSALE!
               </div>
             )}
             <img
               src={productImages[mainImage]}
-              alt={product.name}
+              alt={selectedProduct.name}
               className="w-full h-96 object-cover rounded-lg"
             />
           </div>
@@ -144,7 +157,7 @@ const DetailProduct = () => {
               <img
                 key={idx}
                 src={img}
-                alt={`${product.name} ${idx + 1}`}
+                alt={`${selectedProduct.name} ${idx + 1}`}
                 onClick={() => setMainImage(idx)}
                 className={`w-full h-24 object-cover rounded cursor-pointer transition ${
                   mainImage === idx
@@ -158,17 +171,17 @@ const DetailProduct = () => {
 
         <div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
-            {product.name}
+            {selectedProduct.name}
           </h1>
 
           <div className="flex items-center gap-3 mb-4">
-            {product.originalPrice && (
+            {selectedProduct.originalPrice && (
               <p className="text-lg text-red-500 line-through">
-                IDR {product.originalPrice.toLocaleString("id-ID")}
+                IDR {selectedProduct.originalPrice.toLocaleString("id-ID")}
               </p>
             )}
             <p className="text-2xl font-bold text-[#FF8906]">
-              IDR {product.price.toLocaleString("id-ID")}
+              IDR {selectedProduct.price.toLocaleString("id-ID")}
             </p>
           </div>
 
@@ -178,14 +191,14 @@ const DetailProduct = () => {
                 key={i}
                 size={18}
                 className={`${
-                  i < Math.floor(product.rating)
+                  i < Math.floor(selectedProduct.rating)
                     ? "text-yellow-400 fill-yellow-400"
                     : "text-gray-300"
                 }`}
               />
             ))}
             <span className="text-lg font-semibold">
-              {product.rating.toFixed(1)}
+              {selectedProduct.rating.toFixed(1)}
             </span>
           </div>
 
@@ -197,7 +210,7 @@ const DetailProduct = () => {
           </div>
 
           <p className="text-gray-600 mb-6 leading-relaxed">
-            {product.description}
+            {selectedProduct.description}
           </p>
 
           <div className="flex items-center gap-4 mb-6">
@@ -276,7 +289,56 @@ const DetailProduct = () => {
         <h1 className="text-4xl md:text-5xl font-bold mb-8">
           Recommendation <span className="text-[#8E6447]">For You</span>
         </h1>
-        <CardProductStock />
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
+          {currentProducts.map((product) => (
+            <CardProduct key={product.id} product={product} />
+          ))}
+        </div>
+        {/* Pagination */}
+        <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
+          {/* Prev */}
+          <button
+            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-medium transition ${
+              currentPage === 1
+                ? "bg-[#E8E8E8] text-[#A0A3BD] cursor-not-allowed opacity-50"
+                : "bg-[#FF8906] text-white hover:bg-[#e67a00]"
+            }`}
+          >
+           <MoveLeft className="w-4 h-4" />
+          </button>
+
+          {/* Page Numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-semibold transition ${
+                currentPage === page
+                  ? "bg-[#FF8906] text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-orange-50 hover:text-[#FF8906]"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {/* Next */}
+          <button
+            onClick={() =>
+              handlePageChange(Math.min(currentPage + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className={`w-10 h-10 flex items-center justify-center rounded-full font-medium transition ${
+              currentPage === totalPages
+                ? "bg-[#E8E8E8] text-[#A0A3BD] cursor-not-allowed opacity-50"
+                : "bg-[#FF8906] text-white hover:bg-[#e67a00]"
+            }`}
+          >
+           <MoveRight className="w-4 h-4" />
+          </button>
+        </div>
       </section>
     </main>
   );

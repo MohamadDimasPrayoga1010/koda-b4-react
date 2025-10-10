@@ -1,16 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../components/Button";
 import CoffeImg from "/images/Coffe.png";
 import BaristaImg from "/images/people.png";
 import CeklisImg from "/images/ceklis.png";
-import { products } from "../../public/data/products";
+// import { products } from "../../public/data/products";
 import CardProduct from "../components/CardProduct";
-import MapsImg from "/images/maps.png"
-import Testing from "/images/profile.png"
-import star from "/images/star.png"
+import MapsImg from "/images/maps.png";
+import Testing from "/images/profile.png";
+import star from "/images/star.png";
 import ChatWidget from "../components/ChatWidget";
 
+
 const HomePage = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/data/stockProduct.json");
+        const data = await response.json();
+        setProducts(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading products:", error);
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="col-span-full flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <main>
       <section className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
@@ -137,16 +165,9 @@ const HomePage = () => {
             yours too!
           </p>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 mx-2 my-5 gap-6 md:mx-20 md:my-6">
-          {products.map((product) => (
-            <CardProduct
-              key={product.id}
-              image={product.image}
-              title={product.title}
-              description={product.description}
-              price={product.price}
-                // onAddToCart={() => handleAddToCart(product)}
-            />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mx-8">
+          {products.slice(0, 4).map((product) => (
+            <CardProduct product={product} />
           ))}
         </div>
         ;
