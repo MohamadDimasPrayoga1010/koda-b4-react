@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Viezh Robert",
+    "role": "Manager Coffee Shop",
+    "image": "/images/testiImg/profile.png",
+    "text": "Wow... I am very happy to spend my whole day here. The Wi-fi is good, and the coffee and meals tho. I like it here!! Very recommended!",
+    "rating": 5
+  },
+  {
+    "id": 2,
+    "name": "Fiki",
+    "role": "Barista",
+    "image": "/images/testiImg/profile.png",
+    "text": "Wow... I am very happy to spend my whole day here. The Wi-fi is good, and the coffee and meals tho. I like it here!! Very recommended!",
+    "rating": 4
+  },
+  {
+    "id": 3,
+    "name": "Yoga",
+    "role": "Customer",
+    "image": "/images/testiImg/profile.png",
+    "text": "Wow... I am very happy to spend my whole day here. The Wi-fi is good, and the coffee and meals tho. I like it here!! Very recommended!",
+    "rating": 5
+  }
+]
