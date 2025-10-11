@@ -11,10 +11,8 @@ const ChatWidget = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {/* Chat Window */}
       {isOpen && (
         <div className="mb-4 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden border-t-4 border-t-[#FF8906]">
-          {/* Header */}
           <div className=" p-4 flex items-center justify-between">
             <div>
               <h3 className="text-gray-800 font-bold text-lg">Maria Angela</h3>
@@ -27,10 +25,7 @@ const ChatWidget = () => {
               <X className="w-5 h-5" />
             </button>
           </div>
-
-          {/* Messages Area */}
           <div className="h-72 overflow-y-auto p-4 bg-gray-50">
-            {/* Admin Message with Avatar */}
             <div className="mb-4 flex items-start gap-2">
               <div className="w-8 h-8 rounded-full flex-shrink-0"><img src={ChatImge} alt="profile" /></div>
               <div className="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[75%]">
@@ -39,8 +34,6 @@ const ChatWidget = () => {
                 </p>
               </div>
             </div>
-
-            {/* User Message */}
             <div className="mb-4 flex justify-end">
               <div className="bg-gray-200 rounded-lg rounded-tr-none p-3 max-w-[75%]">
                 <p className="text-sm text-gray-700">
@@ -64,8 +57,6 @@ const ChatWidget = () => {
           </div>
         </div>
       )}
-
-      {/* Floating Button */}
       <button
         onClick={toggleChat}
         className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center group"
