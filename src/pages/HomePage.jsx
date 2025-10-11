@@ -3,13 +3,12 @@ import Button from "../components/Button";
 import CoffeImg from "/images/Coffe.png";
 import BaristaImg from "/images/people.png";
 import CeklisImg from "/images/ceklis.png";
-// import { products } from "../../public/data/products";
 import CardProduct from "../components/CardProduct";
 import MapsImg from "/images/maps.png";
-import Testing from "/images/profile.png";
-import star from "/images/star.png";
-import ChatWidget from "../components/ChatWidget";
 
+import ChatWidget from "../components/ChatWidget";
+import { MoveLeft, MoveRight } from "lucide-react";
+import Testimonial from "../components/Testimonial";
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
@@ -187,37 +186,7 @@ const HomePage = () => {
         </div>
         <img src={MapsImg} alt="maps-image" className="w-full" />
       </section>
-      <section className=" bg-gradient-to-b from-[#777C82] to-[#0B0909] w-full min-h-[583px]">
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="flex flex-col md:flex-row mx-3 md:mx-16 gap-6">
-            <div>
-              <img src={Testing} alt="profile-img" className="w-full" />
-            </div>
-            <div className="flex flex-col gap-6">
-              <h1 className="text-lg font-normal text-white">Testimonial</h1>
-              <h3 className="text-2xl md:text-5xl border-l font-medium border-[#FF8906] px-4 text-white">
-                Viezh Robert
-              </h3>
-              <p className="text-base font-normal text-[#FF8906]">
-                Manager Coffe Shop
-              </p>
-              <p className="max-w-[488px] text-base font-normal text-white">
-                “Wow... I am very happy to spend my whole day here. the Wi-fi is
-                good, and the coffee and meals tho. I like it here!! Very
-                recommended!
-              </p>
-              <div className="flex gap-9">
-                <img src={star} alt="icon-start" className="w-5 h-5" />
-                <img src={star} alt="icon-start" className="w-5 h-5" />
-                <img src={star} alt="icon-start" className="w-5 h-5" />
-                <img src={star} alt="icon-start" className="w-5 h-5" />
-                <img src={star} alt="icon-start" className="w-5 h-5" />
-                <p className="text-white">5.0</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Testimonial />
       <ChatWidget />
     </main>
   );
