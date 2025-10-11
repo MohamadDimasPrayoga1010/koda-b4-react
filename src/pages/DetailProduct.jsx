@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Star, ThumbsUp, MoveLeft, MoveRight } from "lucide-react";
-import CardProductStock from "../components/CardProductStock";
+import {
+  ShoppingCart,
+  Star,
+  ThumbsUp,
+} from "lucide-react";
 import CardProduct from "../components/CardProduct";
+import Pagination from "../components/Pagination";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/reducer/coffeOrder";
 
 const DetailProduct = () => {
   const { slug } = useParams();
@@ -14,14 +20,14 @@ const DetailProduct = () => {
   const [selectedSize, setSelectedSize] = useState("Regular");
   const [selectedTemp, setSelectedTemp] = useState("Ice");
   const [mainImage, setMainImage] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await fetch("/data/stockProduct.json");
         const data = await response.json();
-        setProducts(data)
+        setProducts(data);
         const found = data.find((item) => item.slug === slug);
         setSelectedProduct(found || null);
         setLoading(false);
@@ -36,51 +42,37 @@ const DetailProduct = () => {
   const handleBuyNow = () => {
     if (!selectedProduct) return;
 
-    const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const newItem = {
-      id: Date.now(),
+    const item = {
       productId: selectedProduct.id,
       name: selectedProduct.name,
       image: selectedProduct.image,
       price: selectedProduct.price,
-      originalPrice: selectedProduct.originalPrice,
-      isFlashSale: selectedProduct.isFlashSale,
       quantity,
       size: selectedSize,
       temperature: selectedTemp,
       delivery: "Dine In",
+      cartItemId: Date.now() + Math.random().toString(36).substr(2, 5),
     };
 
-    existingCart.push(newItem);
-    localStorage.setItem("cart", JSON.stringify(existingCart));
-
+    dispatch(addToCart(item)); 
     navigate("/payment-details");
   };
 
   const handleAddToCart = () => {
     if (!selectedProduct) return;
 
-    const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const newItem = {
-      id: Date.now(),
+    const item = {
       productId: selectedProduct.id,
       name: selectedProduct.name,
       image: selectedProduct.image,
       price: selectedProduct.price,
-      originalPrice: selectedProduct.originalPrice,
-      isFlashSale: selectedProduct.isFlashSale,
       quantity,
       size: selectedSize,
       temperature: selectedTemp,
       delivery: "Dine In",
     };
 
-    existingCart.push(newItem);
-    localStorage.setItem("cart", JSON.stringify(existingCart));
-
-    // alert(`${product.name} added to cart!`);
+    dispatch(addToCart(item));
   };
 
   if (loading) {
@@ -111,17 +103,6 @@ const DetailProduct = () => {
       </div>
     );
   }
-
-
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-
-  };
-
   const productImages = selectedProduct.images || [
     selectedProduct.image,
     selectedProduct.image,
@@ -129,15 +110,7 @@ const DetailProduct = () => {
   ];
 
   return (
-    <main className="bg-gray-50 min-h-screen py-8 px-6 md:px-16">
-      <Link
-        to="/our-product"
-        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
-      >
-        <MoveLeft size={20} />
-        <span>Back to Products</span>
-      </Link>
-
+    <main className="bg-gray-50 min-h-screen py-8 px-6 md:px-16 md:my-20">
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-6 shadow-lg">
         <div>
           <div className="relative mb-4">
@@ -289,56 +262,13 @@ const DetailProduct = () => {
         <h1 className="text-4xl md:text-5xl font-bold mb-8">
           Recommendation <span className="text-[#8E6447]">For You</span>
         </h1>
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
-          {currentProducts.map((product) => (
+        <Pagination
+          data={products}
+          itemsPerPage={4}
+          renderItem={(product) => (
             <CardProduct key={product.id} product={product} />
-          ))}
-        </div>
-        {/* Pagination */}
-        <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
-          {/* Prev */}
-          <button
-            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-            disabled={currentPage === 1}
-            className={`w-10 h-10 flex items-center justify-center rounded-full font-medium transition ${
-              currentPage === 1
-                ? "bg-[#E8E8E8] text-[#A0A3BD] cursor-not-allowed opacity-50"
-                : "bg-[#FF8906] text-white hover:bg-[#e67a00]"
-            }`}
-          >
-           <MoveLeft className="w-4 h-4" />
-          </button>
-
-          {/* Page Numbers */}
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`w-10 h-10 flex items-center justify-center rounded-full font-semibold transition ${
-                currentPage === page
-                  ? "bg-[#FF8906] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-orange-50 hover:text-[#FF8906]"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-
-          {/* Next */}
-          <button
-            onClick={() =>
-              handlePageChange(Math.min(currentPage + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className={`w-10 h-10 flex items-center justify-center rounded-full font-medium transition ${
-              currentPage === totalPages
-                ? "bg-[#E8E8E8] text-[#A0A3BD] cursor-not-allowed opacity-50"
-                : "bg-[#FF8906] text-white hover:bg-[#e67a00]"
-            }`}
-          >
-           <MoveRight className="w-4 h-4" />
-          </button>
-        </div>
+          )}
+        />
       </section>
     </main>
   );
