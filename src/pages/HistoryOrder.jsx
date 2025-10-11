@@ -1,44 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { CalendarDays, ChevronDown, Repeat, MoveRight } from "lucide-react";
-import Glass from "/images/glass.png";
-import RepeatImg from "/images/repeat.png";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { CalendarDays, ChevronDown } from "lucide-react";
 import Message from "/images/message.png";
 import Button from "../components/Button";
+import OrderCard from "../components/OrderCard";
+import Pagination from "../components/Pagination";
 
 const HistoryOrder = () => {
-  const [orders, setOrders] = useState([]);
+  const orders = useSelector((state) => state.coffeOrder.orderHistory);
   const [filterStatus, setFilterStatus] = useState("OnProgress");
   const [selectedMonth, setSelectedMonth] = useState("all");
 
-  useEffect(() => {
-    const orderHistory = JSON.parse(
-      localStorage.getItem("orderHistory") || "[]"
-    );
-    setOrders(orderHistory);
-  }, []);
-
-
   const getAvailableMonths = () => {
-    const months = orders.map(order => {
+    const months = orders.map((order) => {
       const date = new Date(order.createdAt);
       return {
         value: `${date.getMonth()}-${date.getFullYear()}`,
-        label: date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+        label: date.toLocaleDateString("id-ID", {
+          month: "long",
+          year: "numeric",
+        }),
       };
     });
-
-    const uniqueMonths = [...new Map(months.map(item => [item.value, item])).values()];
-    return uniqueMonths;
+    return [...new Map(months.map((item) => [item.value, item])).values()];
   };
-
 
   const filteredOrders = orders.filter((order) => {
     let statusMatch = true;
-    if (filterStatus === "OnProgress") statusMatch = order.status === "On Progress";
-    if (filterStatus === "SendingGoods") statusMatch = order.status === "Sending Goods";
+    if (filterStatus === "OnProgress")
+      statusMatch = order.status === "On Progress";
+    if (filterStatus === "SendingGoods")
+      statusMatch = order.status === "Sending Goods";
     if (filterStatus === "FinishOrder") statusMatch = order.status === "Finish";
-
 
     let monthMatch = true;
     if (selectedMonth !== "all") {
@@ -50,57 +44,53 @@ const HistoryOrder = () => {
     return statusMatch && monthMatch;
   });
 
- 
   const getCurrentMonth = () => {
     if (selectedMonth === "all") {
-      return new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+      return new Date().toLocaleDateString("id-ID", {
+        month: "long",
+        year: "numeric",
+      });
     }
-    const availableMonths = getAvailableMonths();
-    const selected = availableMonths.find(m => m.value === selectedMonth);
+    const selected = getAvailableMonths().find(
+      (m) => m.value === selectedMonth
+    );
     return selected ? selected.label : "All Months";
   };
 
   return (
-    <main className="my-30 md:mx-16">
-      <div className="flex gap-4 items-center my-9">
-        <h1 className="text-5xl">History Order</h1>
-        <span className="w-10 h-10 bg-[#E8E8E8] flex items-center justify-center rounded">
+    <main className="my-10 md:my-20 px-4 md:px-16">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 my-9">
+        <h1 className="text-3xl md:text-5xl font-semibold text-center sm:text-left">
+          History Order
+        </h1>
+        <span className="mt-3 sm:mt-0 w-10 h-10 bg-[#E8E8E8] flex items-center justify-center rounded mx-auto sm:mx-0">
           {filteredOrders.length}
         </span>
       </div>
 
-      <div className="flex gap-5 flex-col md:flex-row">
-        <section className="w-[680px]">
-          <div className="flex justify-between gap-5  mb-6 flex-col md:flex-row md:items-center">
-            <div className="flex justify-between gap-4 items-center bg-[#E8E8E899] p-3 rounded-md">
-              <button
-                onClick={() => setFilterStatus("OnProgress")}
-                className={`${
-                  filterStatus === "OnProgress" ? "bg-white" : ""
-                } p-2 px-4 text-sm font-normal rounded-md hover:bg-white/50 transition`}
-              >
-                On Progress
-              </button>
-              <button
-                onClick={() => setFilterStatus("SendingGoods")}
-                className={`${
-                  filterStatus === "SendingGoods" ? "bg-white" : ""
-                } p-2 px-4 text-sm font-normal rounded-md hover:bg-white/50 transition`}
-              >
-                Sending Goods
-              </button>
-              <button
-                onClick={() => setFilterStatus("FinishOrder")}
-                className={`${
-                  filterStatus === "FinishOrder" ? "bg-white" : ""
-                } p-2 px-4 text-sm font-normal rounded-md hover:bg-white/50 transition`}
-              >
-                Finish Order
-              </button>
+      <div className="flex flex-col lg:flex-row gap-8">
+        <section className="flex-1 w-full lg:max-w-[700px]">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-wrap justify-center md:justify-start gap-2 bg-[#E8E8E899] p-2 rounded-md">
+              {[
+                { key: "OnProgress", label: "On Progress" },
+                { key: "SendingGoods", label: "Sending Goods" },
+                { key: "FinishOrder", label: "Finish Order" },
+              ].map((btn) => (
+                <button
+                  key={btn.key}
+                  onClick={() => setFilterStatus(btn.key)}
+                  className={`${
+                    filterStatus === btn.key ? "bg-white" : ""
+                  } p-2 px-4 text-sm font-normal rounded-md hover:bg-white/50 transition`}
+                >
+                  {btn.label}
+                </button>
+              ))}
             </div>
 
-            <div className="bg-[#E8E8E899] p-3 rounded-md relative">
-              <div className="flex gap-2 items-center p-2 cursor-pointer">
+            <div className="bg-[#E8E8E899] p-2 md:p-3 rounded-md">
+              <div className="flex gap-2 items-center p-2 cursor-pointer justify-center md:justify-start">
                 <CalendarDays className="w-5 h-5" />
                 <span className="text-sm">{getCurrentMonth()}</span>
                 <ChevronDown className="w-4 h-4" />
@@ -127,102 +117,22 @@ const HistoryOrder = () => {
               </Link>
             </div>
           ) : (
-            <>
-              {filteredOrders.map((order) => (
-                <div key={order.id} className="my-4 flex gap-3">
-                  <img
-                    src={order.items[0]?.image || "/images/coffeHazel4.jpg"}
-                    alt="order-img"
-                    className="w-[111px] h-[105px] object-cover rounded-md hidden md:flex"
-                  />
-
-                  <div className="flex flex-col bg-[#E8E8E84D] p-4 rounded-md flex-1">
-                    <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2 text-base text-[#4F5665]">
-                          <img
-                            src={Glass}
-                            alt="glass-icon"
-                            className="w-5 h-5"
-                          />
-                          <span>No. Order</span>
-                        </div>
-                        <span className="text-base font-bold">
-                          {order.orderId}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col">
-                        <p className="flex items-center gap-2 text-base text-[#4F5665]">
-                          <CalendarDays className="w-5 h-5" />
-                          <span>Date</span>
-                        </p>
-                        <span className="text-base font-bold">
-                          {order.date}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col">
-                        <p className="flex items-center gap-2 text-base text-[#4F5665]">
-                          <Repeat className="w-5 h-5" />
-                          <span>Total</span>
-                        </p>
-                        <span className="text-base font-bold">
-                          IDR {Math.round(order.total).toLocaleString("id-ID")}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col items-start">
-                        <div className="flex items-center gap-2 text-base text-[#4F5665]">
-                          <img
-                            src={RepeatImg}
-                            alt="repeat-icon"
-                            className="w-5 h-5"
-                          />
-                          <span>Status</span>
-                        </div>
-                        <button
-                          className={`py-2 px-3 rounded-2xl ${order.statusColor} font-semibold`}
-                        >
-                          {order.status}
-                        </button>
-                      </div>
-                    </div>
-
-                    <Link
-                      to={`/order-detail/${order.id}`}
-                      className="text-[#FF8906] text-sm font-semibold mt-3 hover:underline"
-                    >
-                      View Order Detail
-                    </Link>
-                  </div>
-                </div>
-              ))}
-
-              <div className="flex gap-3 justify-center items-center mt-8">
-                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF8906] text-white font-medium hover:bg-orange-600 transition">
-                  1
-                </button>
-                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8E8E8] text-gray-600 font-medium hover:bg-gray-300 transition">
-                  2
-                </button>
-                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8E8E8] text-gray-600 font-medium hover:bg-gray-300 transition">
-                  3
-                </button>
-                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8E8E8] text-gray-600 font-medium hover:bg-gray-300 transition">
-                  4
-                </button>
-                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF8906] text-white font-medium hover:bg-orange-600 transition">
-                  <MoveRight />
-                </button>
-              </div>
-            </>
+            <Pagination
+              data={filteredOrders}
+              itemsPerPage={4}
+              renderItem={(order) => <OrderCard key={order.id} order={order} />}
+              gridCols="grid-cols-1"
+            />
           )}
         </section>
 
-        <section>
-          <div className="w-[480px] p-4 border border-[#E8E8E8] rounded-lg">
-            <img src={Message} alt="message-icon" className="my-4" />
+        <section className="w-full lg:w-[480px]">
+          <div className="p-4 border border-[#E8E8E8] rounded-lg text-center lg:text-left">
+            <img
+              src={Message}
+              alt="message-icon"
+              className="my-4 mx-auto lg:mx-0 w-14 md:w-16"
+            />
             <p className="text-lg text-[#4F5665] font-semibold mb-2">
               Send Us Message
             </p>
@@ -240,5 +150,3 @@ const HistoryOrder = () => {
 };
 
 export default HistoryOrder;
-
-
