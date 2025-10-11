@@ -11,8 +11,8 @@ import PasswordIcon from "/images/Password.svg";
 import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import LoginImg from "/images/LoginImg.png";
-import { X, Check } from "lucide-react";
 import AuthContext from "../context/AuthContext";
+import AuthAlert from "../components/AuthAlert";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +22,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { login } = useContext(AuthContext); // pakai context
+  const { login } = useContext(AuthContext);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -46,7 +46,6 @@ const Login = () => {
     setSuccessMessage("");
 
     try {
-      // pakai context login
       const result = login(data.email, data.password);
 
       if (result.success) {
@@ -83,27 +82,8 @@ const Login = () => {
       <div className="flex">
         <img src={LoginImg} alt="coffe-img" className="hidden md:block" />
         <div className="bg-white w-full max-w-[780px] min-h-[821px] my-10 mx-10 md:mt-60">
-          {successMessage && (
-            <div className="mb-4 p-4 rounded-lg text-green-700 bg-green-50 border border-green-200 flex items-start gap-3">
-              <Check className="text-green-900" />
-              <div>
-                <p className="font-medium">{successMessage}</p>
-                {isLoading && (
-                  <p className="text-sm text-green-600 mt-1">
-                    Redirecting to dashboard...
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-          {errorMessage && (
-            <div className="mb-4 p-4 rounded-lg text-red-700 bg-red-50 border border-red-200 flex items-start gap-3">
-              <X className="text-red-900" />
-              <div>
-                <p className="font-medium">{errorMessage}</p>
-              </div>
-            </div>
-          )}
+          <AuthAlert type="success" message={successMessage}/>
+          <AuthAlert type="error" message={errorMessage}/>
 
           <div>
             <img src={CoffeLogo} alt="coffe-img" />
