@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "image": "/images/iconWomen.png",
+    "title": "HAPPY MOTHER'S DAY!",
+    "description": "Get one of our favorite menu for free!",
+    "ticket": "Klaim kupon",
+    "bgColor": "bg-[#88B788]"
+  },
+  {
+    "id": 2,
+    "image": "/images/iconWomen.png",
+    "title": "WEEKEND DEAL!",
+    "description": "Buy 1 get 1 free for selected coffee.",
+    "ticket": "Klaim kupon",
+    "bgColor": "bg-[#88B788]"
+  },
+  {
+    "id": 3,
+    "image": "/images/iconWomen.png",
+    "title": "NEW CUSTOMER PROMO!",
+    "description": "Get 20% off on your first order.",
+    "ticket": "Klaim kupon",
+    "bgColor": "bg-[#88B788]"
+  },
+  {
+    "id": 4,
+    "image": "/images/image.png",
+    "title": "SUNDAY MORNING COFFEE",
+    "description": "Get a cup of coffee for free on Sunday morning.",
+    "ticket": "",
+    "bgColor": "bg-[#F5C361]"
+  },
+  {
+    "id": 5,
+    "image": "/images/image.png",
+    "title": "SATURDAY MORNING COFFEE",
+    "description": "Get a cup of coffee for free on Sunday morning.",
+    "ticket": "",
+    "bgColor": "bg-[#F5C361]"
+  }
+]
