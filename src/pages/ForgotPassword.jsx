@@ -9,6 +9,7 @@ import { Mail } from "lucide-react";
 
 import Button from "../components/Button";
 import ForgotImg from "/images/ForgotImg.png";
+import AuthAlert from "../components/AuthAlert";
 
 const forgotPasswordSchema = yup.object().shape({
   email: yup
@@ -58,16 +59,8 @@ const ForgotPassword = () => {
       <div className="flex">
         <img src={ForgotImg} alt="coffe-img" className="hidden md:block" />
         <div className="bg-white w-full max-w-[780px] min-h-[821px] my-10 mx-10 md:mt-60">
-          {successMessage && (
-            <div className="mb-4 p-3 rounded-lg text-green-700 bg-green-100 border border-green-300">
-              {successMessage}
-            </div>
-          )}
-          {failedMessage && (
-            <div className="mb-4 p-3 rounded-lg text-red-700 bg-red-100 border border-red-300">
-              {failedMessage}
-            </div>
-          )}
+       <AuthAlert type="success" message={successMessage}/>
+       <AuthAlert type="error" message={failedMessage}/>
 
           <div>
             <img src={CoffeLogo} alt="coffe-img" />
