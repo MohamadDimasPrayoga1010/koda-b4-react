@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Plus, X, Mail, User, MapPin } from "lucide-react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Mail, User, MapPin } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import CartItems from "../components/CartItem";
+import { addOrder, clearCart, removeFromCart } from "../redux/reducer/coffeOrder";
 
 const PaymentDetails = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([]);
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.coffeOrder.cart || []);
+
   const [formData, setFormData] = useState({
     email: "",
     fullName: "",
@@ -26,10 +31,6 @@ const PaymentDetails = () => {
     { name: "Paypal", image: "/images/paypal.png" },
   ];
 
-  useEffect(() => {
-    setCartItems(JSON.parse(localStorage.getItem("cart") || "[]"));
-  }, []);
-
   const deliveryFee = formData.delivery === "door-delivery" ? 10000 : 0;
   const orderTotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -38,13 +39,6 @@ const PaymentDetails = () => {
   const taxAmount = orderTotal * 0.1;
   const grandTotal = orderTotal + deliveryFee + taxAmount;
 
-  const handleRemoveItem = (id) => {
-    const updated = cartItems.filter((item) => item.id !== id);
-    setCartItems(updated);
-    localStorage.setItem("cart", JSON.stringify(updated));
-  };
-
-  // ✅ Input binding dan auto clear error
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -67,9 +61,9 @@ const PaymentDetails = () => {
     return Object.keys(errors).length === 0;
   };
 
-  // ✅ Checkout logic tetap utuh & berfungsi
   const handleCheckout = () => {
     if (!validateForm()) return;
+
     setIsProcessing(true);
 
     const generatedOrderId = `#${Math.random()
@@ -99,29 +93,23 @@ const PaymentDetails = () => {
     };
 
     setTimeout(() => {
-      const existingOrders = JSON.parse(
-        localStorage.getItem("orderHistory") || "[]"
-      );
-      localStorage.setItem(
-        "orderHistory",
-        JSON.stringify([newOrder, ...existingOrders])
-      );
+      dispatch(addOrder(newOrder));
+      dispatch(clearCart());
 
       setIsProcessing(false);
       setPaymentSuccess(true);
 
+      setFormData({
+        email: "",
+        fullName: "",
+        address: "",
+        delivery: "dine-in",
+      });
+      setSelectedPayment("");
+      setValidationErrors({});
+
       setTimeout(() => {
         setPaymentSuccess(false);
-        setCartItems([]);
-        localStorage.removeItem("cart");
-        setFormData({
-          email: "",
-          fullName: "",
-          address: "",
-          delivery: "dine-in",
-        });
-        setSelectedPayment("");
-        setValidationErrors({});
         navigate("/history-order");
       }, 3000);
     }, 2000);
@@ -133,7 +121,6 @@ const PaymentDetails = () => {
         Payment Details
       </h1>
 
-      {/* ✅ Success Modal */}
       {paymentSuccess && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-md">
@@ -149,101 +136,19 @@ const PaymentDetails = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT SIDE */}
         <section className="lg:col-span-2 space-y-8">
-          {/* CART */}
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Your Order
-              </h2>
-              <Link to="/our-product">
-                <button className="flex items-center gap-2 px-4 py-2 bg-[#FF8906] text-white rounded-lg hover:bg-orange-600 transition-colors">
-                  <Plus size={18} />
-                  <span>Add Menu</span>
-                </button>
-              </Link>
-            </div>
+          <CartItems
+            cartItems={cartItems}
+            onRemoveItem={(cartItemId) => dispatch(removeFromCart(cartItemId))}
+            validationErrors={validationErrors}
+          />
 
-            {validationErrors.cart && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4">
-                {validationErrors.cart}
-              </div>
-            )}
-
-            {cartItems.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">Your cart is empty</p>
-                <Link to="/our-product">
-                  <button className="bg-[#FF8906] text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition">
-                    Browse Products
-                  </button>
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-md flex-shrink-0"
-                    />
-
-                    <div className="flex-1 space-y-2">
-                      {item.isFlashSale && (
-                        <span className="inline-block bg-red-600 text-white text-xs font-bold px-3 py-1 rounded">
-                          FLASHSALE!
-                        </span>
-                      )}
-                      <h3 className="text-lg font-bold text-gray-800">
-                        {item.name}
-                      </h3>
-                      <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                        <span>{item.quantity}pcs</span>
-                        <span className="text-gray-300">|</span>
-                        <span>{item.size}</span>
-                        <span className="text-gray-300">|</span>
-                        <span>{item.temperature}</span>
-                        <span className="text-gray-300">|</span>
-                        <span>{item.delivery}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {item.originalPrice && (
-                          <p className="text-sm text-red-500 line-through">
-                            IDR {item.originalPrice.toLocaleString("id-ID")}
-                          </p>
-                        )}
-                        <p className="text-lg font-bold text-[#FF8906]">
-                          IDR{" "}
-                          {(item.price * item.quantity).toLocaleString("id-ID")}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleRemoveItem(item.id)}
-                      className="flex-shrink-0 text-gray-400 hover:text-red-500 transition"
-                    >
-                      <X size={24} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* PAYMENT INFO */}
           <div className="bg-white rounded-lg p-6 shadow-md">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">
               Payment Info & Delivery
             </h2>
 
             <div className="space-y-6">
-              {/* Email */}
               <div>
                 <label className="block text-base font-semibold text-[#0B132A] mb-2">
                   Email
@@ -272,7 +177,6 @@ const PaymentDetails = () => {
                 </div>
               </div>
 
-              {/* Full Name */}
               <div>
                 <label className="block text-base font-semibold text-[#0B132A] mb-2">
                   Full Name
@@ -301,7 +205,6 @@ const PaymentDetails = () => {
                 </div>
               </div>
 
-              {/* Address */}
               <div>
                 <label className="block text-base font-semibold text-[#0B132A] mb-2">
                   Address
@@ -330,7 +233,6 @@ const PaymentDetails = () => {
                 </div>
               </div>
 
-              {/* Delivery */}
               <div>
                 <label className="block text-sm font-bold text-gray-800 mb-3">
                   Delivery
@@ -361,7 +263,6 @@ const PaymentDetails = () => {
           </div>
         </section>
 
-        {/* RIGHT SIDE - TOTAL */}
         <section className="lg:col-span-1">
           <div className="bg-white rounded-lg p-6 shadow-md sticky top-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Total</h2>
