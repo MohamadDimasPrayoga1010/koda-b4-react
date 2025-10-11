@@ -12,6 +12,7 @@ import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import Button from "../components/Button";
 import AuthContext  from "../context/AuthContext"; 
+import AuthAlert from "../components/AuthAlert";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -78,16 +79,8 @@ const Register = () => {
       <div className="flex">
         <img src={Rectangle} alt="coffe-img" className="hidden md:block" />
         <div className="bg-white w-full max-w-[780px] min-h-[821px] mx-10 md:mt-[61px]">
-          {successMessage && (
-            <div className="mb-4 p-3 rounded-lg text-green-700 bg-green-100 border border-green-300">
-              {successMessage}
-            </div>
-          )}
-          {failedMessage && (
-            <div className="mb-4 p-3 rounded-lg text-red-700 bg-red-100 border border-red-300">
-              {failedMessage}
-            </div>
-          )}
+          <AuthAlert type="success" message={successMessage}/>
+          <AuthAlert type="error" message={failedMessage}/>
           <div>
             <img src={CoffeLogo} alt="coffe-img" />
           </div>
