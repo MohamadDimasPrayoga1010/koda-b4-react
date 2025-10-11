@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
-  MoveLeft,
   User,
   MapPin,
   Phone,
@@ -12,17 +12,15 @@ import {
 
 const OrderDetail = () => {
   const { id } = useParams();
+  const orderHistory = useSelector(
+    (state) => state.coffeOrder.orderHistory || []
+  );
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    const orderHistory = JSON.parse(
-      localStorage.getItem("orderHistory") || "[]"
-    );
     const foundOrder = orderHistory.find((o) => o.id === parseInt(id));
-    setOrder(foundOrder);
-  }, [id]);
-
-  
+    setOrder(foundOrder || null);
+  }, [id, orderHistory]);
 
   if (!order) {
     return (
@@ -44,8 +42,7 @@ const OrderDetail = () => {
 
   return (
     <main className="min-h-screen bg-gray-50 py-8 px-6 md:my-30 md:px-16">
-
-      <div className=" p-6  mb-6">
+      <div className="p-6 mb-6">
         <h1 className="text-3xl font-bold mb-2">Order {order.orderId}</h1>
         <p className="text-gray-600 text-sm">
           {order.date} at{" "}
@@ -93,6 +90,7 @@ const OrderDetail = () => {
                   </p>
                 </div>
               </div>
+
               <div className="flex items-start gap-3">
                 <CreditCard className="w-5 h-5 text-gray-500 mt-1" />
                 <div className="flex-1">
@@ -112,6 +110,7 @@ const OrderDetail = () => {
                   </p>
                 </div>
               </div>
+
               <div className="flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-gray-500 mt-1" />
                 <div className="flex-1">
@@ -136,18 +135,14 @@ const OrderDetail = () => {
           </div>
         </div>
 
+
         <div className="space-y-6">
           <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-semibold mb-4">
-              Your Order
-            </h2>
+            <h2 className="text-xl font-semibold mb-4">Your Order</h2>
 
             <div className="space-y-4">
               {order.items.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex gap-4 pb-4"
-                >
+                <div key={index} className="flex gap-4 pb-4">
                   <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                     <img
                       src={item.image}
@@ -190,8 +185,7 @@ const OrderDetail = () => {
               ))}
             </div>
 
-     
-            <div className="mt-6 pt-4  space-y-2">
+            <div className="mt-6 pt-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-semibold">
@@ -210,7 +204,7 @@ const OrderDetail = () => {
                   IDR {Math.round(order.tax).toLocaleString("id-ID")}
                 </span>
               </div>
-              <div className="flex justify-between text-lg font-bold pt-2 ">
+              <div className="flex justify-between text-lg font-bold pt-2">
                 <span>Total</span>
                 <span className="text-[#FF8906]">
                   IDR {Math.round(order.total).toLocaleString("id-ID")}
