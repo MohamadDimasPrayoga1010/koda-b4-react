@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Search,
@@ -16,6 +16,7 @@ import GroupIcon from "/images/Group.png";
 import PortIcon from "/images/u_postcard.png";
 import RepeatIcon from "/images/repeat.png";
 import Coffe from "/images/coffeHazelnut.png";
+import Xcircle from "/images/XCircle.png";
 
 const OrderList = () => {
   const [status, setStatus] = useState("all");
@@ -24,52 +25,28 @@ const OrderList = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const [product, setProduct] = useState([
-    {
-      id: 1,
-      noOrder: "#12354-09893",
-      date: "26 Januari 2023",
-      order: [
-        { name: "Hazelnut Latte", size: "L", qty: 1 },
-        { name: "Caramel Machiatho", size: "L", qty: 1 },
-      ],
-      status: "Done",
-      total: "IDR 40.000",
-    },
-    {
-      id: 2,
-      noOrder: "#33411-77622",
-      date: "27 Januari 2023",
-      order: [
-        { name: "Hazelnut Latte", size: "M", qty: 2 },
-        { name: "Caramel Machiatho", size: "S", qty: 1 },
-      ],
-      status: "Pending",
-      total: "IDR 60.000",
-    },
-    {
-      id: 3,
-      noOrder: "#99812-44231",
-      date: "28 Januari 2023",
-      order: [
-        { name: "Hazelnut Latte", size: "L", qty: 1 },
-        { name: "Caramel Machiatho", size: "L", qty: 1 },
-      ],
-      status: "OnProgress",
-      total: "IDR 40.000",
-    },
-    {
-      id: 4,
-      noOrder: "#99812-44231",
-      date: "28 Januari 2023",
-      order: [
-        { name: "Hazelnut Latte", size: "L", qty: 1 },
-        { name: "Caramel Machiatho", size: "L", qty: 1 },
-      ],
-      status: "Waiting",
-      total: "IDR 40.000",
-    },
-  ]);
+  const [product, setProduct] = useState([]);
+
+  useEffect(()=>{
+    const orderList = async () =>{
+      try{
+      const response = await fetch("/data/orderList.json")
+      const data = await response.json()
+      setProduct(data);
+      }catch(err){
+        console.log("Error fetching data", err);
+      }
+    }
+    orderList()
+  },[])
+
+    const formatRupiah = (price) =>
+      price
+        ? "IDR " +
+          new Intl.NumberFormat("id-ID", {
+            minimumFractionDigits: 0,
+          }).format(price)
+        : "-";
 
   const statusColors = {
     done: "bg-green-200 text-green-800",
@@ -81,11 +58,7 @@ const OrderList = () => {
   const getStatusColor = (status) =>
     statusColors[status.toLowerCase()] || "bg-gray-100 text-gray-800";
 
-  const handleDelete = (id) => {
-    if (window.confirm("Yakin ingin menghapus order ini?")) {
-      setProduct(product.filter((item) => item.id !== id));
-    }
-  };
+  
 
   const handleHistory = (order) => {
     setSelectedOrder(order), setShowModal(true);
@@ -184,7 +157,7 @@ const OrderList = () => {
               {filteredProducts.map((item) => (
                 <tr
                   key={item.id}
-                  className="border-b hover:bg-gray-50 transition text-sm"
+                  className="border-b border-gray-200 hover:bg-gray-50 transition text-sm"
                 >
                   <td className="px-4 py-3">
                     <input
@@ -215,7 +188,7 @@ const OrderList = () => {
                     </span>
                   </td>
 
-                  <td className="px-6 py-3">{item.total}</td>
+                  <td className="px-6 py-3">{formatRupiah(item.total)}</td>
 
                   <td className="px-6 py-3 flex gap-2">
                     <button
@@ -232,7 +205,6 @@ const OrderList = () => {
                       <Edit size={18} />
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded transition"
                       title="Delete"
                     >
@@ -282,8 +254,7 @@ const OrderList = () => {
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-gray-600"
-              >
-                <X size={24} />
+              ><img src={Xcircle} alt="icon-close" />
               </button>
             </div>
             <div className="p-6">
