@@ -7,6 +7,8 @@ Aplikasi e-commerce kedai kopi modern dan lengkap yang dibangun dengan React, Ta
 - Tailwind CSS – Kerangka kerja CSS berbasis utilitas
 - Lucide React – Library ikon modern
 - LocalStorage API – Penyimpanan data secara lokal (data persistence)
+- Menggunakan Redux cart, payment, history order
+- Menggunakan useContext untuk login dan register
 - Vite – Alat build dan development serverr
 
 ## Hasil
@@ -49,3 +51,11 @@ Aplikasi e-commerce kedai kopi modern dan lengkap yang dibangun dengan React, Ta
 ### History Order
 ![history](/public/images/historyorderdekstop.png)
 ![history](/public/images/historyorderdekstop2.png)
+
+
+### Admin
+![admin](/public/images/dashoard1.png)
+![admin](/public/images/dashboard2.png)
+![admin](/public/images/prroductdash.png)
+![admin](/public/images/orderdash.png)
+![admin](/public/images/userdash.png)
