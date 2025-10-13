@@ -1,36 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Filter, Edit, Trash2, Plus } from "lucide-react";
 import ProductModal from "../components/ProductModal";
 
 export default function ProductList() {
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Caramel Macchiato",
-      price: "IDR 40.000",
-      desc: "Cold brewing...",
-      size: "S,M,L,XL,250 gr",
-      method: "Deliver, Dine In",
-      stock: 200,
-      image: "/images/coffeHazelnut.png",
-    },
-    {
-      id: 2,
-      name: "Hazelnut Latte",
-      price: "IDR 40.000",
-      desc: "Cold brewing...",
-      size: "S,M,L,XL,500 gr",
-      method: "Deliver, Dine In",
-      stock: 200,
-      image: "/images/coffeHazelnut.png",
-    },
-  ]);
+  const [products, setProducts] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
+
+  useEffect(() => {
+    const productListData = async () => {
+      try {
+        const response = await fetch("/data/productListAdmin.json");
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error("Data fetched is not an array:", data);
+          setProducts([]);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    productListData();
+  }, []);
+
+    const formatRupiah = (price) =>
+      price
+        ? "IDR " +
+          new Intl.NumberFormat("id-ID", {
+            minimumFractionDigits: 0,
+          }).format(price)
+        : "-";
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -116,7 +123,7 @@ export default function ProductList() {
               });
               setShowModal(true);
             }}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition"
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600  px-4 py-2 rounded-lg font-semibold transition"
           >
             <Plus size={20} /> Add Product
           </button>
@@ -135,7 +142,7 @@ export default function ProductList() {
                 size={20}
               />
             </div>
-            <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+            <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600  px-6 py-2 rounded-lg font-semibold transition">
               <Filter size={20} /> Filter
             </button>
           </div>
@@ -175,12 +182,11 @@ export default function ProductList() {
                 {filteredProducts.map((product) => (
                   <tr
                     key={product.id}
-                    className="border-b hover:bg-gray-50 transition"
+                    className="border-b border-gray-200 hover:bg-gray-50 transition"
                   >
                     <td className="px-4 py-2">
                       <input
                         type="checkbox"
-                       
                         className="w-4 h-4 accent-orange-500"
                       />
                     </td>
@@ -195,7 +201,7 @@ export default function ProductList() {
                       {product.name}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      {product.price}
+                      {formatRupiah(product.price)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {product.desc}
