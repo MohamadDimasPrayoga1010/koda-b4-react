@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "noOrder": "#12354-09893",
+    "date": "26 Januari 2023",
+    "order": [
+      { "name": "Hazelnut Latte", "size": "L", "qty": 1 },
+      { "name": "Caramel Machiatho", "size": "L", "qty": 1 }
+    ],
+    "status": "Done",
+    "total": 40000
+  },
+  {
+    "id": 2,
+    "noOrder": "#12354-09893",
+    "date": "27 Januari 2023",
+    "order": [
+      { "name": "Hazelnut Latte", "size": "M", "qty": 2 },
+      { "name": "Caramel Machiatho", "size": "S", "qty": 1 }
+    ],
+    "status": "Pending",
+    "total": 60000
+  },
+  {
+    "id": 3,
+    "noOrder": "#12354-09893",
+    "date": "28 Januari 2023",
+    "order": [
+      { "name": "Hazelnut Latte", "size": "L", "qty": 1 },
+      { "name": "Caramel Machiatho", "size": "L", "qty": 1 }
+    ],
+    "status": "OnProgress",
+    "total": 40000
+  },
+  {
+    "id": 4,
+    "noOrder": "#12354-09893",
+    "date": "28 Januari 2023",
+    "order": [
+      { "name": "Hazelnut Latte", "size": "L", "qty": 1 },
+      { "name": "Caramel Machiatho", "size": "L", "qty": 1 }
+    ],
+    "status": "Waiting",
+    "total": 40000
+  },
+    {
+      "id": 4,
+      "noOrder": "#12354-09893",
+      "date": "28 Januari 2023",
+      "order": [
+        { "name": "Hazelnut Latte", "size": "L", "qty": 1 },
+        { "name": "Caramel Machiatho", "size": "L", "qty": 1 }
+      ],
+      "status": "OnProgress",
+      "total": 40000
+    }
+]
