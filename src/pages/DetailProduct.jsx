@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import {
-  ShoppingCart,
-  Star,
-  ThumbsUp,
-} from "lucide-react";
+import { ShoppingCart, Star, ThumbsUp } from "lucide-react";
 import CardProduct from "../components/CardProduct";
 import Pagination from "../components/Pagination";
 import { useDispatch } from "react-redux";
@@ -47,6 +43,8 @@ const DetailProduct = () => {
       name: selectedProduct.name,
       image: selectedProduct.image,
       price: selectedProduct.price,
+      originalPrice: selectedProduct.originalPrice || null,
+      isFlashSale: selectedProduct.isFlashSale || false,
       quantity,
       size: selectedSize,
       temperature: selectedTemp,
@@ -54,7 +52,7 @@ const DetailProduct = () => {
       cartItemId: Date.now() + Math.random().toString(36).substr(2, 5),
     };
 
-    dispatch(addToCart(item)); 
+    dispatch(addToCart(item));
     navigate("/payment-details");
   };
 
@@ -66,6 +64,8 @@ const DetailProduct = () => {
       name: selectedProduct.name,
       image: selectedProduct.image,
       price: selectedProduct.price,
+      originalPrice: selectedProduct.originalPrice || null,
+      isFlashSale: selectedProduct.isFlashSale || false,
       quantity,
       size: selectedSize,
       temperature: selectedTemp,
@@ -103,6 +103,7 @@ const DetailProduct = () => {
       </div>
     );
   }
+
   const productImages = selectedProduct.images || [
     selectedProduct.image,
     selectedProduct.image,
@@ -110,7 +111,7 @@ const DetailProduct = () => {
   ];
 
   return (
-    <main className="bg-gray-50 min-h-screen py-8 px-6 md:px-16 md:my-20">
+    <main className="bg-gray-50 min-h-screen py-8 px-6  md:px-16 my-20">
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-6 shadow-lg">
         <div>
           <div className="relative mb-4">
@@ -209,7 +210,7 @@ const DetailProduct = () => {
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`px-6 py-2 rounded border transition ${
+                  className={`px-4 py-1 md:px-6 md:py-2 rounded border transition ${
                     selectedSize === size
                       ? "border-[#FF8906] bg-orange-50 text-[#FF8906]"
                       : "border-gray-300 hover:border-[#FF8906]"
@@ -259,12 +260,13 @@ const DetailProduct = () => {
       </section>
 
       <section className="my-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center md:text-start">
           Recommendation <span className="text-[#8E6447]">For You</span>
         </h1>
         <Pagination
           data={products}
           itemsPerPage={4}
+          gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
           renderItem={(product) => (
             <CardProduct key={product.id} product={product} />
           )}
