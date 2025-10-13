@@ -42,11 +42,11 @@ const Testimonial = () => {
   return (
     <section className="bg-gradient-to-b from-[#777C82] to-[#0B0909] w-full py-12 flex justify-center items-center">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mx-4 md:mx-16">
-        <div className="flex justify-center md:justify-start">
+        <div className="flex justify-center md:justify-start w-[400px] h-[348px] md:w-[700px] md:h-[438px] object-cover overflow-hidden">
           <img src={current.image} alt={current.name} className="w-full" />
         </div>
 
-        <div className="flex flex-col gap-4 md:w-2/3 text-center md:text-left">
+        <div className="flex flex-col gap-4 md:w-2/3 text-center md:text-left p-4">
           <h1 className="text-lg font-normal text-white">Testimonial</h1>
           <h3 className="text-2xl md:text-5xl border-l font-medium border-[#FF8906] pl-4 text-white">
             {current.name}
@@ -63,27 +63,29 @@ const Testimonial = () => {
             <span className="text-white ml-2">{current.rating}</span>
           </div>
 
-          <div className="flex gap-2 mt-4 justify-center md:justify-start">
+          <div className="flex gap-2 mt-4  md:justify-start">
             <button
               onClick={handlePrev}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF8906] text-white hover:bg-[#e67a00] transition"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white  hover:bg-[#e67a00] transition"
             >
               <MoveLeft />
             </button>
             <button
               onClick={handleNext}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF8906] text-white hover:bg-[#e67a00] transition"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF8906]  hover:bg-[#e67a00] transition"
             >
               <MoveRight />
             </button>
           </div>
 
-          <div className="flex gap-2 mt-4 justify-center md:justify-start">
+          <div className="flex gap-2 mt-4  md:justify-start">
             {testimonials.map((_, idx) => (
               <span
                 key={idx}
                 className={`w-3 h-3 rounded-full transition ${
-                  idx === currentIndex ? "bg-[#FF8906]" : "bg-white/50"
+                  idx === currentIndex
+                    ? "bg-[#FF8906] w-7 h-3 rounded-full transition"
+                    : "bg-white/50"
                 }`}
               />
             ))}
