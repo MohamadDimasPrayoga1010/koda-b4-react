@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { User, Mail, Phone, Lock, MapPin, CircleUser } from "lucide-react";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 
 const Profile = () => {
+    const fileInputRef = useRef(null);
+
+    const handleButtonClick = () => {
+      fileInputRef.current.click();
+    };
+
+    const handleFileChange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        console.log("File dipilih:", file.name);
+      }
+    };
   const {
     register,
     handleSubmit,
@@ -21,7 +33,6 @@ const Profile = () => {
       <section className="my-7 flex gap-3">
         <div className="border border-[#E8E8E8] w-[280px] h-[343px] p-6">
           <div className="flex flex-col items-center space-y-4">
-            
             <div className="text-center">
               <p className="text-lg font-semibold text-[#0B132A]">Yoga</p>
               <p className="text-sm text-gray-500">Yoga@gmail.com</p>
@@ -29,7 +40,17 @@ const Profile = () => {
             <div className="w-25 h-25 rounded-full bg-gray-100 flex items-center justify-center">
               <CircleUser className="w-16 h-16 text-gray-400" />
             </div>
-            <Button className="w-full">Upload New Photo</Button>
+            <div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              <Button className="w-full" onClick={handleButtonClick}>
+                Upload New Photo
+              </Button>
+            </div>
             <p className="text-base text-[#4F5665] text-center">
               Since 20 January 2022
             </p>
