@@ -10,7 +10,6 @@ const Footer = () => {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <img src={CoffeIcon} alt="coffee-logo" className="h-8" />
-            {/* <h3 className="text-lg font-semibold text-gray-800">Coffee Shop</h3> */}
           </div>
           <p className="text-gray-500 text-base">
             Coffee Shop is a store that sells some good meals, and especially
@@ -19,7 +18,7 @@ const Footer = () => {
           <p className="text-gray-400 text-xs">©2020CoffeeStore</p>
         </div>
 
-        {/* Product Column */}
+ 
         <div>
           <h4 className="font-semibold text-gray-800 mb-4">Product</h4>
           <ul className="space-y-2">
@@ -66,7 +65,6 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Engage Column */}
         <div>
           <h4 className="font-semibold text-gray-800 mb-4">Engage</h4>
           <ul className="space-y-2">
@@ -113,7 +111,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Social Media Column */}
+
         <div>
           <h4 className="font-semibold text-gray-800 mb-4">Social Media</h4>
           <div className="flex gap-3">
