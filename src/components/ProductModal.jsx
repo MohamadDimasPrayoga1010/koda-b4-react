@@ -1,5 +1,6 @@
 import React from "react";
-import { X } from "lucide-react";
+import { Image } from "lucide-react";
+import Xcircle from "/images/XCircle.png"
 
 export default function ProductModal({
   mode,
@@ -32,7 +33,6 @@ export default function ProductModal({
   return (
     <div className="absolute right-0 top-[26px] w-[600px] bg-opacity-50 flex items-end justify-end p-4 z-50">
       <div className="bg-white shadow-lg w-full max-w-xl max-h-screen overflow-y-auto mt-10">
-  
         <div className="flex justify-between items-center p-6 sticky top-0 bg-white">
           <h2 className="text-lg font-bold text-gray-900">
             {mode === "edit" ? "Edit Product" : "Add Product"}
@@ -41,11 +41,10 @@ export default function ProductModal({
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
           >
-            <X size={24} />
+            <img src={Xcircle} alt="close-icon" />
           </button>
         </div>
 
-  
         <div className="p-6 space-y-5">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -53,7 +52,19 @@ export default function ProductModal({
             </label>
             <div className="flex flex-col gap-2">
               <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-2xl border-2 border-dashed border-gray-300">
-                {formData.productImage ? "✓" : "📷"}
+                {formData.productImage ? (
+                  <img
+                    src={
+                      typeof formData.productImage === "string"
+                        ? formData.productImage
+                        : URL.createObjectURL(formData.productImage)
+                    }
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Image />
+                )}
               </div>
               <input
                 type="file"
@@ -64,7 +75,7 @@ export default function ProductModal({
               />
               <label
                 htmlFor="imageInput"
-                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-lg cursor-pointer w-[80px]"
+                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-sm font-semibold rounded-lg cursor-pointer w-[80px]"
               >
                 {mode === "edit" ? "Change" : "Upload"}
               </label>
@@ -151,7 +162,7 @@ export default function ProductModal({
         <div className="p-6 sticky bottom-0 bg-white">
           <button
             onClick={onSave}
-            className="w-full px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition text-base"
+            className="w-full px-4 py-3 bg-orange-500 hover:bg-orange-600 font-bold rounded-lg transition text-base"
           >
             {mode === "edit" ? "Edit Save" : "Save Product"}
           </button>
