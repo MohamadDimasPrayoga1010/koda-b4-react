@@ -1,6 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Plus, X } from "lucide-react";
+import Xcircle from "/images/XCircle.png";
+
+/**
+ * @typedef {Object} CartItem
+ * @property {string|number} cartItemId - ID unik untuk item dalam keranjang.
+ * @property {string} name - Nama produk.
+ * @property {string} [image] - URL gambar produk.
+ * @property {number} price - Harga satuan produk.
+ * @property {number} quantity - Jumlah item yang dibeli.
+ * @property {number} [originalPrice] - Harga sebelum diskon (jika ada).
+ * @property {string} [size] - Ukuran produk (misalnya: "Medium", "Large").
+ * @property {string} [temperature] - Suhu penyajian (misalnya: "Hot", "Ice").
+ * @property {string} [delivery] - Metode pengiriman.
+ * @property {boolean} [isFlashSale] - Menandakan apakah item termasuk promo flash sale.
+ */
 
 const CartItems = ({ cartItems = [], onRemoveItem, validationErrors }) => {
   return (
@@ -99,7 +114,7 @@ const CartItems = ({ cartItems = [], onRemoveItem, validationErrors }) => {
                 onClick={() => onRemoveItem(item.cartItemId)}
                 className="flex-shrink-0 text-gray-400 hover:text-red-500 transition"
               >
-                <X size={24} />
+                <img src={Xcircle} alt="close-icon" />
               </button>
             </div>
           ))}
