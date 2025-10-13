@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { Mail, User, MapPin } from "lucide-react";
 
+/**
+ * @typedef {Object} PaymentFormData
+ * @property {string} email - Alamat email pengguna.
+ * @property {string} fullName - Nama lengkap pengguna.
+ * @property {string} address - Alamat pengguna.
+ * @property {"dine-in" | "door-delivery" | "pick-up"} delivery - Metode pengantaran yang dipilih.
+ */
+
 const InputPayment = () => {
   const [formData, setFormData] = useState({
     email: "",
