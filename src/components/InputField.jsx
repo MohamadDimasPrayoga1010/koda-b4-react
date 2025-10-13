@@ -1,5 +1,18 @@
 import { Eye, EyeOff } from "lucide-react";
 
+/** 
+ * @property {string} label - Label yang ditampilkan di atas input field.
+ * @property {"text" | "email" | "password" | "number" | "date"} [type="text"] - Jenis input yang digunakan.
+ * @property {string} name - Nama unik untuk input (biasanya digunakan dengan react-hook-form).
+ * @property {string} [placeholder] - Placeholder teks di dalam input.
+ * @property {JSX.Element} [icon] - Ikon di sisi kiri input.
+ * @property {boolean} [showPassword] - Menentukan apakah password ditampilkan atau disembunyikan.
+ * @property {() => void} [onTogglePassword] - Fungsi yang dijalankan saat tombol "show/hide password" ditekan.
+ * @property {Function} [register] - Fungsi dari react-hook-form untuk mendaftarkan input.
+ * @property {{ message?: string }} [error] - Objek error (biasanya dari validasi react-hook-form).
+ * @property {any} [rest] - Properti tambahan yang diteruskan ke elemen input.
+ */
+
 const InputField = ({
   label,
   type = "text",
