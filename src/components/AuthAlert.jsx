@@ -1,5 +1,13 @@
 import { CheckCircle, XCircle } from "lucide-react";
 
+/**
+ * 
+ * @param {Object} props - Properti komponen.
+ * @param {"success" | "error"} [props.type="success"] - Jenis alert yang akan ditampilkan.
+ * @param {string} props.message - Pesan yang akan ditampilkan pada alert.
+ * @returns {JSX.Element | null} Elemen alert, atau `null` jika tidak ada pesan.
+ */
+
 const AuthAlert = ({ type = "success", message }) => {
   if (!message) return null;
 
