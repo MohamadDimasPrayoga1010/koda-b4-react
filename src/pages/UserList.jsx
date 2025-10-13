@@ -1,7 +1,22 @@
-import React, { useState } from "react";
-import { Plus, Search, Filter, Edit, Trash2, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  User,
+  Mail,
+  Phone,
+  Eye,
+  EyeOff,
+  MapPin,
+} from "lucide-react";
 import GroupIcon from "/images/Group.png";
 import ImgUpload from "/images/imgupload.png";
+import Xcircle from "/images/XCircle.png";
+import PasswordIcon from "/images/Password.svg";
+import { Link } from "react-router-dom";
 
 const UserList = () => {
   const [search, setSearch] = useState("");
@@ -9,29 +24,26 @@ const UserList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [showPassword, setShowPassword] = useState(false)
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      image: "/images/testiImg/profile.png",
-      fullname: "Eleanor Pena",
-      phone: "(205) 555-0100",
-      address: "3517 W. Gray St. Utica, Pennsylvania 57867",
-      email: "eleanor.pena@gmail.com",
-      password: "123456",
-      type: "Normal User",
-    },
-    {
-      id: 2,
-      image: "/images/testiImg/profile.png",
-      fullname: "Ronald Richards",
-      phone: "(205) 555-0100",
-      address: "1901 Thornridge Cir. Shiloh, Hawaii 81063",
-      email: "cikaracak@gmail.com",
-      password: "123456",
-      type: "Admin",
-    },
-  ]);
+  const togglePassword = () =>{
+    setShowPassword((prev) => !prev)
+  }
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const userList = async () => {
+      try {
+        const response = await fetch("/data/userList.json");
+        const data = await response.json();
+        setUsers(data);
+      } catch (err) {
+        console.log("Error fetching data", err);
+      }
+    };
+    userList();
+  }, []);
 
   const handleAddUser = () => {
     setIsEditing(false);
@@ -84,7 +96,7 @@ const UserList = () => {
         <div className="my-4 flex flex-wrap justify-between items-end gap-4">
           <button
             onClick={handleAddUser}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition"
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600  px-4 py-2 rounded-lg font-semibold transition"
           >
             <Plus size={20} /> Add User
           </button>
@@ -111,7 +123,7 @@ const UserList = () => {
               />
             </div>
 
-            <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold transition">
+            <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600  px-6 py-2 rounded-lg font-semibold transition">
               <Filter size={20} /> Filter
             </button>
           </div>
@@ -203,7 +215,7 @@ const UserList = () => {
             <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition">
               Prev
             </button>
-            {[1, 2, 3].map((page) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((page) => (
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
@@ -230,7 +242,7 @@ const UserList = () => {
               onClick={() => setIsModalOpen(false)}
               className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
             >
-              <X size={20} />
+              <img src={Xcircle} alt="close-icon" />
             </button>
 
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -274,30 +286,104 @@ const UserList = () => {
             </div>
 
             <div className="space-y-3">
-              {[
-                { label: "Full Name", key: "fullname", type: "text" },
-                { label: "Email", key: "email", type: "email" },
-                { label: "Phone", key: "phone", type: "text" },
-                { label: "Password", key: "password", type: "password" },
-                { label: "Address", key: "address", type: "text" },
-              ].map((field, idx) => (
-                <div key={idx}>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    {field.label}
+              <div className="flex flex-col gap-1 relative">
+                <label htmlFor="fullname" className="font-medium">
+                  FullName
+                </label>
+                <input
+                  type="text"
+                  name="fullname"
+                  id="fullname"
+                  placeholder="Enter Your FullName"
+                  className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition text-sm bg-white"
+                />
+                <User
+                  size={22}
+                  className="absolute top-9 left-3 text-gray-400"
+                />
+              </div>
+              <div className="flex flex-col gap-1 relative">
+                <label htmlFor="email" className="font-medium">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  placeholder="Enter Your Email"
+                  className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition text-sm bg-white"
+                />
+                <Mail
+                  size={22}
+                  className="absolute top-9 left-3 text-gray-400"
+                />
+              </div>
+              <div className="flex flex-col gap-1 relative">
+                <label htmlFor="phone" className="font-medium">
+                  Phone
+                </label>
+                <input
+                  type="number"
+                  name="phone"
+                  id="phone"
+                  placeholder="Enter Your Number"
+                  className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition text-sm bg-white"
+                />
+
+                <Phone
+                  size={22}
+                  className="absolute top-9 left-3 text-gray-400"
+                />
+              </div>
+              <div className="flex flex-col gap-1 relative">
+                <div className="flex justify-between items-center">
+                  <label htmlFor="password" className="font-medium">
+                    Password
                   </label>
-                  <input
-                    type={field.type}
-                    value={selectedUser[field.key]}
-                    onChange={(e) =>
-                      setSelectedUser({
-                        ...selectedUser,
-                        [field.key]: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-                  />
+                  <Link to="" className="text-normal text-orange-400">
+                    Set New Password
+                  </Link>
                 </div>
-              ))}
+
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  id="password"
+                  placeholder="Enter Your Password"
+                  className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition text-sm bg-white"
+                />
+
+                <img
+                  src={PasswordIcon}
+                  alt="password-icon"
+                  className="absolute top-9 left-3  w-6 h-6 object-cover"
+                />
+
+                <button
+                  type="button"
+                  onClick={togglePassword}
+                  className="absolute right-3 top-9 text-gray-400 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                </button>
+              </div>
+              <div className="flex flex-col gap-1 relative">
+                <label htmlFor="address" className="font-medium">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  id="address"
+                  placeholder="Enter Your Address"
+                  className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition text-sm bg-white"
+                />
+
+                <MapPin
+                  size={22}
+                  className="absolute top-9 left-3 text-gray-400"
+                />
+              </div>
 
               {!isEditing && (
                 <div>
@@ -327,7 +413,7 @@ const UserList = () => {
 
             <button
               onClick={handleSaveUser}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 mt-5 rounded-lg transition"
+              className="w-full bg-orange-500 hover:bg-orange-600  font-semibold py-2 mt-5 rounded-lg transition"
             >
               {isEditing ? "Update" : "Add User"}
             </button>
