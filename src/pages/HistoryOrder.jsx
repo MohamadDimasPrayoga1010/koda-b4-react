@@ -58,8 +58,8 @@ const HistoryOrder = () => {
   };
 
   return (
-    <main className="my-10 md:my-20 px-4 md:px-16">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 my-9">
+    <main className="my-25 px-4 md:px-16">
+      <div className="flex items-center sm:gap-4 my-9">
         <h1 className="text-3xl md:text-5xl font-semibold text-center sm:text-left">
           History Order
         </h1>
