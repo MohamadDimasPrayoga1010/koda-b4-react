@@ -116,13 +116,13 @@ const PaymentDetails = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8 px-6 md:my-20 md:px-16">
+    <main className="min-h-screen bg-gray-50 py-8 px-6 my-20 md:px-16">
       <h1 className="text-4xl md:text-5xl font-bold mb-8 text-gray-800">
         Payment Details
       </h1>
 
       {paymentSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center max-w-md">
             <div className="text-green-500 text-6xl mb-4">✓</div>
             <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
