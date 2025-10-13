@@ -164,7 +164,7 @@ const HomePage = () => {
             yours too!
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mx-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mx-8">
           {products.slice(0, 4).map((product) => (
             <CardProduct product={product} />
           ))}
