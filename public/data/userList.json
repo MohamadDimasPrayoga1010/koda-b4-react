@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "image": "/images/user1.png",
+    "fullname": "Eleanor Pena",
+    "phone": "(205) 555-0100",
+    "address": "3517 W. Gray St. Utica, Pennsylvania 57867",
+    "email": "eleanor.pena@gmail.com",
+    "password": "123456",
+    "type": "Normal User"
+  },
+  {
+    "id": 2,
+    "image": "/images/user2.png",
+    "fullname": "Ronald Richards",
+    "phone": "(205) 555-0100",
+    "address": "1901 Thornridge Cir. Shiloh, Hawaii 81063",
+    "email": "cikaracak@gmail.com",
+    "password": "123456",
+    "type": "Admin"
+  },
+  {
+    "id": 3,
+    "image": "/images/user3.png",
+    "fullname": "Darlene Robertson",
+    "phone": "(209) 555-0104",
+    "address": "4140 Parker Rd. Allentown, New Mexico 31134",
+    "email": "eleanor.pena@gmail.com",
+    "password": "123456",
+    "type": "Normal User"
+  },
+  {
+    "id": 4,
+    "image": "/images/user4.png",
+    "fullname": "Kristin Watson",
+    "phone": "(252) 555-0126",
+    "address": "4140 Parker Rd. Allentown, New Mexico 31134",
+    "email": "eleanor.pena@gmail.com",
+    "password": "123456",
+    "type": "Normal User"
+  },
+  {
+    "id": 5,
+    "image": "/images/user5.png",
+    "fullname": "Dianne Russell",
+    "phone": "(201) 555-0124",
+    "address": "4517 Washington Ave. Manchester, Kentucky 39495",
+    "email": "eleanor.pena@gmail.com",
+    "password": "123456",
+    "type": "Normal User"
+  }
+]
