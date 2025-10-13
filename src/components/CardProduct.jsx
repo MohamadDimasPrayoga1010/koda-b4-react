@@ -4,6 +4,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/reducer/coffeOrder";
 import { useState} from "react";
 
+/**
+ * @typedef {Object} Product
+ * @property {number} id - ID unik produk.
+ * @property {string} name - Nama produk.
+ * @property {string} description - Deskripsi singkat produk.
+ * @property {string} image - URL gambar produk.
+ * @property {number} price - Harga diskon atau harga utama produk.
+ * @property {number} [originalPrice] - Harga asli sebelum diskon (jika ada).
+ * @property {boolean} [isFlashSale] - Menandakan apakah produk termasuk flash sale.
+ * @property {number} rating - Nilai rating produk (0–5).
+ * @property {string} slug - Slug produk untuk URL detail.
+ */
+
 function CardProduct({ product }) {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.coffeOrder.cart || []);
