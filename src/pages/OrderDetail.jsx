@@ -61,60 +61,72 @@ const OrderDetail = () => {
             </h2>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <User className="w-5 h-5 text-gray-500 mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-500">Full Name</p>
+              <div className="flex justify-between items-center w-full border-b border-gray-200 p-3">
+                <div className="flex items-center gap-4">
+                  <User className="w-5 h-5 text-gray-500 mt-1" />
+                  <p className="text-normal text-gray-500">Full Name</p>
+                </div>
+                <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
                     {order.customerInfo.fullName}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-gray-500 mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-500">Address</p>
+              <div className="flex justify-between items-center w-full border-b border-gray-200 p-3">
+                <div className="flex items-center gap-4">
+                  <MapPin className="w-5 h-5 text-gray-500 mt-1" />
+                  <p className="text-normal text-gray-500">Address</p>
+                </div>
+                <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
                     {order.customerInfo.address}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-gray-500 mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-500">Phone</p>
+              <div className="flex justify-between items-center w-full border-b border-gray-200 p-3">
+                <div className="flex items-center gap-4">
+                  <Phone className="w-5 h-5 text-gray-500 mt-1" />
+                  <p className="text-normal text-gray-500">Phone</p>
+                </div>
+                <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
                     {order.customerInfo.phone || "08123456789"}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <CreditCard className="w-5 h-5 text-gray-500 mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-500">Payment Method</p>
+              <div className="flex justify-between items-center w-full border-b border-gray-200 p-3">
+                <div className="flex items-center gap-4">
+                  <CreditCard className="w-5 h-5 text-gray-500 mt-1" />
+                  <p className="text-normal text-gray-500">Payment Method</p>
+                </div>
+                <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
                     {order.paymentMethod}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <Truck className="w-5 h-5 text-gray-500 mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-500">Shipping</p>
-                  <p className="font-semibold text-gray-800 capitalize">
+              <div className="flex justify-between items-center w-full border-b border-gray-200 p-3">
+                <div className="flex items-center gap-4">
+                  <Truck className="w-5 h-5 text-gray-500 mt-1" />
+                  <p className="text-normal text-gray-500">Shipping</p>
+                </div>
+                <div className="ml-auto text-right">
+                  <p className="font-semibold text-gray-800">
                     {order.customerInfo.delivery.replace("-", " ")}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-gray-500 mt-1" />
-                <div className="flex-1">
+              <div className="flex justify-between items-center w-full border-b border-gray-200 p-3">
+                <div className="flex items-center gap-4">
+                  <CheckCircle className="w-5 h-5 text-gray-500 mt-1" />
                   <p className="text-sm text-gray-500">Status</p>
+                </div>
+                <div className="ml-auto text-right">
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${order.statusColor}`}
                   >
@@ -135,14 +147,13 @@ const OrderDetail = () => {
           </div>
         </div>
 
-
         <div className="space-y-6">
           <div className="bg-white rounded-lg p-6 shadow-md">
             <h2 className="text-xl font-semibold mb-4">Your Order</h2>
 
             <div className="space-y-4">
               {order.items.map((item, index) => (
-                <div key={index} className="flex gap-4 pb-4">
+                <div key={index} className="flex gap-4 pb-4 bg-gray-100 p-3">
                   <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                     <img
                       src={item.image}
