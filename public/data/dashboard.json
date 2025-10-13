@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1, 
+"name": "Coffe", 
+  "terjual": "300 Cup", 
+  "keuntungan": 9000000
+},
+  { 
+  "id": 2,  
+  "name": "Americano", 
+  "terjual": "400 Cup", 
+  "keuntungan": 8000000 
+},
+{
+  "id": 3,
+  "name": "Kopi Susu",
+  "terjual": "100 Cup",
+  "keuntungan": 7000000
+},
+{
+  "id": 4,
+  "name": "Expresso Supreme",
+  "terjual": "90 Cup",
+  "keuntungan": 6000000
+},
+{
+  "id": 5,
+  "name": "Caramel Velvet Latte",
+  "terjual": "80 Cup",
+  "keuntungan": 5000000
+},
+{
+  "id": 6,
+  "name": "Hazelnut Dream Brew",
+  "terjual": "70 Cup",
+  "keuntungan": 4000000
+},
+{
+  "id": 7,
+  "name": "Vanilla Silk Mocha",
+  "terjual": "60 Cup",
+  "keuntungan": 3000000
+}, 
+{
+  "id": 8,
+  "name": "Dark Roast Delight",
+  "terjual": "50 Cup",
+  "keuntungan": 2000000
+},
+{
+  "id": 9,
+  "name": "Ethiopian Yingacheffe Euphone",
+  "terjual": "40 Cup",
+  "keuntungan": 1000000
+},
+{
+  "id": 10,
+  "name": "Indonesian Sumatra Reverse",
+  "terjual": "30 Cup",
+  "keuntungan": 500000
+}
+]
