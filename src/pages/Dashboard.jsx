@@ -1,4 +1,5 @@
 import { ChevronDown, Calendar, Trash2, Truck, UserCheck } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -10,6 +11,31 @@ import {
 } from "recharts";
 
 const Dashboard = () => {
+  
+  const [productData, setProductData] = useState([]);
+
+  useEffect(() => {
+    const dashboardData = async () => {
+      try {
+        const response = await fetch("data/dashboard.json");
+        const data = await response.json();
+        setProductData(data);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+    dashboardData();
+  }, []);
+
+  const formatRupiah = (price) =>
+    price
+      ? "IDR " +
+        new Intl.NumberFormat("id-ID", {
+          minimumFractionDigits: 0,
+        }).format(price)
+      : "-";
+
+
   const chartData = [
     { month: "6.22", value: 300 },
     { month: "9.22", value: 350 },
@@ -43,11 +69,6 @@ const Dashboard = () => {
       color: "bg-[#C56FBC]",
       icon: <UserCheck className="text-[#FF8906]" />,
     },
-  ];
-
-  const recentItems = [
-    { name: "Coffe", terjual: "300Cup", keuntungan: "IDR9.000.000" },
-    { name: "Americano", terjual: "400Cup", keuntungan: "IDR19.000.000" },
   ];
 
   return (
@@ -142,7 +163,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody className="text-center">
-              {recentItems.map((item, idx) => (
+              {productData.map((item, idx) => (
                 <tr
                   key={idx}
                   className="border-b border-gray-100 hover:bg-gray-50"
@@ -155,7 +176,7 @@ const Dashboard = () => {
                     {item.terjual}
                   </td>
                   <td className="py-4 px-4 text-sm font-medium text-green-600">
-                    {item.keuntungan}
+                    {formatRupiah(item.keuntungan)}
                   </td>
                 </tr>
               ))}
