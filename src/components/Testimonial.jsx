@@ -42,17 +42,21 @@ const Testimonial = () => {
   return (
     <section className="bg-gradient-to-b from-[#777C82] to-[#0B0909] w-full py-12 flex justify-center items-center">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mx-4 md:mx-16">
-        <div className="flex justify-center md:justify-start w-[400px] h-[348px] md:w-[700px] md:h-[438px] object-cover overflow-hidden">
-          <img src={current.image} alt={current.name} className="w-full" />
+        <div className="flex justify-center md:justify-start  object-cover overflow-hidden">
+          <img
+            src={current.image}
+            alt={current.name}
+            className="w-[300px] h-[250px] md:w-[700px] md:h-[438px]"
+          />
         </div>
 
-        <div className="flex flex-col gap-4 md:w-2/3 text-center md:text-left p-4">
+        <div className="flex flex-col gap-4 text-center md:text-left p-4">
           <h1 className="text-lg font-normal text-white">Testimonial</h1>
-          <h3 className="text-2xl md:text-5xl border-l font-medium border-[#FF8906] pl-4 text-white">
+          <h3 className="text-xl md:2xl lg:text-5xl border-l font-medium border-[#FF8906] pl-4 text-white">
             {current.name}
           </h3>
           <p className="text-base font-normal text-[#FF8906]">{current.role}</p>
-          <p className="text-base font-normal text-white max-w-md">
+          <p className="text-base font-normal p-2 w-full md:w-[200px] lg:w-full text-white max-w-md">
             {current.text}
           </p>
 
