@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CoffeImg from "/images/ourproduct.png";
 import CardProduct from "../components/CardProduct";
 import Pagination from "../components/Pagination";
@@ -10,9 +10,20 @@ import FilterIcon from "/images/Filter.png";
 
 const OurProduct = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [searchInput, setSearchInput] = useState(
     searchParams.get("search") || ""
   );
+  const [selectedCategories, setSelectedCategories] = useState(
+    searchParams.get("category") ? searchParams.get("category").split(",") : []
+  );
+  const [selectedSorts, setSelectedSorts] = useState(
+    searchParams.get("sort") ? searchParams.get("sort").split(",") : []
+  );
+  const [priceRange, setPriceRange] = useState([
+    Number(searchParams.get("minPrice")) || 0,
+    Number(searchParams.get("maxPrice")) || 50000,
+  ]);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,37 +35,81 @@ const OurProduct = () => {
         const response = await fetch("/data/stockProduct.json");
         const data = await response.json();
         setProducts(data);
-        setLoading(false);
       } catch (error) {
         console.error("Error loading products:", error);
+      } finally {
         setLoading(false);
       }
     };
     fetchProducts();
   }, []);
 
+
+  const updateURL = useCallback(() => {
+    const params = new URLSearchParams();
+    if (searchInput) params.set("search", searchInput);
+    if (selectedCategories.length > 0)
+      params.set("category", selectedCategories.join(","));
+    if (selectedSorts.length > 0) params.set("sort", selectedSorts.join(","));
+    if (priceRange[0] > 0) params.set("minPrice", priceRange[0]);
+    if (priceRange[1] < 50000) params.set("maxPrice", priceRange[1]);
+    setSearchParams(params);
+  }, [
+    searchInput,
+    selectedCategories,
+    selectedSorts,
+    priceRange,
+    setSearchParams,
+  ]);
+
+
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchInput.trim()) {
-      setSearchParams({ search: searchInput.trim() });
-    } else {
-      setSearchParams({});
-    }
-  };
-
-  const handleResetFilter = () => {
-    setSearchInput("");
-    setSearchParams({});
+    updateURL();
   };
 
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name?.toLowerCase().includes(searchInput.toLowerCase())
-  );
+  const handleResetFilter = () => {
+    setSearchInput("");
+    setSelectedCategories([]);
+    setSelectedSorts([]);
+    setPriceRange([0, 50000]);
+    setSearchParams({});
+  };
 
+
+  const filteredProducts = products.filter((product) => {
+    const matchSearch = product.name
+      .toLowerCase()
+      .includes(searchInput.toLowerCase());
+
+    const matchCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(product.category) ||
+      (selectedCategories.includes("Coffe") && product.category === "Minuman");
+
+    const matchSort =
+      selectedSorts.length === 0 ||
+      (selectedSorts.includes("Flash Sale") && product.isFlashSale) ||
+      (selectedSorts.includes("Cheap") && product.price < 15000) ||
+      (selectedSorts.includes("Buy1get1") &&
+        product.name.toLowerCase().includes("hazelnut")) ||
+      (selectedSorts.includes("Birthday Package") && product.price > 20000);
+
+    const matchPrice =
+      product.price >= priceRange[0] && product.price <= priceRange[1];
+
+    return matchSearch && matchCategory && matchSort && matchPrice;
+  });
+
+  useEffect(() => {
+    updateURL();
+  }, [updateURL]);
+
+ 
   if (loading) {
     return (
       <div className="col-span-full flex items-center justify-center py-12">
@@ -65,6 +120,7 @@ const OurProduct = () => {
       </div>
     );
   }
+
 
   return (
     <main>
@@ -91,19 +147,19 @@ const OurProduct = () => {
             <Search className="absolute top-3 left-3 text-gray-400" />
           </button>
         </form>
-        <div>
-          <button onClick={() => setShowFilter(!showFilter)}>
-            <img
-              src={FilterIcon}
-              alt="filter-icon"
-              className="p-3.5 bg-orange-400 rounded"
-            />
-          </button>
-        </div>
+
+        <button onClick={() => setShowFilter(!showFilter)}>
+          <img
+            src={FilterIcon}
+            alt="filter-icon"
+            className="p-3.5 bg-orange-400 rounded"
+          />
+        </button>
+
         {showFilter && (
           <>
             <div
-              className="fixed inset-0 bg-opacity-50 z-40"
+              className="fixed inset-0  bg-opacity-50 z-40"
               onClick={() => setShowFilter(false)}
             ></div>
 
@@ -123,6 +179,12 @@ const OurProduct = () => {
                   searchInput={searchInput}
                   onSearchChange={handleSearchChange}
                   onSearchSubmit={handleSearch}
+                  selectedCategories={selectedCategories}
+                  setSelectedCategories={setSelectedCategories}
+                  selectedSorts={selectedSorts}
+                  setSelectedSorts={setSelectedSorts}
+                  priceRange={priceRange}
+                  setPriceRange={setPriceRange}
                   onReset={handleResetFilter}
                   className="w-full bg-transparent text-white"
                 />
@@ -131,9 +193,11 @@ const OurProduct = () => {
           </>
         )}
       </section>
+
       <section className="my-6">
         <CardPromo />
       </section>
+
       <section className="my-8 mx-12">
         <h3 className="text-5xl mb-5">
           Our <span className="text-[#8E6447]">Product</span>
@@ -144,18 +208,34 @@ const OurProduct = () => {
             searchInput={searchInput}
             onSearchChange={handleSearchChange}
             onSearchSubmit={handleSearch}
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
+            selectedSorts={selectedSorts}
+            setSelectedSorts={setSelectedSorts}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
             onReset={handleResetFilter}
-            className="hidden md:flex p-8 w-sm md:h-[650px]"
+            className="hidden md:flex p-8 w-sm md:h-[700px]"
           />
+
           <div className="w-full">
-            <Pagination
-              data={filteredProducts}
-              itemsPerPage={6}
-              gridCols="grid-cols-1 md:grid-cols-2"
-              renderItem={(product) => (
-                <CardProduct key={product.id} product={product} />
-              )}
-            />
+            {filteredProducts.length > 0 ? (
+              <Pagination
+                data={filteredProducts}
+                itemsPerPage={6}
+                gridCols="grid-cols-1 md:grid-cols-2"
+                renderItem={(product) => (
+                  <CardProduct key={product.id} product={product} />
+                )}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-64 text-center text-gray-600">
+                <p className="text-lg font-medium">❌ Data tidak tersedia</p>
+                <p className="text-sm">
+                  Coba ubah filter atau pencarian untuk melihat produk lain.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
