@@ -14,10 +14,46 @@ const ProductFilter = ({
   searchInput,
   onSearchChange,
   onSearchSubmit,
+  selectedCategories = [],
+  setSelectedCategories,
+  selectedSorts = [],
+  setSelectedSorts,
+  priceRange = [0, 50000],
+  setPriceRange,
+  onReset,
   className = "",
 }) => {
+  const handleCategoryChange = (category) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const handleSortChange = (sort) => {
+    if (selectedSorts.includes(sort)) {
+      setSelectedSorts(selectedSorts.filter((s) => s !== sort));
+    } else {
+      setSelectedSorts([...selectedSorts, sort]);
+    }
+  };
+
   return (
-    <div className={`flex flex-col gap-4 bg-black rounded-lg text-white ${className}`}>
+    <div
+      className={`flex flex-col gap-4 bg-black rounded-lg text-white ${className}`}
+    >
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold">Filter</h1>
+        <button
+          type="button"
+          className="text-lg text-orange-400 hover:text-orange-300 transition cursor-pointer"
+          onClick={onReset}
+        >
+          Reset Filter
+        </button>
+      </div>
+
       <form onSubmit={onSearchSubmit} className="flex flex-col">
         <label htmlFor="search" className="font-bold text-lg mb-2">
           Search
@@ -40,46 +76,134 @@ const ProductFilter = ({
           </button>
         </div>
 
+
         <div>
           <h1 className="font-bold text-lg mb-2">Category</h1>
-          {["Favorite Product", "Coffe", "Non Coffe", "Foods", "Add-On"].map(
-            (item, i) => (
-              <div key={i} className="flex items-center gap-3 my-1">
-                <input
-                  type="checkbox"
-                  id={item}
-                  name={item}
-                  className="w-4 h-4 accent-orange-500"
-                />
-                <label htmlFor={item}>{item}</label>
-              </div>
-            )
-          )}
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Favorite Product"
+              checked={selectedCategories.includes("Favorite Product")}
+              onChange={() => handleCategoryChange("Favorite Product")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Favorite Product">Favorite Product</label>
+          </div>
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Coffe"
+              checked={selectedCategories.includes("Coffe")}
+              onChange={() => handleCategoryChange("Coffe")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Coffe">Coffe</label>
+          </div>
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Non Coffe"
+              checked={selectedCategories.includes("Non Coffe")}
+              onChange={() => handleCategoryChange("Non Coffe")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Non Coffe">Non Coffe</label>
+          </div>
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Foods"
+              checked={selectedCategories.includes("Foods")}
+              onChange={() => handleCategoryChange("Foods")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Foods">Foods</label>
+          </div>
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Add-On"
+              checked={selectedCategories.includes("Add-On")}
+              onChange={() => handleCategoryChange("Add-On")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Add-On">Add-On</label>
+          </div>
         </div>
 
         <div>
           <h1 className="font-bold text-lg mb-2 mt-4">Sort By</h1>
-          {["Buy1get1", "Flash Sale", "Birthday Package", "Cheap"].map(
-            (item, i) => (
-              <div key={i} className="flex items-center gap-3 my-1">
-                <input
-                  type="checkbox"
-                  id={item}
-                  name={item}
-                  className="w-4 h-4 accent-orange-500"
-                />
-                <label htmlFor={item}>{item}</label>
-              </div>
-            )
-          )}
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Buy1get1"
+              checked={selectedSorts.includes("Buy1get1")}
+              onChange={() => handleSortChange("Buy1get1")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Buy1get1">Buy1get1</label>
+          </div>
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Flash Sale"
+              checked={selectedSorts.includes("Flash Sale")}
+              onChange={() => handleSortChange("Flash Sale")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Flash Sale">Flash Sale</label>
+          </div>
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Birthday Package"
+              checked={selectedSorts.includes("Birthday Package")}
+              onChange={() => handleSortChange("Birthday Package")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Birthday Package">Birthday Package</label>
+          </div>
+
+          <div className="flex items-center gap-3 my-1">
+            <input
+              type="checkbox"
+              id="Cheap"
+              checked={selectedSorts.includes("Cheap")}
+              onChange={() => handleSortChange("Cheap")}
+              className="w-4 h-4 accent-orange-500"
+            />
+            <label htmlFor="Cheap">Cheap</label>
+          </div>
         </div>
 
         <div className="mt-4">
           <h1 className="font-bold text-lg mb-2">Range Price</h1>
-          <input type="range" className="w-full" />
+          <input
+            type="range"
+            min="0"
+            max="50000"
+            step="5000"
+            value={priceRange[1]}
+            onChange={(e) => setPriceRange([0, Number(e.target.value)])}
+            className="w-full accent-orange-500"
+          />
+          <p className="text-sm mt-2">
+            Rp{priceRange[0].toLocaleString()} - Rp
+            {priceRange[1].toLocaleString()}
+          </p>
         </div>
 
-        <Button type="submit">Apply</Button>
+        <Button type="submit" className="mt-4">
+          Apply
+        </Button>
       </form>
     </div>
   );
