@@ -5,9 +5,7 @@ import BaristaImg from "/images/people.png";
 import CeklisImg from "/images/ceklis.png";
 import CardProduct from "../components/CardProduct";
 import MapsImg from "/images/maps.png";
-
 import ChatWidget from "../components/ChatWidget";
-import { MoveLeft, MoveRight } from "lucide-react";
 import Testimonial from "../components/Testimonial";
 
 const HomePage = () => {
@@ -164,7 +162,7 @@ const HomePage = () => {
             yours too!
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mx-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 my-3 md:my-8 mx-8">
           {products.slice(0, 4).map((product) => (
             <CardProduct product={product} />
           ))}
