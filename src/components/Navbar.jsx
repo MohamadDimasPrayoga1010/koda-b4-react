@@ -1,26 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import CoffeLogo from "/images/Frame.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchIcon from "/images/Search.png";
 import CartIcon from "/images/ShoppingCart.png";
-import { X, Menu } from "lucide-react";
+import { X, Menu, ChevronDown } from "lucide-react";
+import AuthContext from "../context/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const { user, isLoggedIn, logout } = useContext(AuthContext);
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleDropdown = () => setShowDropdown(!showDropdown);
 
-  const isActive = (path) => {
-    return location.pathname === path;
+  const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    setShowDropdown(false);
+    navigate("/login");
   };
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50  bg-[#0B0909]/80  py-5 px-6 md:px-16 lg:px-32">
+      <header className="fixed top-0 left-0 w-full z-50 bg-[#0B0909]/80 py-5 px-6 md:px-16 lg:px-32">
         <nav className="flex justify-between items-center">
           <div className="flex items-center gap-3 md:gap-5">
             <img src={CoffeLogo} alt="coffe-logo" className="h-8 md:h-10" />
@@ -48,23 +55,62 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4 relative">
             <Link>
               <img src={SearchIcon} alt="search-icon" className="w-5 h-5" />
             </Link>
             <Link to="/payment-details">
               <img src={CartIcon} alt="cart-icon" className="w-5 h-5" />
             </Link>
-            <Link to="/login">
-              <button className="py-3 px-4 border border-white text-white rounded hover:bg-white hover:text-black transition">
-                SignIn
-              </button>
-            </Link>
-            <Link to="/register">
-              <button className="py-3 px-4 bg-[#FF8906] text-black rounded hover:bg-[#e67a05] transition">
-                SignUp
-              </button>
-            </Link>
+
+            {!isLoggedIn ? (
+              <>
+                <Link to="/login">
+                  <button className="py-3 px-4 border border-white text-white rounded hover:bg-white hover:text-black transition">
+                    SignIn
+                  </button>
+                </Link>
+                <Link to="/register">
+                  <button className="py-3 px-4 bg-[#FF8906] text-black rounded hover:bg-[#e67a05] transition">
+                    SignUp
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={toggleDropdown}
+                  className="flex items-center gap-2 text-white hover:text-[#FF8906]"
+                >
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      user?.fullName || "User"
+                    )}&background=FF8906&color=fff`}
+                    alt="profile"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <ChevronDown size={18} />
+                </button>
+
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50">
+                    <Link
+                      to="/profile"
+                      onClick={() => setShowDropdown(false)}
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex md:hidden items-center gap-4">
@@ -82,6 +128,7 @@ const Navbar = () => {
         </nav>
       </header>
 
+
       {isMenuOpen && (
         <>
           <div
@@ -90,7 +137,7 @@ const Navbar = () => {
           ></div>
 
           <div className="fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-lg md:hidden animate-slide-in">
-            <div className="p-6">
+            <div className="p-6 flex flex-col h-full">
               <div className="flex items-center justify-between mb-8">
                 <img src={CoffeLogo} alt="coffe-logo" className="h-8" />
                 <button
@@ -145,18 +192,55 @@ const Navbar = () => {
                 </Link>
               </div>
 
-              <div className="space-y-3 mt-auto absolute bottom-6 left-6 right-6">
-                <Link to="/login" onClick={toggleMenu}>
-                  <button className="w-full py-3 px-4 border border-[#FF8906] text-[#FF8906] rounded-lg font-medium hover:bg-[#FF8906] hover:text-white transition">
-                    SignIn
-                  </button>
-                </Link>
-                <Link to="/register" onClick={toggleMenu}>
-                  <button className="w-full py-3 px-4 bg-[#FF8906] text-white rounded-lg font-medium hover:bg-[#e67a05] transition">
-                    SignUp
-                  </button>
-                </Link>
-              </div>
+              {!isLoggedIn ? (
+                <div className="space-y-3 mt-auto">
+                  <Link to="/login" onClick={toggleMenu}>
+                    <button className="w-full py-3 px-4 border border-[#FF8906] text-[#FF8906] rounded-lg font-medium hover:bg-[#FF8906] hover:text-white transition">
+                      SignIn
+                    </button>
+                  </Link>
+                  <Link to="/register" onClick={toggleMenu}>
+                    <button className="w-full py-3 px-4 bg-[#FF8906] text-white rounded-lg font-medium hover:bg-[#e67a05] transition">
+                      SignUp
+                    </button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="mt-auto">
+                  <div className="flex items-center gap-3 border-t border-gray-200 pt-4">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user?.fullName || "User"
+                      )}&background=FF8906&color=fff`}
+                      alt="profile"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <div>
+                      <p className="text-gray-800 font-semibold">
+                        {user?.fullName || "User"}
+                      </p>
+                      <p className="text-gray-500 text-sm">
+                        {user?.email || ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <Link
+                      to="/profile"
+                      onClick={toggleMenu}
+                      className="block py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </>
