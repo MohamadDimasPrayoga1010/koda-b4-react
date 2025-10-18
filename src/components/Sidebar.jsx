@@ -21,7 +21,7 @@ const Sidebar = () => {
     {
       name: "Keluar",
       icon: <img src={ExitIcon} alt="icon" className="w-5 h-5" />,
-      path: "/logout",
+      path: "/login",
     },
   ];
 
