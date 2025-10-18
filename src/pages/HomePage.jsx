@@ -164,7 +164,7 @@ const HomePage = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 my-3 md:my-8 mx-8">
           {products.slice(0, 4).map((product) => (
-            <CardProduct product={product} />
+            <CardProduct key={product.id} product={product} />
           ))}
         </div>
         ;
