@@ -114,7 +114,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex md:hidden items-center gap-4">
-            <Link to="payment-details">
+            <Link>
               <img src={CartIcon} alt="cart-icon" className="w-6 h-6" />
             </Link>
             <button
@@ -167,6 +167,7 @@ const Navbar = () => {
                 </div>
               </div>
 
+
               <div className="mb-6">
                 <Link
                   to="/"
@@ -193,7 +194,11 @@ const Navbar = () => {
               </div>
 
               {!isLoggedIn ? (
+<<<<<<< HEAD
                 <div className="space-y-3 mt-auto">
+=======
+                <div className="space-y-3 flex flex-col gap-1 mt-auto">
+>>>>>>> dc4d9c1 (feat:added logout feature~)
                   <Link to="/login" onClick={toggleMenu}>
                     <button className="w-full py-3 px-4 border border-[#FF8906] text-[#FF8906] rounded-lg font-medium hover:bg-[#FF8906] hover:text-white transition">
                       SignIn
