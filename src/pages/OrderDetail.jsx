@@ -181,14 +181,17 @@ const OrderDetail = () => {
                       <span>{item.delivery}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {item.originalPrice && (
+                      {item.isFlashSale && item.originalPrice && (
                         <span className="text-xs text-red-500 line-through">
                           IDR {item.originalPrice.toLocaleString("id-ID")}
                         </span>
                       )}
                       <span className="text-lg font-bold text-[#FF8906]">
                         IDR{" "}
-                        {(item.price * item.quantity).toLocaleString("id-ID")}
+                        {(
+                          (item.isFlashSale ? item.price : item.originalPrice) *
+                          item.quantity
+                        ).toLocaleString("id-ID")}
                       </span>
                     </div>
                   </div>
