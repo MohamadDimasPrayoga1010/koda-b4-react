@@ -12,6 +12,7 @@ const AuthContext = createContext({
   isLoggedIn: false,
   register: () => {},
   login: () => {},
+  logout: () => {},
 });
 
 export const AuthProvider = ({ children }) => {
@@ -34,10 +35,11 @@ export const AuthProvider = ({ children }) => {
     }
     return result;
   };
+  const logout = () => { setUser(null); setIsLoggedIn(false); setToLocalStorage(STORAGE_KEYS.USER, null); setToLocalStorage(STORAGE_KEYS.IS_LOGGED_IN, false); };
 
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, register, login }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, register, login,logout }}>
       {children}
     </AuthContext.Provider>
   );
