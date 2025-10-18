@@ -17,6 +17,7 @@ const DetailProduct = () => {
   const [selectedTemp, setSelectedTemp] = useState("Ice");
   const [mainImage, setMainImage] = useState(0);
   const dispatch = useDispatch();
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -73,6 +74,8 @@ const DetailProduct = () => {
     };
 
     dispatch(addToCart(item));
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
   };
 
   if (loading) {
@@ -149,14 +152,25 @@ const DetailProduct = () => {
           </h1>
 
           <div className="flex items-center gap-3 mb-4">
-            {selectedProduct.originalPrice && (
-              <p className="text-lg text-red-500 line-through">
-                IDR {selectedProduct.originalPrice.toLocaleString("id-ID")}
+            {selectedProduct.isFlashSale ? (
+              <>
+                {selectedProduct.originalPrice && (
+                  <p className="text-lg text-red-500 line-through">
+                    IDR {selectedProduct.originalPrice.toLocaleString("id-ID")}
+                  </p>
+                )}
+                <p className="text-2xl font-bold text-[#FF8906]">
+                  IDR {selectedProduct.price.toLocaleString("id-ID")}
+                </p>
+              </>
+            ) : (
+              <p className="text-2xl font-bold text-gray-800">
+                IDR{" "}
+                {(
+                  selectedProduct.originalPrice ?? selectedProduct.price
+                ).toLocaleString("id-ID")}
               </p>
             )}
-            <p className="text-2xl font-bold text-[#FF8906]">
-              IDR {selectedProduct.price.toLocaleString("id-ID")}
-            </p>
           </div>
 
           <div className="flex items-center gap-2 mb-4">
@@ -196,11 +210,29 @@ const DetailProduct = () => {
             </button>
             <span className="text-lg font-semibold">{quantity}</span>
             <button
-              onClick={() => setQuantity(quantity + 1)}
-              className="w-8 h-8 bg-[#FF8906] text-white flex items-center justify-center font-bold hover:bg-orange-600 transition"
+              onClick={() => {
+                if (quantity < selectedProduct.stock) {
+                  setQuantity(quantity + 1);
+                }
+              }}
+              disabled={quantity >= selectedProduct.stock}
+              className={`w-8 h-8 flex items-center justify-center font-bold transition ${
+                quantity < selectedProduct.stock
+                  ? "bg-[#FF8906] text-white hover:bg-orange-600"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              }`}
             >
               +
             </button>
+          </div>
+
+          {/* stok tersisa */}
+          <div className="mb-6 text-sm text-gray-500">
+            {selectedProduct.stock > 0 ? (
+              <p>Stock tersisa: {selectedProduct.stock - quantity}</p>
+            ) : (
+              <p className="text-red-500 font-medium">Stock habis</p>
+            )}
           </div>
 
           <div className="mb-6">
@@ -256,6 +288,11 @@ const DetailProduct = () => {
               Add to Cart
             </button>
           </div>
+          {added && (
+            <div className="mt-3 text-green-600 text-center text-sm font-semibold">
+              Added to Cart!
+            </div>
+          )}
         </div>
       </section>
 
