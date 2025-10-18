@@ -10,15 +10,23 @@ const coffeOrderSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action) => {
-      const exists = state.cart.find(
-        (item) => item.productId === action.payload.productId
+      const newItem = action.payload;
+
+      const existingItem = state.cart.find(
+        (cartItem) =>
+          cartItem.productId === newItem.productId &&
+          cartItem.size === newItem.size &&
+          cartItem.temperature === newItem.temperature &&
+          cartItem.delivery === newItem.delivery
       );
-      if (!exists) {
-        state.cart.push(action.payload);
+
+      if (existingItem) {
+        existingItem.quantity += newItem.quantity;
       } else {
-        exists.quantity += action.payload.quantity;
+        state.cart.push({ ...newItem });
       }
     },
+
     removeFromCart: (state, action) => {
       state.cart = state.cart.filter(
         (item) => item.cartItemId !== action.payload
