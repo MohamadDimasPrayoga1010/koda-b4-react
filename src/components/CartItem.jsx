@@ -49,7 +49,7 @@ const CartItems = ({ cartItems = [], onRemoveItem, validationErrors }) => {
         <div className="space-y-4">
           {cartItems.map((item) => (
             <div
-              key={item.cartItemId} 
+              key={item.cartItemId}
               className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
             >
               {item?.image ? (
@@ -96,16 +96,19 @@ const CartItems = ({ cartItems = [], onRemoveItem, validationErrors }) => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  {item?.originalPrice && (
+                  {item?.isFlashSale && item?.originalPrice && (
                     <p className="text-sm text-red-500 line-through">
                       IDR {item.originalPrice.toLocaleString("id-ID")}
                     </p>
                   )}
                   <p className="text-lg font-bold text-[#FF8906]">
                     IDR{" "}
-                    {(item?.price * item?.quantity || 0).toLocaleString(
-                      "id-ID"
-                    )}
+                    {(item?.isFlashSale
+                      ? item?.price * item?.quantity
+                      : item?.originalPrice * item?.quantity ||
+                        item?.price * item?.quantity ||
+                        0
+                    ).toLocaleString("id-ID")}
                   </p>
                 </div>
               </div>
