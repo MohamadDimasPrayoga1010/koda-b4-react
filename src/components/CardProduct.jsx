@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/reducer/coffeOrder";
-import { useState} from "react";
+import { useState } from "react";
 
 /**
  * @typedef {Object} Product
@@ -21,6 +21,7 @@ function CardProduct({ product }) {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.coffeOrder.cart || []);
   const [added, setAdded] = useState(false);
+  const currentStock = product.stock ?? 0;
 
   const formatRupiah = (price) => `IDR ${price.toLocaleString("id-ID")}`;
 
@@ -43,6 +44,7 @@ function CardProduct({ product }) {
   };
 
   const handleAddToCart = (product) => {
+    if (product.stock <= 0) return;
     const exists = cartItems.find((item) => item.productId === product.id);
     if (!exists) {
       dispatch(
@@ -76,12 +78,19 @@ function CardProduct({ product }) {
           FLASH SALE!
         </div>
       )}
-      <div className="w-full h-60 sm:h-64 md:h-72 overflow-hidden">
+      <div className="w-full h-60 sm:h-64 md:h-72 overflow-hidden relative">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          className={`w-full h-full object-cover transition-transform duration-300 hover:scale-105 ${
+            currentStock <= 0 ? "opacity-60" : "hover:scale-105"
+          }`}
         />
+        {currentStock <= 0 && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <span className="text-white text-lg font-semibold">SOLD OUT</span>
+          </div>
+        )}
       </div>
 
       <div className="absolute top-[230px] left-1/2 -translate-x-1/2 w-[90%] sm:w-[85%] bg-white p-4 shadow-md">
@@ -101,24 +110,41 @@ function CardProduct({ product }) {
 
         <div className="flex items-center justify-between mb-4">
           <div className="flex flex-col">
-            {product.originalPrice && (
-              <span className="text-sm text-red-500 line-through">
-                {formatRupiah(product.originalPrice)}
+            {product.isFlashSale ? (
+              <>
+                {product.originalPrice && (
+                  <span className="text-sm text-red-500 line-through">
+                    {formatRupiah(product.originalPrice)}
+                  </span>
+                )}
+                <span className="text-lg font-bold text-[#FF8906]">
+                  {formatRupiah(product.price)}
+                </span>
+              </>
+            ) : (
+              <span className="text-lg font-bold text-gray-800">
+                {formatRupiah(product.originalPrice ?? product.price)}
               </span>
             )}
-            <span className="text-lg font-bold text-[#FF8906]">
-              {formatRupiah(product.price)}
-            </span>
           </div>
         </div>
 
         <div className="flex gap-2">
-          <Link
-            to={`/detail-product/${product.slug}`}
-            className="flex-1 bg-[#FF8906] hover:bg-[#e67a05] text-white text-sm py-2 px-4 rounded-md font-semibold transition-colors duration-300 flex items-center justify-center"
-          >
-            Buy
-          </Link>
+          {product.stock > 0 ? (
+            <Link
+              to={`/detail-product/${product.slug}`}
+              className="flex-1 text-sm py-2 px-4 rounded-md font-semibold transition-colors duration-300 flex items-center justify-center bg-[#FF8906] hover:bg-[#e67a05] text-white"
+            >
+              Buy
+            </Link>
+          ) : (
+            <button
+              disabled
+              className="flex-1 text-sm py-2 px-4 rounded-md font-semibold bg-gray-300 text-gray-600 cursor-not-allowed"
+            >
+              Out of Stock
+            </button>
+          )}
           <button
             onClick={() => handleAddToCart(product)}
             className="border border-[#FF8906] p-2 rounded-md transition-colors h-10 w-10 flex items-center justify-center shrink-0 hover:bg-[#FFF3E0]"
@@ -127,7 +153,7 @@ function CardProduct({ product }) {
           </button>
         </div>
 
-        {added && (
+        {added && product.stock > 0 && (
           <div className="mt-2 text-center text-green-600 text-sm font-semibold">
             Added to Cart!
           </div>
