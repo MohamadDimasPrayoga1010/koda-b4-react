@@ -29,7 +29,6 @@ const Navbar = () => {
     <>
       <header className="fixed top-0 left-0 w-full z-50 bg-[#0B0909]/80 py-5 px-6 md:px-16 lg:px-32">
         <nav className="flex justify-between items-center">
-          {/* Left Logo + Menu */}
           <div className="flex items-center gap-3 md:gap-5">
             <img src={CoffeLogo} alt="coffe-logo" className="h-8 md:h-10" />
             <div className="hidden md:flex gap-8">
@@ -56,9 +55,8 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Right Section (Desktop) */}
           <div className="hidden md:flex items-center gap-4 relative">
-            <Link>
+            <Link to="/our-product">
               <img src={SearchIcon} alt="search-icon" className="w-5 h-5" />
             </Link>
             <Link to="/payment-details">
@@ -115,7 +113,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+     
           <div className="flex md:hidden items-center gap-4">
             <Link>
               <img src={CartIcon} alt="cart-icon" className="w-6 h-6" />
@@ -152,7 +150,6 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* Search */}
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">
                   Search Product
@@ -171,7 +168,6 @@ const Navbar = () => {
                 </div>
               </div>
 
-              {/* Menu Links */}
               <div className="mb-6">
                 <Link
                   to="/"
