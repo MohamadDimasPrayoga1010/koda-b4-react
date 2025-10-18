@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Mail, User, MapPin } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import CartItems from "../components/CartItem";
-import { addOrder, clearCart, removeFromCart } from "../redux/reducer/coffeOrder";
+import {
+  addOrder,
+  clearCart,
+  removeFromCart,
+} from "../redux/reducer/coffeOrder";
 
 const PaymentDetails = () => {
   const navigate = useNavigate();
@@ -32,10 +36,13 @@ const PaymentDetails = () => {
   ];
 
   const deliveryFee = formData.delivery === "door-delivery" ? 10000 : 0;
-  const orderTotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+ const orderTotal = cartItems.reduce((sum, item) => {
+  const itemPrice = item.isFlashSale
+    ? item.price 
+    : item.originalPrice || item.price;
+  return sum + itemPrice * item.quantity;
+}, 0);
+
   const taxAmount = orderTotal * 0.1;
   const grandTotal = orderTotal + deliveryFee + taxAmount;
 
