@@ -115,7 +115,7 @@ const Navbar = () => {
 
      
           <div className="flex md:hidden items-center gap-4">
-            <Link>
+            <Link to="/payment-details">
               <img src={CartIcon} alt="cart-icon" className="w-6 h-6" />
             </Link>
             <button
