@@ -1,4 +1,6 @@
 FROM node:alpine AS builder
+ARG VITE_BASE_URL
+ENV VITE_BASE_URL=${VITE_BASE_URL}
 
 WORKDIR /app
 COPY . .
