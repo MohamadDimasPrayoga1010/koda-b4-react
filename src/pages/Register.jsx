@@ -11,7 +11,7 @@ import PasswordIcon from "/images/Password.svg";
 import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import Button from "../components/Button";
-import AuthContext  from "../context/AuthContext"; 
+import AuthContext from "../context/AuthContext"; 
 import AuthAlert from "../components/AuthAlert";
 
 const Register = () => {
@@ -40,29 +40,26 @@ const Register = () => {
     setFailedMessage("");
 
     try {
-      const result = registerUser({
+      const result = await registerUser({
         fullName: data.fullName,
         email: data.email,
         password: data.password,
       });
 
       if (result.success) {
-        setSuccessMessage("Registration successful! Please login");
+        setSuccessMessage(result.message || "Registration successful! Please login");
         reset();
-        console.log("Registered user:", result.user);
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
-       
+        setTimeout(() => navigate("/login"), 1500);
       } else {
         setError("email", {
           type: "manual",
-          message: result.message,
+          message: result.message || "Registration failed",
         });
+        setFailedMessage(result.message || "Registration failed");
       }
     } catch (error) {
       console.error("Registration error:", error);
-      setFailedMessage("An error occurred during registration");
+      setFailedMessage("Failed to connect to server");
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +67,6 @@ const Register = () => {
 
   const handleSocialLogin = (provider) => {
     setSuccessMessage("");
-    setFailedMessage("");
     setFailedMessage(`${provider} login is not implemented yet.`);
   };
 
@@ -78,11 +74,12 @@ const Register = () => {
     <main className="my-6 md:my-0">
       <div className="flex">
         <img src={Rectangle} alt="coffe-img" className="hidden md:block" />
-        <div className="bg-white w-full max-w-[780px] min-h-[821px] mx-10 md:mt-[61px]">
-          <AuthAlert type="success" message={successMessage}/>
-          <AuthAlert type="error" message={failedMessage}/>
+        <div className="bg-white w-full max-w-[780px] min-h-[821px] mx-10 md:mt-[61px] p-6">
+          <AuthAlert type="success" message={successMessage} />
+          <AuthAlert type="error" message={failedMessage} />
+
           <div>
-            <img src={CoffeLogo} alt="coffe-img" />
+            <img src={CoffeLogo} alt="coffe-logo" />
           </div>
           <h1 className="text-[#8E6447] text-2xl font-semibold mt-6">
             Register
@@ -138,7 +135,7 @@ const Register = () => {
               icon={<img src={PasswordIcon} alt="password-icon" />}
             />
 
-            <Button className="w-full">
+            <Button className="w-full" type="submit">
               {isLoading ? "Registering..." : "Register"}
             </Button>
           </form>
@@ -170,7 +167,7 @@ const Register = () => {
               className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
               onClick={() => handleSocialLogin("Facebook")}
             >
-              <img src={FacebookIcon} alt="facebox-icon" />
+              <img src={FacebookIcon} alt="facebook-icon" />
               <span className="text-gray-700 font-medium text-sm">
                 Facebook
               </span>
