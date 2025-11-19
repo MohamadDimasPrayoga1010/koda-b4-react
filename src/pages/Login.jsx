@@ -40,43 +40,39 @@ const Login = () => {
     resolver: yupResolver(loginSchema),
   });
 
-  const onSubmit = async (data) => {
-    setIsLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+ const onSubmit = async (data) => {
+  setIsLoading(true);
+  setErrorMessage("");
+  setSuccessMessage("");
 
-    try {
-      if (data.email === "admin@gmail.com" && data.password === "Admin123") {
-      setSuccessMessage("Welcome back, Admin!");
+  try {
+    const result = await login(data.email, data.password);
+
+    if (result.success) {
+      setSuccessMessage(result.message);
+
+      console.log("Logged in user:", result.data); 
+
       setTimeout(() => {
-        navigate("/dashboard"); 
-      }, 1000);
-      return;
-    }
-      const result = login(data.email, data.password);
-
-      if (result.success) {
-        console.log("Logged in user:", result.user);
-        setSuccessMessage(result.message);
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
+        navigate("/"); // bisa diganti ke /dashboard jika admin
+      }, 1500);
+    } else {
+      if (result.message.includes("Email")) {
+        setError("email", { type: "manual", message: result.message });
+      } else if (result.message.includes("password")) {
+        setError("password", { type: "manual", message: result.message });
       } else {
-        if (result.message.includes("Email")) {
-          setError("email", { type: "manual", message: result.message });
-        } else if (result.message.includes("password")) {
-          setError("password", { type: "manual", message: result.message });
-        } else {
-          setErrorMessage(result.message);
-        }
+        setErrorMessage(result.message);
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrorMessage("An error occurred during login. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Login error:", error);
+    setErrorMessage("An error occurred during login. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleSocialLogin = (provider) => {
     setErrorMessage("");

@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { apiRequest } from "../utils/api";
+import { apiRequest } from "../utils/api"; 
 
 const AuthContext = createContext({
   user: null,
@@ -9,22 +9,48 @@ const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
+  /**
+   * Register user ke backend
+   * @param {{ fullname: string, email: string, password: string }} userData
+   * @returns {Promise<{success: boolean, message: string, data?: any}>}
+   */
   const register = async (userData) => {
-    const res = await apiRequest("/auth/register", "POST", userData);
-    return res;
+    try {
+      const res = await apiRequest("/auth/register", "POST", userData);
+      return res;
+    } catch (error) {
+      console.error("Register error:", error);
+      return {
+        success: false,
+        message: "Failed to register. Please try again.",
+      };
+    }
   };
 
+  /**
+   * Login user ke backend
+   * @param {string} email 
+   * @param {string} password 
+   * @returns {Promise<{success: boolean, message: string, data?: any}>}
+   */
   const login = async (email, password) => {
-    const res = await apiRequest("/auth/login", "POST", { email, password });
-    if (res.success) {
-      setUser(res.data);
-      setIsLoggedIn(true);
-      localStorage.setItem("token", res.data.token);
+    try {
+      const res = await apiRequest("/auth/login", "POST", { email, password });
+      if (res.success) {
+        setUser(res.data);      
+        setIsLoggedIn(true);
+      }
+      return res;
+    } catch (error) {
+      console.error("Login error:", error);
+      return {
+        success: false,
+        message: "Failed to login. Please try again.",
+      };
     }
-    return res;
   };
 
   return (
