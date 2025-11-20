@@ -12,7 +12,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { user, isLoggedIn, logout } = useContext(AuthContext);
+  const { user, isLoggedIn, logout, loading } = useContext(AuthContext);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
@@ -113,7 +113,6 @@ const Navbar = () => {
             )}
           </div>
 
-     
           <div className="flex md:hidden items-center gap-4">
             <Link to="/payment-details">
               <img src={CartIcon} alt="cart-icon" className="w-6 h-6" />
@@ -193,7 +192,6 @@ const Navbar = () => {
                 </Link>
               </div>
 
-           
               {!isLoggedIn ? (
                 <div className="space-y-3 flex flex-col gap-1 mt-auto">
                   <Link to="/login" onClick={toggleMenu}>
