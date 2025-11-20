@@ -3,7 +3,7 @@ import InputField from "../components/InputField";
 import Button from "../components/Button";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { loginSchema } from "../utils/loginSchema";
 import { Mail } from "lucide-react";
@@ -11,73 +11,74 @@ import PasswordIcon from "/images/Password.svg";
 import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import LoginImg from "/images/LoginImg.png";
-import AuthContext from "../context/AuthContext";
 import AuthAlert from "../components/AuthAlert";
+import { useDispatch, useSelector } from "react-redux";
+import { login as loginAction, setError, setLoading, setMessage } from "../redux/reducer/auth";
+import { apiRequest } from "../utils/api";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-
-  const { login } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (location.state?.message) {
-      setSuccessMessage(location.state.message);
-      window.history.replaceState({}, document.title);
-    }
-  }, [location]);
+  const dispatch = useDispatch();
+  const { loading, error, message } = useSelector((state) => state.auth);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
+    setError: setFormError,
   } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
- const onSubmit = async (data) => {
-  setIsLoading(true);
-  setErrorMessage("");
-  setSuccessMessage("");
-
-  try {
-    const result = await login(data.email, data.password);
-
-    if (result.success) {
-      setSuccessMessage(result.message);
-
-      console.log("Logged in user:", result.data); 
-
-      setTimeout(() => {
-        navigate("/"); // bisa diganti ke /dashboard jika admin
-      }, 1500);
-    } else {
-      if (result.message.includes("Email")) {
-        setError("email", { type: "manual", message: result.message });
-      } else if (result.message.includes("password")) {
-        setError("password", { type: "manual", message: result.message });
-      } else {
-        setErrorMessage(result.message);
-      }
+  useEffect(() => {
+    if (location.state?.message) {
+      dispatch(setMessage(location.state.message));
+      window.history.replaceState({}, document.title);
     }
-  } catch (error) {
-    console.error("Login error:", error);
-    setErrorMessage("An error occurred during login. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  }, [location, dispatch]);
 
+  const onSubmit = async (data) => {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    dispatch(setMessage(null));
+
+    try {
+      const result = await apiRequest("/auth/login", "POST", {
+        email: data.email,
+        password: data.password,
+      });
+
+      if (result.success) {
+        dispatch(loginAction(result.data));
+        dispatch(setMessage(result.message));
+
+        console.log("Logged in user:", result.data);
+
+        setTimeout(() => {
+          navigate("/"); 
+        }, 1500);
+      } else {
+        if (result.message.includes("Email")) {
+          setFormError("email", { type: "manual", message: result.message });
+        } else if (result.message.includes("password")) {
+          setFormError("password", { type: "manual", message: result.message });
+        } else {
+          dispatch(setError(result.message));
+        }
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      dispatch(setError("An error occurred during login. Please try again."));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
   const handleSocialLogin = (provider) => {
-    setErrorMessage("");
-    setSuccessMessage("");
-    setErrorMessage(`${provider} login is not implemented yet.`);
+    dispatch(setError(`${provider} login is not implemented yet.`));
+    dispatch(setMessage(""));
   };
 
   return (
@@ -85,8 +86,8 @@ const Login = () => {
       <div className="flex">
         <img src={LoginImg} alt="coffe-img" className="hidden md:block" />
         <div className="bg-white w-full max-w-[780px] min-h-[821px] my-10 mx-10 md:mt-60">
-          <AuthAlert type="success" message={successMessage}/>
-          <AuthAlert type="error" message={errorMessage}/>
+          <AuthAlert type="success" message={message} />
+          <AuthAlert type="error" message={error} />
 
           <div>
             <img src={CoffeLogo} alt="coffe-img" />
@@ -127,8 +128,8 @@ const Login = () => {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+            <Button type="submit" className="w-full mt-6" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
 
@@ -143,6 +144,7 @@ const Login = () => {
               </Link>
             </p>
           </div>
+
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -151,6 +153,7 @@ const Login = () => {
               <span className="px-3 bg-white text-gray-500">Or</span>
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -158,9 +161,7 @@ const Login = () => {
               onClick={() => handleSocialLogin("Facebook")}
             >
               <img src={FacebookIcon} alt="facebook-icon" />
-              <span className="text-gray-700 font-medium text-sm">
-                Facebook
-              </span>
+              <span className="text-gray-700 font-medium text-sm">Facebook</span>
             </button>
             <button
               type="button"

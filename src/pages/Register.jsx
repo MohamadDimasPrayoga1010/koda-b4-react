@@ -3,7 +3,7 @@ import CoffeLogo from "/images/CoffeLogo.png";
 import InputField from "../components/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { schema } from "../utils/schema";
 import { Mail, User } from "lucide-react";
@@ -11,8 +11,15 @@ import PasswordIcon from "/images/Password.svg";
 import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import Button from "../components/Button";
-import AuthContext from "../context/AuthContext"; 
 import AuthAlert from "../components/AuthAlert";
+
+import { useDispatch } from "react-redux";
+import {
+  register as registerAction,
+  setLoading,
+  setError,
+} from "../redux/reducer/auth";
+import { apiRequest } from "../utils/api";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,8 +28,7 @@ const Register = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [failedMessage, setFailedMessage] = useState("");
   const navigate = useNavigate();
-
-  const { register: registerUser } = useContext(AuthContext); 
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -38,16 +44,20 @@ const Register = () => {
     setIsLoading(true);
     setSuccessMessage("");
     setFailedMessage("");
+    dispatch(setLoading(true));
 
     try {
-      const result = await registerUser({
-        fullName: data.fullName,
+      const result = await apiRequest("/auth/register", "POST", {
+        fullname: data.fullName,
         email: data.email,
         password: data.password,
       });
 
       if (result.success) {
-        setSuccessMessage(result.message || "Registration successful! Please login");
+        dispatch(registerAction(result.data));
+        setSuccessMessage(
+          result.message || "Registration successful! Please login"
+        );
         reset();
         setTimeout(() => navigate("/login"), 1500);
       } else {
@@ -61,6 +71,7 @@ const Register = () => {
       console.error("Registration error:", error);
       setFailedMessage("Failed to connect to server");
     } finally {
+      dispatch(setLoading(false));
       setIsLoading(false);
     }
   };
