@@ -9,7 +9,7 @@ function CardProduct({ product }) {
   const cartItems = useSelector((state) => state.coffeOrder.cart || []);
   const [added, setAdded] = useState(false);
 
-  const price = Number(product.base_price ?? 0);
+  const price = Number(product.basePrice ?? 0);
   const isFlashSale = product.isFlashSale ?? false;
   const originalPrice = product.originalPrice ?? null;
 
@@ -23,7 +23,7 @@ function CardProduct({ product }) {
           productId: product.id,
           name: product.name,
           image: product.image,
-          price: price,
+          basePrice: product.basePrice,
           originalPrice: originalPrice,
           isFlashSale: isFlashSale,
           quantity: 1,
