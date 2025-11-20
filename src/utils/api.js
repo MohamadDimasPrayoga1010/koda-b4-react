@@ -1,8 +1,11 @@
-export const apiRequest = async (endpoint, method = "POST", body = null) => {
+export const apiRequest = async (endpoint, method = "POST", body = null, token = null) => {
   try {
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`; 
+
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}${endpoint}`, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: body ? JSON.stringify(body) : null,
     });
 
