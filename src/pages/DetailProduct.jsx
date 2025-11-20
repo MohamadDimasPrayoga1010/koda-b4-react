@@ -99,26 +99,25 @@ const DetailProduct = () => {
   };
 
   // Calculate current price with selected size
-  const getCurrentPrice = () => {
-    if (!selectedProduct) return 0;
-    
-    let price = selectedProduct.basePrice;
-    
-    // Add variant price
-    if (selectedProduct.variant && selectedProduct.variant.additionalPrice) {
-      price += selectedProduct.variant.additionalPrice;
+const getCurrentPrice = () => {
+  if (!selectedProduct) return 0;
+  
+  let price = selectedProduct.basePrice;
+
+  if (selectedTemp === "Ice") {
+    price += 7000;
+  }
+ 
+  if (selectedSize && selectedProduct.sizes) {
+    const size = selectedProduct.sizes.find((s) => s.id === selectedSize);
+    if (size && size.additionalPrice) {
+      price += size.additionalPrice;
     }
-    
-    // Add size price
-    if (selectedSize && selectedProduct.sizes) {
-      const size = selectedProduct.sizes.find(s => s.id === selectedSize);
-      if (size && size.additionalPrice) {
-        price += size.additionalPrice;
-      }
-    }
-    
-    return price;
-  };
+  }
+
+  return price;
+};
+
 
   const handleBuyNow = () => {
     if (!selectedProduct) return;
@@ -254,7 +253,15 @@ const DetailProduct = () => {
 
           {/* Price */}
           <div className="flex items-center gap-3 mb-4">
-            {selectedProduct.isFlashSale ? (
+            <div>
+                {/* <p className="text-sm text-gray-500 mb-1">
+                  Base Price: IDR {selectedProduct.basePrice.toLocaleString("id-ID")}
+                </p> */}
+                <p className="text-2xl font-bold text-gray-800">
+                  IDR {getCurrentPrice().toLocaleString("id-ID")}
+                </p>
+              </div>
+            {/* {selectedProduct.isFlashSale ? (
               <>
                 {selectedProduct.originalPrice && (
                   <p className="text-lg text-red-500 line-through">
@@ -265,16 +272,16 @@ const DetailProduct = () => {
                   IDR {getCurrentPrice().toLocaleString("id-ID")}
                 </p>
               </>
-            ) : (
-              <div>
+            ) : ( */}
+              {/* <div>
                 <p className="text-sm text-gray-500 mb-1">
                   Base Price: IDR {selectedProduct.basePrice.toLocaleString("id-ID")}
                 </p>
                 <p className="text-2xl font-bold text-gray-800">
                   IDR {getCurrentPrice().toLocaleString("id-ID")}
                 </p>
-              </div>
-            )}
+              </div> */}
+            {/* )} */}
           </div>
 
           {/* Rating */}
