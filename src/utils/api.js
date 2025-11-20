@@ -1,12 +1,13 @@
-export const apiRequest = async (endpoint, method = "POST", body = null, token = null) => {
+export const apiRequest = async (endpoint, method = "GET", body = null, token = null, isFormData = false) => {
   try {
-    const headers = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`; 
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    if (!isFormData) headers["Content-Type"] = "application/json";
 
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}${endpoint}`, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : null,
+      body: isFormData ? body : body ? JSON.stringify(body) : null,
     });
 
     const data = await res.json();
