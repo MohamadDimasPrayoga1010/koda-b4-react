@@ -12,7 +12,7 @@ import OrderDetail from "./pages/OrderDetail";
 import Profile from "./pages/Profile";
 import MainLayoutAdmin from "./layout/MainLayoutAdmin";
 import Dashboard from "./pages/Dashboard";
-import { AuthProvider } from "./context/AuthContext";
+// import { AuthProvider } from "./context/AuthContext";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
@@ -52,9 +52,9 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <AuthProvider>
+        {/* <AuthProvider> */}
           <RouterProvider router={router} />
-        </AuthProvider>
+        {/* </AuthProvider> */}
       </PersistGate>
     </Provider>
   );
