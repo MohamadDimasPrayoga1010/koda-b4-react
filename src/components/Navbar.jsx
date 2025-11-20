@@ -1,18 +1,20 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import CoffeLogo from "/images/Frame.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchIcon from "/images/Search.png";
 import CartIcon from "/images/ShoppingCart.png";
 import { X, Menu, ChevronDown } from "lucide-react";
-import AuthContext from "../context/AuthContext";
+import { useSelector, useDispatch } from "react-redux";
+import { logout as logoutAction } from "../redux/reducer/auth";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const { user, isLoggedIn, logout, loading } = useContext(AuthContext);
+  const { user, isLoggedIn } = useSelector((state) => state.auth);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
@@ -20,7 +22,7 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
-    logout();
+    dispatch(logoutAction());
     setShowDropdown(false);
     navigate("/login");
   };
@@ -35,9 +37,7 @@ const Navbar = () => {
               <Link
                 to="/"
                 className={`text-white transition ${
-                  isActive("/")
-                    ? "border-b border-b-[#FF8906]"
-                    : "hover:text-[#FF8906]"
+                  isActive("/") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
                 }`}
               >
                 Home
@@ -45,9 +45,7 @@ const Navbar = () => {
               <Link
                 to="/our-product"
                 className={`text-white transition ${
-                  isActive("/our-product")
-                    ? "border-b border-b-[#FF8906]"
-                    : "hover:text-[#FF8906]"
+                  isActive("/our-product") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
                 }`}
               >
                 Product
