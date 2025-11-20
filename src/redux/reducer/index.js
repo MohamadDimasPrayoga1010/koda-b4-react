@@ -1,7 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import coffeOrderReducer from "../reducer/coffeOrder"
-const rootReducer = combineReducers({
-    coffeOrder: coffeOrderReducer
-})
+import coffeOrderReducer from "../reducer/coffeOrder";
+import authReducer from "../reducer/auth"; 
 
-export default rootReducer
+const rootReducer = combineReducers({
+  coffeOrder: coffeOrderReducer,
+  auth: authReducer, 
+});
+
+export default rootReducer;
