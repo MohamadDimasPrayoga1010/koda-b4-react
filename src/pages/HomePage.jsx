@@ -7,22 +7,34 @@ import CardProduct from "../components/CardProduct";
 import MapsImg from "/images/maps.png";
 import ChatWidget from "../components/ChatWidget";
 import Testimonial from "../components/Testimonial";
+import { getFavoriteProducts } from "../utils/products";
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
+      setError("");
+
       try {
-        const response = await fetch("/data/stockProduct.json");
-        const data = await response.json();
-        setProducts(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error loading products:", error);
+        const res = await getFavoriteProducts(10); 
+        console.log(res)
+        if (res.success) {
+          setProducts(res.data);
+        } else {
+          setError(res.message);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Gagal mengambil data produk.");
+      } finally {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, []);
 
@@ -36,6 +48,15 @@ const HomePage = () => {
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="col-span-full flex items-center justify-center py-12">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <main>
       <section className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
