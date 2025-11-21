@@ -3,9 +3,10 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Star, ThumbsUp } from "lucide-react";
 import CardProduct from "../components/CardProduct";
 import Pagination from "../components/Pagination";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../redux/reducer/coffeOrder";
 import { fetchDetailProduct } from "../utils/products";
+import { apiRequest } from "../utils/api";
+import AuthAlert from "../components/AuthAlert";
+import { useSelector } from "react-redux";
 
 const DetailProduct = () => {
   const { slug } = useParams();
@@ -15,24 +16,22 @@ const DetailProduct = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(
+    selectedProduct?.sizes?.[0]?.id || null
+  );
   const [selectedTemp, setSelectedTemp] = useState("Ice");
   const [mainImage, setMainImage] = useState(0);
-  const dispatch = useDispatch();
   const [added, setAdded] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
         setError(null);
-        console.log(" Slug from useParams:", slug);
-        console.log(" Type of slug:", typeof slug);
-        const productId = slug;
 
-        const result = await fetchDetailProduct(productId);
-        console.log(result);
-
+        const result = await fetchDetailProduct(slug);
         if (!result.success) {
           setError(result.message || "Failed to fetch product");
           setSelectedProduct(null);
@@ -51,59 +50,49 @@ const DetailProduct = () => {
         if (result.data.sizes && result.data.sizes.length > 0) {
           setSelectedSize(result.data.sizes[0].id);
         }
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        setError(error.message || "Failed to load product");
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError(err.message || "Failed to load product");
         setSelectedProduct(null);
       } finally {
         setLoading(false);
       }
     };
 
-    if (slug) {
-      fetchProduct();
-    }
+    if (slug) fetchProduct();
   }, [slug]);
 
-  const transformProductData = (data) => {
-    return {
-      id: data.id,
-      name: data.title,
-      slug: data.id.toString(),
-      description: data.description,
-      price: calculateTotalPrice(data),
-      basePrice: data.basePrice,
-      originalPrice: data.basePrice,
-      isFlashSale: false,
-      rating: data.rating ?? 0,
-      rating: 4.5,
-      stock: data.stock,
-      image:
-        data.images && data.images.length > 0
-          ? data.images[0].image
-          : "/placeholder.jpg",
-      images: data.images ? data.images.map((img) => img.image) : [],
-      category: data.categoryId,
-      variant: data.variant,
-      sizes: data.sizes || [],
-      recommended: data.recommended || [],
-    };
-  };
+  const transformProductData = (data) => ({
+    id: data.id,
+    name: data.title,
+    slug: data.id.toString(),
+    description: data.description,
+    price: calculateTotalPrice(data),
+    basePrice: data.basePrice,
+    originalPrice: data.basePrice,
+    isFlashSale: false,
+    rating: data.rating ?? 4.5,
+    stock: data.stock,
+    image:
+      data.images && data.images.length > 0
+        ? data.images[0].image
+        : "/placeholder.jpg",
+    images: data.images ? data.images.map((img) => img.image) : [],
+    category: data.categoryId,
+    variant: data.variant,
+    sizes: data.sizes || [],
+    recommended: data.recommended || [],
+  });
 
-  
   const calculateTotalPrice = (product) => {
     let total = product.basePrice || 0;
-
-    if (product.variant && product.variant.additionalPrice) {
+    if (product.variant?.additionalPrice)
       total += product.variant.additionalPrice;
-    }
-
     return total;
   };
 
   const getCurrentPrice = () => {
     if (!selectedProduct) return 0;
-
     let price = selectedProduct.basePrice;
 
     if (selectedProduct.variant?.name !== "Food" && selectedTemp === "Ice") {
@@ -112,12 +101,44 @@ const DetailProduct = () => {
 
     if (selectedSize && selectedProduct.sizes) {
       const size = selectedProduct.sizes.find((s) => s.id === selectedSize);
-      if (size && size.additionalPrice) {
-        price += size.additionalPrice;
-      }
+      if (size?.additionalPrice) price += size.additionalPrice;
     }
 
     return price;
+  };
+  const auth = useSelector((state) => state.auth);
+  const token = auth?.token || null;
+
+  const AddToCart = async () => {
+    if (!selectedProduct) return;
+
+    const cartItem = {
+      productId: selectedProduct.id,
+      size_id: selectedSize || null,
+      variantId: selectedProduct.variant?.id || null,
+      quantity: quantity,
+    };
+    console.log("Cart item to send:", cartItem);
+
+    try {
+      const response = await apiRequest("/cart", "POST", [cartItem], token);
+      if (!response.success) {
+        setAlertMessage(response.message || "Failed to add to cart");
+        setAlertType("error");
+        return;
+      }
+
+      console.log("Cart response:", response.data);
+      setAlertMessage("Item added to cart successfully!");
+      setAlertType("success");
+      setTimeout(() => setAlertMessage(""), 3000); 
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+      setAlertMessage("Network error. Please try again.");
+      setAlertType("error");
+    }
   };
 
   const handleBuyNow = () => {
@@ -143,37 +164,7 @@ const DetailProduct = () => {
       delivery: "Dine In",
       cartItemId: Date.now() + Math.random().toString(36).substr(2, 5),
     };
-
-    dispatch(addToCart(item));
-    navigate("/payment-details");
-  };
-
-  const handleAddToCart = () => {
-    if (!selectedProduct) return;
-
-    const currentPrice = getCurrentPrice();
-    const selectedSizeObj = selectedProduct.sizes?.find(
-      (s) => s.id === selectedSize
-    );
-
-    const item = {
-      productId: selectedProduct.id,
-      name: selectedProduct.name,
-      image: selectedProduct.image,
-      price: currentPrice,
-      originalPrice: selectedProduct.originalPrice || null,
-      isFlashSale: selectedProduct.isFlashSale || false,
-      quantity,
-      size: selectedSizeObj?.name || "Regular",
-      sizeId: selectedSize,
-      temperature: selectedTemp,
-      variant: selectedProduct.variant?.name || null,
-      delivery: "Dine In",
-    };
-
-    dispatch(addToCart(item));
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    navigate("/payment-details", { state: { item } });
   };
 
   if (loading) {
@@ -212,8 +203,9 @@ const DetailProduct = () => {
 
   return (
     <main className="bg-gray-50 min-h-screen py-8 px-6 md:px-16 my-20">
+     <AuthAlert type={alertType} message={alertMessage} />
+
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-6 shadow-lg">
-        {/* Product Images */}
         <div>
           <div className="relative mb-4">
             {selectedProduct.isFlashSale && (
@@ -221,11 +213,6 @@ const DetailProduct = () => {
                 FLASHSALE!
               </div>
             )}
-            {/* {selectedProduct.variant && (
-              <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded z-10">
-                {selectedProduct.variant.name}
-              </div>
-            )} */}
             <img
               src={productImages[mainImage]}
               alt={selectedProduct.name}
@@ -257,14 +244,6 @@ const DetailProduct = () => {
           </h1>
 
           <div className="flex items-center gap-3 mb-4">
-            <div>
-              {/* <p className="text-sm text-gray-500 mb-1">
-                  Base Price: IDR {selectedProduct.basePrice.toLocaleString("id-ID")}
-                </p> */}
-              {/* <p className="text-2xl font-bold text-gray-800">
-                IDR {getCurrentPrice().toLocaleString("id-ID")}
-              </p> */}
-            </div>
             {selectedProduct.isFlashSale ? (
               <>
                 {selectedProduct.originalPrice && (
@@ -277,9 +256,10 @@ const DetailProduct = () => {
                 </p>
               </>
             ) : (
-            <div>
+              <div>
                 <p className="text-sm text-gray-500 mb-1">
-                  Base Price: IDR {selectedProduct.basePrice.toLocaleString("id-ID")}
+                  Base Price: IDR{" "}
+                  {selectedProduct.basePrice.toLocaleString("id-ID")}
                 </p>
                 <p className="text-2xl font-bold text-gray-800">
                   IDR {getCurrentPrice().toLocaleString("id-ID")}
@@ -326,9 +306,7 @@ const DetailProduct = () => {
             <span className="text-lg font-semibold">{quantity}</span>
             <button
               onClick={() => {
-                if (quantity < selectedProduct.stock) {
-                  setQuantity(quantity + 1);
-                }
+                if (quantity < selectedProduct.stock) setQuantity(quantity + 1);
               }}
               disabled={quantity >= selectedProduct.stock}
               className={`w-8 h-8 flex items-center justify-center font-bold transition ${
@@ -356,7 +334,7 @@ const DetailProduct = () => {
                 {selectedProduct.sizes.map((size) => (
                   <button
                     key={size.id}
-                    onClick={() => setSelectedSize(size.id)}
+                    onClick={() => setSelectedSize(Number(size.id))}
                     className={`px-4 py-2 rounded border transition ${
                       selectedSize === size.id
                         ? "border-[#FF8906] bg-orange-50 text-[#FF8906]"
@@ -407,7 +385,7 @@ const DetailProduct = () => {
               {selectedProduct.stock === 0 ? "Out of Stock" : "Buy Now"}
             </button>
             <button
-              onClick={handleAddToCart}
+              onClick={AddToCart}
               disabled={selectedProduct.stock === 0}
               className="flex-1 border border-[#FF8906] text-[#FF8906] py-3 rounded font-semibold hover:bg-orange-50 transition flex items-center justify-center gap-2 disabled:border-gray-400 disabled:text-gray-400 disabled:cursor-not-allowed"
             >
