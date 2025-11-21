@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CoffeLogo from "/images/Frame.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchIcon from "/images/Search.png";
 import CartIcon from "/images/ShoppingCart.png";
 import { X, Menu, ChevronDown } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout as logoutAction } from "../redux/reducer/auth";
+import { logout as logoutAction, setUser } from "../redux/reducer/auth";
+import { apiRequest } from "../utils/api";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,7 +15,35 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { user, isLoggedIn } = useSelector((state) => state.auth);
+  const { user, isLoggedIn, token } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!isLoggedIn || !token) return;
+
+      try {
+        const res = await apiRequest("/profile", "GET", null, token);
+
+        if (res.success) {
+          const data = res.data;
+
+          dispatch(
+            setUser({
+              ...data,
+              avatar: data.image
+                ? `${import.meta.env.VITE_API_URL}/${data.image}`
+                : null,
+              token,
+            })
+          );
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, [isLoggedIn, token, dispatch]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
@@ -37,7 +66,9 @@ const Navbar = () => {
               <Link
                 to="/"
                 className={`text-white transition ${
-                  isActive("/") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
+                  isActive("/")
+                    ? "border-b border-b-[#FF8906]"
+                    : "hover:text-[#FF8906]"
                 }`}
               >
                 Home
@@ -45,7 +76,9 @@ const Navbar = () => {
               <Link
                 to="/our-product"
                 className={`text-white transition ${
-                  isActive("/our-product") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
+                  isActive("/our-product")
+                    ? "border-b border-b-[#FF8906]"
+                    : "hover:text-[#FF8906]"
                 }`}
               >
                 Product
@@ -81,11 +114,15 @@ const Navbar = () => {
                   className="flex items-center gap-2 text-white hover:text-[#FF8906]"
                 >
                   <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      user?.fullName || "User"
-                    )}&background=FF8906&color=fff`}
+                    src={
+                      user?.avatar
+                        ? user.avatar
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            user?.fullname || "User"
+                          )}&background=FF8906&color=fff`
+                    }
                     alt="profile"
-                    className="w-8 h-8 rounded-full"
+                    className="w-8 h-8 rounded-full object-cover"
                   />
                   <ChevronDown size={18} />
                 </button>
@@ -207,15 +244,19 @@ const Navbar = () => {
                 <div className="mt-auto">
                   <div className="flex items-center gap-3 border-t border-gray-200 pt-4">
                     <img
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        user?.fullName || "User"
-                      )}&background=FF8906&color=fff`}
+                      src={
+                        user?.avatar
+                          ? user.avatar
+                          : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              user?.fullname || "User"
+                            )}&background=FF8906&color=fff`
+                      }
                       alt="profile"
-                      className="w-8 h-8 rounded-full"
+                      className="w-8 h-8 rounded-full object-cover"
                     />
                     <div>
                       <p className="text-gray-800 font-semibold">
-                        {user?.fullName || "User"}
+                        {user?.fullname || "User"}
                       </p>
                       <p className="text-gray-500 text-sm">
                         {user?.email || ""}
