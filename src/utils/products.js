@@ -16,10 +16,7 @@ export const getFavoriteProducts = async (limit = 10) => {
 
 
 export const fetchDetailProduct = async (id) => {
-  try {
-    console.log('🔍 fetchDetailProduct called with ID:', id);
-    console.log('🔍 ID type:', typeof id);
-    
+  try { 
     if (!id) {
       throw new Error('Product ID is required');
     }
@@ -29,9 +26,6 @@ export const fetchDetailProduct = async (id) => {
     if (isNaN(productId)) {
       throw new Error('Invalid product ID format');
     }
-    
-    console.log('🚀 Calling API: /products/' + productId);
-
     const data = await apiClient(`/products/${productId}`, {
       method: 'GET',
     });
