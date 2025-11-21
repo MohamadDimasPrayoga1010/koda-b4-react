@@ -12,16 +12,17 @@ import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
 import LoginImg from "/images/LoginImg.png";
 import AuthAlert from "../components/AuthAlert";
-import { useDispatch, useSelector } from "react-redux";
-import { login as loginAction, setError, setLoading, setMessage } from "../redux/reducer/auth";
+import { useDispatch } from "react-redux";
+import { login as loginAction, setLoading } from "../redux/reducer/auth";
 import { apiRequest } from "../utils/api";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [alert, setAlert] = useState({ type: "", message: "" });
+
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { loading, error, message } = useSelector((state) => state.auth);
 
   const {
     register,
@@ -34,15 +35,13 @@ const Login = () => {
 
   useEffect(() => {
     if (location.state?.message) {
-      dispatch(setMessage(location.state.message));
+      setAlert({ type: "success", message: location.state.message });
       window.history.replaceState({}, document.title);
     }
-  }, [location, dispatch]);
+  }, [location]);
 
   const onSubmit = async (data) => {
     dispatch(setLoading(true));
-    dispatch(setError(null));
-    dispatch(setMessage(null));
 
     try {
       const result = await apiRequest("/auth/login", "POST", {
@@ -52,46 +51,49 @@ const Login = () => {
 
       if (result.success) {
         dispatch(loginAction(result.data));
-        dispatch(setMessage(result.message));
 
-        console.log("Logged in user:", result.data);
+        setAlert({ type: "success", message: "Login berhasil!" });
 
-        setTimeout(() => {
-          navigate("/"); 
-        }, 1500);
+        setTimeout(() => navigate("/"), 1500);
       } else {
         if (result.message.includes("Email")) {
           setFormError("email", { type: "manual", message: result.message });
         } else if (result.message.includes("password")) {
           setFormError("password", { type: "manual", message: result.message });
         } else {
-          dispatch(setError(result.message));
+          setAlert({ type: "error", message: result.message });
         }
       }
     } catch (err) {
       console.error("Login error:", err);
-      dispatch(setError("An error occurred during login. Please try again."));
+      setAlert({ type: "error", message: "Terjadi kesalahan server!" });
     } finally {
       dispatch(setLoading(false));
     }
   };
 
   const handleSocialLogin = (provider) => {
-    dispatch(setError(`${provider} login is not implemented yet.`));
-    dispatch(setMessage(""));
+    setAlert({ type: "error", message: `${provider} login belum tersedia.` });
   };
 
   return (
     <main className="my-6 md:my-0">
       <div className="flex">
         <img src={LoginImg} alt="coffe-img" className="hidden md:block" />
+
         <div className="bg-white w-full max-w-[780px] min-h-[821px] my-10 mx-10 md:mt-60">
-          <AuthAlert type="success" message={message} />
-          <AuthAlert type="error" message={error} />
+          {alert.message && (
+            <AuthAlert
+              type={alert.type}
+              message={alert.message}
+              onClose={() => setAlert({ type: "", message: "" })}
+            />
+          )}
 
           <div>
-            <img src={CoffeLogo} alt="coffe-img" />
+            <img src={CoffeLogo} alt="coffe-logo" />
           </div>
+
           <h1 className="text-[#8E6447] text-2xl font-semibold mt-6">Login</h1>
           <p className="text-[#4F5665] text-base font-normal my-6">
             Fill out the form correctly
@@ -107,6 +109,7 @@ const Login = () => {
               error={errors.email}
               icon={<Mail className="w-5 h-5" />}
             />
+
             <InputField
               type="password"
               name="password"
@@ -128,8 +131,8 @@ const Login = () => {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full mt-6" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+            <Button type="submit" className="w-full mt-6">
+              Login
             </Button>
           </form>
 
@@ -161,8 +164,11 @@ const Login = () => {
               onClick={() => handleSocialLogin("Facebook")}
             >
               <img src={FacebookIcon} alt="facebook-icon" />
-              <span className="text-gray-700 font-medium text-sm">Facebook</span>
+              <span className="text-gray-700 font-medium text-sm">
+                Facebook
+              </span>
             </button>
+
             <button
               type="button"
               className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
