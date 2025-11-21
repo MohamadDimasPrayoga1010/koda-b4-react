@@ -15,39 +15,39 @@ const Profile = () => {
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [showPassword, setShowPassword] = useState(false);
-  const [avatar, setAvatar] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
   const [alert, setAlert] = useState({ type: "success", message: "" });
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         if (!token) return;
+
         const res = await apiRequest("/profile", "GET", null, token);
+
         if (res.success) {
           const data = res.data;
+
           reset({
             fullname: data.fullname || "",
             email: data.email || "",
             phone: data.phone || "",
             address: data.address || "",
           });
-          if (data.image) setAvatar(data.image);
-          dispatch(setUser({
-            id: data.id,
-            fullname: data.fullname,
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            avatar: data.image,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
-            token,
-          }));
+
+          setAvatarPreview(data.image || null);
+
+          dispatch(
+            setUser({
+              ...data,
+              avatar: data.image,
+              token,
+            })
+          );
         } else {
           setAlert({ type: "error", message: res.message });
         }
       } catch (err) {
-        console.error("Failed to fetch profile:", err);
         setAlert({ type: "error", message: "Failed to fetch profile" });
       }
     };
@@ -55,57 +55,61 @@ const Profile = () => {
     fetchProfile();
   }, [token, reset, dispatch]);
 
-  const handleButtonClick = () => {
-    fileInputRef.current.click();
-  };
+  const handleButtonClick = () => fileInputRef.current.click();
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+
     if (file) {
-      setAvatar(URL.createObjectURL(file));
+      setAvatarPreview(URL.createObjectURL(file));
     }
   };
+
 
   const onSubmit = async (formData) => {
     try {
       const payload = new FormData();
+
       payload.append("fullname", formData.fullname);
       payload.append("email", formData.email);
       payload.append("phone", formData.phone || "");
       payload.append("address", formData.address || "");
+
+      if (formData.password && formData.password.trim() !== "") {
+        payload.append("password", formData.password);
+      }
+
       if (fileInputRef.current.files[0]) {
         payload.append("image", fileInputRef.current.files[0]);
       }
 
       const res = await apiRequest("/profile", "PATCH", payload, token, true);
-      console.log(res)
+
       if (res.success) {
         const data = res.data;
-        dispatch(setUser({
-          id: data.id,
-          fullname: data.fullname,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
-          avatar: data.image,
-          createdAt: data.createdAt,
-          updatedAt: data.updatedAt,
-          token,
-        }));
-  
+
+        dispatch(
+          setUser({
+            ...data,
+            avatar: data.image,
+            token,
+          })
+        );
+
         reset({
           fullname: data.fullname || "",
           email: data.email || "",
           phone: data.phone || "",
           address: data.address || "",
         });
-        if (data.image) setAvatar(data.image);
+
+        setAvatarPreview(data.image || null);
+
         setAlert({ type: "success", message: "Profile updated successfully!" });
       } else {
         setAlert({ type: "error", message: res.message || "Failed to update profile" });
       }
     } catch (err) {
-      console.error(err);
       setAlert({ type: "error", message: "An error occurred while updating profile" });
     }
   };
@@ -120,27 +124,37 @@ const Profile = () => {
         <div className="border border-[#E8E8E8] w-[280px] h-[343px] p-6">
           <div className="flex flex-col items-center space-y-4">
             <div className="text-center">
-              <p className="text-lg font-semibold text-[#0B132A]">{user?.fullname || "User"}</p>
+              <p className="text-lg font-semibold text-[#0B132A]">
+                {user?.fullname || "User"}
+              </p>
               <p className="text-sm text-gray-500">{user?.email || ""}</p>
             </div>
+
             <div className="w-25 h-25 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-              {avatar ? (
-                <img src={avatar} alt="avatar" className="w-16 h-16 object-cover rounded-full" />
+              {avatarPreview ? (
+                <img
+                  src={avatarPreview}
+                  alt="avatar"
+                  className="w-16 h-16 object-cover rounded-full"
+                />
               ) : (
                 <CircleUser className="w-16 h-16 text-gray-400" />
               )}
             </div>
+
             <div>
               <input
                 type="file"
                 ref={fileInputRef}
                 className="hidden"
                 onChange={handleFileChange}
+                accept="image/*"
               />
               <Button className="w-full" onClick={handleButtonClick}>
                 Upload New Photo
               </Button>
             </div>
+
             <p className="text-base text-[#4F5665] text-center">
               Since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
             </p>
@@ -182,21 +196,15 @@ const Profile = () => {
             <div className="relative">
               <InputField
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="••••••••••"
+                register={register}
+                error={errors.password}
                 icon={<Lock className="w-5 h-5" />}
                 showPassword={showPassword}
                 onTogglePassword={() => setShowPassword(!showPassword)}
-                register={register}
-                error={errors.password}
               />
-              <button
-                type="button"
-                className="absolute right-0 top-0 text-sm text-orange-500 font-medium hover:text-orange-600"
-              >
-                Set New Password?
-              </button>
             </div>
 
             <InputField
