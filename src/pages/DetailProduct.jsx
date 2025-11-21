@@ -109,7 +109,7 @@ const DetailProduct = () => {
   const auth = useSelector((state) => state.auth);
   const token = auth?.token || null;
 
-  const AddToCart = async () => {
+  const addToCart = async () => {
     if (!selectedProduct) return;
 
     const cartItem = {
@@ -220,7 +220,6 @@ const DetailProduct = () => {
             />
           </div>
 
-          {/* Thumbnail Images */}
           <div className="grid grid-cols-3 gap-2">
             {productImages.map((img, idx) => (
               <img
@@ -385,7 +384,7 @@ const DetailProduct = () => {
               {selectedProduct.stock === 0 ? "Out of Stock" : "Buy Now"}
             </button>
             <button
-              onClick={AddToCart}
+              onClick={addToCart}
               disabled={selectedProduct.stock === 0}
               className="flex-1 border border-[#FF8906] text-[#FF8906] py-3 rounded font-semibold hover:bg-orange-50 transition flex items-center justify-center gap-2 disabled:border-gray-400 disabled:text-gray-400 disabled:cursor-not-allowed"
             >
