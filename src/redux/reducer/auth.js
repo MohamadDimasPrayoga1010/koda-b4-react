@@ -66,7 +66,7 @@ const authSlice = createSlice({
         fullname: userData.fullname,
         email: userData.email,
         role: userData.role,
-        avatar: userData.image,
+        image: userData.image,
         createdAt: userData.createdAt,
         updatedAt: userData.updatedAt,
       };
