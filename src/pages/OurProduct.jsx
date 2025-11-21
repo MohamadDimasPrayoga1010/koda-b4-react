@@ -5,111 +5,116 @@ import Pagination from "../components/Pagination";
 import { useSearchParams } from "react-router-dom";
 import CardPromo from "../components/CardPromo";
 import ProductFilter from "../components/ProductFilter";
-import { Search } from "lucide-react";
 import FilterIcon from "/images/Filter.png";
+import { apiRequest } from "../utils/api";
 
 const OurProduct = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [searchInput, setSearchInput] = useState(
-    searchParams.get("search") || ""
-  );
-  const [selectedCategories, setSelectedCategories] = useState(
-    searchParams.get("category") ? searchParams.get("category").split(",") : []
-  );
-  const [selectedSorts, setSelectedSorts] = useState(
-    searchParams.get("sort") ? searchParams.get("sort").split(",") : []
-  );
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || null);
+  const [selectedSort, setSelectedSort] = useState(searchParams.get("sort") || null);
   const [priceRange, setPriceRange] = useState([
     Number(searchParams.get("minPrice")) || 0,
     Number(searchParams.get("maxPrice")) || 50000,
   ]);
 
+  const [categoriesList, setCategoriesList] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [showFilter, setShowFilter] = useState(false);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("/data/stockProduct.json");
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error loading products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-
 
   const updateURL = useCallback(() => {
     const params = new URLSearchParams();
     if (searchInput) params.set("search", searchInput);
-    if (selectedCategories.length > 0)
-      params.set("category", selectedCategories.join(","));
-    if (selectedSorts.length > 0) params.set("sort", selectedSorts.join(","));
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (selectedSort) params.set("sort", selectedSort);
     if (priceRange[0] > 0) params.set("minPrice", priceRange[0]);
     if (priceRange[1] < 50000) params.set("maxPrice", priceRange[1]);
     setSearchParams(params);
-  }, [
-    searchInput,
-    selectedCategories,
-    selectedSorts,
-    priceRange,
-    setSearchParams,
-  ]);
+  }, [searchInput, selectedCategory, selectedSort, priceRange, setSearchParams]);
+
+  const fetchCategories = useCallback(async () => {
+    const res = await apiRequest("/categories");
+    if (res.success) setCategoriesList(res.data || []);
+  }, []);
+
+const fetchProducts = useCallback(
+  async (filters = { search: searchInput, category: selectedCategory, sort: selectedSort, priceRange }) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page,
+        limit: 50,
+        q: filters.search || "",
+        price_min: filters.priceRange?.[0] || 0,
+        price_max: filters.priceRange?.[1] || 50000,
+      });
+
+      if (filters.category) params.append("cat", filters.category);
+
+      if (filters.sort) {
+        if (filters.sort === "Cheap") {
+          params.append("sortby", "baseprice");
+          params.append("order", "ASC");
+        } else {
+          params.append("sortby", "name");
+          params.append("order", "ASC");
+        }
+      }
+
+      let res;
+      try {
+        res = await apiRequest(`/products?${params.toString()}`, "GET");
+      } catch (apiError) {
+        console.error("API request failed:", apiError);
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
+
+      if (res.success) {
+        setProducts(res.data || []);
+        if (res.pagination?.totalPages) setTotalPages(res.pagination.totalPages);
+      } else {
+        console.error("Failed to fetch products:", res.message);
+        setProducts([]);
+      }
+    } catch (err) {
+      console.error("Unexpected error fetching products:", err);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  },
+  [page, searchInput, selectedCategory, selectedSort, priceRange]
+);
 
 
-  const handleSearch = (e) => {
-    e.preventDefault();
+  const handleSearch = (filters) => {
+    setSearchInput(filters.search || "");
+    setSelectedCategory(filters.category || null);
+    setSelectedSort(filters.sort || null);
+    setPriceRange(filters.priceRange || [0, 50000]);
+    fetchProducts(filters);
     updateURL();
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchInput(e.target.value);
   };
 
   const handleResetFilter = () => {
     setSearchInput("");
-    setSelectedCategories([]);
-    setSelectedSorts([]);
+    setSelectedCategory(null);
+    setSelectedSort(null);
     setPriceRange([0, 50000]);
     setSearchParams({});
+    fetchProducts({ search: "", category: null, sort: null, priceRange: [0, 50000] });
   };
 
+  useEffect(() => { fetchCategories(); }, [fetchCategories]);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  useEffect(() => { updateURL(); }, [updateURL]);
 
-  const filteredProducts = products.filter((product) => {
-    const matchSearch = product.name
-      .toLowerCase()
-      .includes(searchInput.toLowerCase());
-
-    const matchCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(product.category) ||
-      (selectedCategories.includes("Coffe") && product.category === "Minuman");
-
-    const matchSort =
-      selectedSorts.length === 0 ||
-      (selectedSorts.includes("Flash Sale") && product.isFlashSale) ||
-      (selectedSorts.includes("Cheap") && product.price < 15000) ||
-      (selectedSorts.includes("Buy1get1") &&
-        product.name.toLowerCase().includes("hazelnut")) ||
-      (selectedSorts.includes("Birthday Package") && product.price > 20000);
-
-    const matchPrice =
-      product.price >= priceRange[0] && product.price <= priceRange[1];
-
-    return matchSearch && matchCategory && matchSort && matchPrice;
-  });
-
-  useEffect(() => {
-    updateURL();
-  }, [updateURL]);
-
- 
   if (loading) {
     return (
       <div className="col-span-full flex items-center justify-center py-12">
@@ -120,7 +125,6 @@ const OurProduct = () => {
       </div>
     );
   }
-
 
   return (
     <main>
@@ -134,58 +138,31 @@ const OurProduct = () => {
       </section>
 
       <section className="md:hidden mx-12 relative flex items-center gap-3">
-        <form onSubmit={handleSearch} className="relative flex-1">
-          <input
-            type="search"
-            placeholder="Find Product"
-            name="search-menu"
-            value={searchInput}
-            onChange={handleSearchChange}
-            className="border border-gray-300 w-full pr-12 pl-10 py-2.5 rounded"
-          />
-          <button type="submit">
-            <Search className="absolute top-3 left-3 text-gray-400" />
-          </button>
-        </form>
-
         <button onClick={() => setShowFilter(!showFilter)}>
-          <img
-            src={FilterIcon}
-            alt="filter-icon"
-            className="p-3.5 bg-orange-400 rounded"
-          />
+          <img src={FilterIcon} alt="filter-icon" className="p-3.5 bg-orange-400 rounded" />
         </button>
 
         {showFilter && (
           <>
-            <div
-              className="fixed inset-0  bg-opacity-50 z-40"
-              onClick={() => setShowFilter(false)}
-            ></div>
-
-            <div className="fixed top-0 right-0 h-full w-80 bg-black text-white z-50 shadow-lg transition-transform duration-300 ease-in-out">
+            <div className="fixed inset-0 bg-opacity-50 z-40" onClick={() => setShowFilter(false)}></div>
+            <div className="fixed top-0 right-0 h-full w-80 bg-black text-white z-50 shadow-lg">
               <div className="flex justify-between items-center p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold">Filter</h2>
-                <button
-                  onClick={() => setShowFilter(false)}
-                  className="text-gray-300 hover:text-orange-400 transition"
-                >
-                  ✕
-                </button>
+                <button onClick={() => setShowFilter(false)} className="text-gray-300 hover:text-orange-400 transition">✕</button>
               </div>
-
               <div className="overflow-y-auto h-[calc(100%-4rem)] p-4">
                 <ProductFilter
                   searchInput={searchInput}
-                  onSearchChange={handleSearchChange}
                   onSearchSubmit={handleSearch}
-                  selectedCategories={selectedCategories}
-                  setSelectedCategories={setSelectedCategories}
-                  selectedSorts={selectedSorts}
-                  setSelectedSorts={setSelectedSorts}
-                  priceRange={priceRange}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  selectedSort={selectedSort}
+                  setSelectedSort={setSelectedSort}
+                  priceMin={priceRange[0]}
+                  priceMax={priceRange[1]}
                   setPriceRange={setPriceRange}
                   onReset={handleResetFilter}
+                  categoriesList={categoriesList}
                   className="w-full bg-transparent text-white"
                 />
               </div>
@@ -206,34 +183,31 @@ const OurProduct = () => {
         <div className="flex gap-5 my-5">
           <ProductFilter
             searchInput={searchInput}
-            onSearchChange={handleSearchChange}
             onSearchSubmit={handleSearch}
-            selectedCategories={selectedCategories}
-            setSelectedCategories={setSelectedCategories}
-            selectedSorts={selectedSorts}
-            setSelectedSorts={setSelectedSorts}
-            priceRange={priceRange}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            selectedSort={selectedSort}
+            setSelectedSort={setSelectedSort}
+            priceMin={priceRange[0]}
+            priceMax={priceRange[1]}
             setPriceRange={setPriceRange}
             onReset={handleResetFilter}
+            categoriesList={categoriesList}
             className="hidden md:flex p-8 w-sm md:h-[700px]"
           />
 
           <div className="w-full">
-            {filteredProducts.length > 0 ? (
+            {products.length > 0 ? (
               <Pagination
-                data={filteredProducts}
+                data={products}
                 itemsPerPage={6}
                 gridCols="grid-cols-1 md:grid-cols-2"
-                renderItem={(product) => (
-                  <CardProduct key={product.id} product={product} />
-                )}
+                renderItem={(product) => <CardProduct key={product.id} product={product} />}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-center text-gray-600">
-                <p className="text-lg font-medium">❌ Data tidak tersedia</p>
-                <p className="text-sm">
-                  Coba ubah filter atau pencarian untuk melihat produk lain.
-                </p>
+                <p className="text-lg font-medium">Data tidak tersedia</p>
+                <p className="text-sm">Coba ubah filter atau pencarian untuk melihat produk lain.</p>
               </div>
             )}
           </div>
