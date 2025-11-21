@@ -26,13 +26,13 @@ const DetailProduct = () => {
       try {
         setLoading(true);
         setError(null);
-         console.log(' Slug from useParams:', slug);        
-      console.log(' Type of slug:', typeof slug);  
+        console.log(" Slug from useParams:", slug);
+        console.log(" Type of slug:", typeof slug);
         const productId = slug;
-        
+
         const result = await fetchDetailProduct(productId);
-        console.log(result)
-        
+        console.log(result);
+
         if (!result.success) {
           setError(result.message || "Failed to fetch product");
           setSelectedProduct(null);
@@ -41,16 +41,16 @@ const DetailProduct = () => {
 
         const transformedProduct = transformProductData(result.data);
         setSelectedProduct(transformedProduct);
-        
+
         if (result.data.recommended && result.data.recommended.length > 0) {
-          const transformedRecommended = result.data.recommended.map(transformProductData);
+          const transformedRecommended =
+            result.data.recommended.map(transformProductData);
           setProducts(transformedRecommended);
         }
 
         if (result.data.sizes && result.data.sizes.length > 0) {
           setSelectedSize(result.data.sizes[0].id);
         }
-        
       } catch (error) {
         console.error("Error fetching product:", error);
         setError(error.message || "Failed to load product");
@@ -59,12 +59,11 @@ const DetailProduct = () => {
         setLoading(false);
       }
     };
-    
+
     if (slug) {
       fetchProduct();
     }
   }, [slug]);
-
 
   const transformProductData = (data) => {
     return {
@@ -75,55 +74,59 @@ const DetailProduct = () => {
       price: calculateTotalPrice(data),
       basePrice: data.basePrice,
       originalPrice: data.basePrice,
-      isFlashSale: false, 
-      rating: 4.5, 
+      isFlashSale: false,
+      rating: data.rating ?? 0,
+      rating: 4.5,
       stock: data.stock,
-      image: data.images && data.images.length > 0 ? data.images[0].image : '/placeholder.jpg',
-      images: data.images ? data.images.map(img => img.image) : [],
+      image:
+        data.images && data.images.length > 0
+          ? data.images[0].image
+          : "/placeholder.jpg",
+      images: data.images ? data.images.map((img) => img.image) : [],
       category: data.categoryId,
       variant: data.variant,
       sizes: data.sizes || [],
-      recommended: data.recommended || []
+      recommended: data.recommended || [],
     };
   };
 
-  // Calculate base price + variant price
+  
   const calculateTotalPrice = (product) => {
     let total = product.basePrice || 0;
-    
+
     if (product.variant && product.variant.additionalPrice) {
       total += product.variant.additionalPrice;
     }
-    
+
     return total;
   };
 
-  // Calculate current price with selected size
-const getCurrentPrice = () => {
-  if (!selectedProduct) return 0;
-  
-  let price = selectedProduct.basePrice;
+  const getCurrentPrice = () => {
+    if (!selectedProduct) return 0;
 
-  if (selectedTemp === "Ice") {
-    price += 7000;
-  }
- 
-  if (selectedSize && selectedProduct.sizes) {
-    const size = selectedProduct.sizes.find((s) => s.id === selectedSize);
-    if (size && size.additionalPrice) {
-      price += size.additionalPrice;
+    let price = selectedProduct.basePrice;
+
+    if (selectedProduct.variant?.name !== "Food" && selectedTemp === "Ice") {
+      price += 7000;
     }
-  }
 
-  return price;
-};
+    if (selectedSize && selectedProduct.sizes) {
+      const size = selectedProduct.sizes.find((s) => s.id === selectedSize);
+      if (size && size.additionalPrice) {
+        price += size.additionalPrice;
+      }
+    }
 
+    return price;
+  };
 
   const handleBuyNow = () => {
     if (!selectedProduct) return;
 
     const currentPrice = getCurrentPrice();
-    const selectedSizeObj = selectedProduct.sizes?.find(s => s.id === selectedSize);
+    const selectedSizeObj = selectedProduct.sizes?.find(
+      (s) => s.id === selectedSize
+    );
 
     const item = {
       productId: selectedProduct.id,
@@ -149,7 +152,9 @@ const getCurrentPrice = () => {
     if (!selectedProduct) return;
 
     const currentPrice = getCurrentPrice();
-    const selectedSizeObj = selectedProduct.sizes?.find(s => s.id === selectedSize);
+    const selectedSizeObj = selectedProduct.sizes?.find(
+      (s) => s.id === selectedSize
+    );
 
     const item = {
       productId: selectedProduct.id,
@@ -200,9 +205,10 @@ const getCurrentPrice = () => {
     );
   }
 
-  const productImages = selectedProduct.images && selectedProduct.images.length > 0
-    ? selectedProduct.images
-    : [selectedProduct.image];
+  const productImages =
+    selectedProduct.images && selectedProduct.images.length > 0
+      ? selectedProduct.images
+      : [selectedProduct.image];
 
   return (
     <main className="bg-gray-50 min-h-screen py-8 px-6 md:px-16 my-20">
@@ -215,18 +221,18 @@ const getCurrentPrice = () => {
                 FLASHSALE!
               </div>
             )}
-            {selectedProduct.variant && (
+            {/* {selectedProduct.variant && (
               <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded z-10">
                 {selectedProduct.variant.name}
               </div>
-            )}
+            )} */}
             <img
               src={productImages[mainImage]}
               alt={selectedProduct.name}
               className="w-full h-96 object-cover rounded-lg"
             />
           </div>
-          
+
           {/* Thumbnail Images */}
           <div className="grid grid-cols-3 gap-2">
             {productImages.map((img, idx) => (
@@ -245,23 +251,21 @@ const getCurrentPrice = () => {
           </div>
         </div>
 
-        {/* Product Details */}
         <div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
             {selectedProduct.name}
           </h1>
 
-          {/* Price */}
           <div className="flex items-center gap-3 mb-4">
             <div>
-                {/* <p className="text-sm text-gray-500 mb-1">
+              {/* <p className="text-sm text-gray-500 mb-1">
                   Base Price: IDR {selectedProduct.basePrice.toLocaleString("id-ID")}
                 </p> */}
-                <p className="text-2xl font-bold text-gray-800">
-                  IDR {getCurrentPrice().toLocaleString("id-ID")}
-                </p>
-              </div>
-            {/* {selectedProduct.isFlashSale ? (
+              {/* <p className="text-2xl font-bold text-gray-800">
+                IDR {getCurrentPrice().toLocaleString("id-ID")}
+              </p> */}
+            </div>
+            {selectedProduct.isFlashSale ? (
               <>
                 {selectedProduct.originalPrice && (
                   <p className="text-lg text-red-500 line-through">
@@ -272,19 +276,18 @@ const getCurrentPrice = () => {
                   IDR {getCurrentPrice().toLocaleString("id-ID")}
                 </p>
               </>
-            ) : ( */}
-              {/* <div>
+            ) : (
+            <div>
                 <p className="text-sm text-gray-500 mb-1">
                   Base Price: IDR {selectedProduct.basePrice.toLocaleString("id-ID")}
                 </p>
                 <p className="text-2xl font-bold text-gray-800">
                   IDR {getCurrentPrice().toLocaleString("id-ID")}
                 </p>
-              </div> */}
-            {/* )} */}
+              </div>
+            )}
           </div>
 
-          {/* Rating */}
           <div className="flex items-center gap-2 mb-4">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -309,12 +312,10 @@ const getCurrentPrice = () => {
             <ThumbsUp size={18} className="text-[#FF8906]" />
           </div>
 
-          {/* Description */}
           <p className="text-gray-600 mb-6 leading-relaxed">
             {selectedProduct.description}
           </p>
 
-          {/* Quantity Controls */}
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -340,7 +341,6 @@ const getCurrentPrice = () => {
             </button>
           </div>
 
-          {/* Stock Info */}
           <div className="mb-6 text-sm text-gray-500">
             {selectedProduct.stock > 0 ? (
               <p>Stock tersisa: {selectedProduct.stock - quantity}</p>
@@ -349,7 +349,6 @@ const getCurrentPrice = () => {
             )}
           </div>
 
-          {/* Size Selection - dari Backend */}
           {selectedProduct.sizes && selectedProduct.sizes.length > 0 && (
             <div className="mb-6">
               <p className="font-bold text-lg mb-3">Choose Size</p>
@@ -378,7 +377,6 @@ const getCurrentPrice = () => {
             </div>
           )}
 
-          {/* Hot/Ice - hanya tampil jika bukan variant Food */}
           {selectedProduct.variant?.name !== "Food" && (
             <div className="mb-8">
               <p className="font-bold text-lg mb-3">Hot/Ice</p>
@@ -400,7 +398,6 @@ const getCurrentPrice = () => {
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="flex gap-4">
             <button
               onClick={handleBuyNow}
@@ -418,7 +415,7 @@ const getCurrentPrice = () => {
               Add to Cart
             </button>
           </div>
-          
+
           {added && (
             <div className="mt-3 text-green-600 text-center text-sm font-semibold">
               Added to Cart!
@@ -427,7 +424,6 @@ const getCurrentPrice = () => {
         </div>
       </section>
 
-      {/* Recommended Products dari Backend */}
       {products.length > 0 && (
         <section className="my-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center md:text-start">
