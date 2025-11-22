@@ -1,26 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-  User,
-  MapPin,
-  Phone,
-  CreditCard,
-  Truck,
-  CheckCircle,
-} from "lucide-react";
+import { apiRequest } from "../utils/api";
+import { User, MapPin, Phone, CreditCard, Truck, CheckCircle } from "lucide-react";
 
 const OrderDetail = () => {
   const { id } = useParams();
-  const orderHistory = useSelector(
-    (state) => state.coffeOrder.orderHistory || []
-  );
+  const token = useSelector((state) => state.auth.token); 
   const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const foundOrder = orderHistory.find((o) => o.id === parseInt(id));
-    setOrder(foundOrder || null);
-  }, [id, orderHistory]);
+    const fetchOrderDetail = async () => {
+      try {
+        const res = await apiRequest(`/history/${id}`, "GET", null, token);
+        if (res.success) {
+          setOrder(res.Data || res.data); 
+        } else {
+          setOrder(null);
+        }
+      } catch (error) {
+        console.error("Fetch order detail error:", error);
+        setOrder(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrderDetail();
+  }, [id, token]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -43,14 +58,23 @@ const OrderDetail = () => {
   return (
     <main className="min-h-screen bg-gray-50 py-8 px-6 md:my-30 md:px-16">
       <div className="p-6 mb-6">
-        <h1 className="text-3xl font-bold mb-2">Order {order.orderId}</h1>
-        <p className="text-gray-600 text-sm">
-          {order.date} at{" "}
-          {new Date(order.createdAt).toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
+        <h1 className="text-3xl font-bold mb-2">
+          Order {order.invoice || "-"}
+        </h1>
+        {order.createdAt && (
+          <p className="text-gray-600 text-sm">
+            {new Date(order.createdAt).toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            at{" "}
+            {new Date(order.createdAt).toLocaleTimeString("id-ID", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -68,7 +92,7 @@ const OrderDetail = () => {
                 </div>
                 <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
-                    {order.customerInfo.fullName}
+                    {order.custName || "-"}
                   </p>
                 </div>
               </div>
@@ -80,7 +104,7 @@ const OrderDetail = () => {
                 </div>
                 <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
-                    {order.customerInfo.address}
+                    {order.custAddress || "-"}
                   </p>
                 </div>
               </div>
@@ -92,7 +116,7 @@ const OrderDetail = () => {
                 </div>
                 <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
-                    {order.customerInfo.phone || "08123456789"}
+                    {order.custPhone || "-"}
                   </p>
                 </div>
               </div>
@@ -104,7 +128,7 @@ const OrderDetail = () => {
                 </div>
                 <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
-                    {order.paymentMethod}
+                    {order.paymentMethod || "-"}
                   </p>
                 </div>
               </div>
@@ -116,7 +140,7 @@ const OrderDetail = () => {
                 </div>
                 <div className="ml-auto text-right">
                   <p className="font-semibold text-gray-800">
-                    {order.customerInfo.delivery.replace("-", " ")}
+                    {order.deliveryMethod || "-"}
                   </p>
                 </div>
               </div>
@@ -127,10 +151,8 @@ const OrderDetail = () => {
                   <p className="text-sm text-gray-500">Status</p>
                 </div>
                 <div className="ml-auto text-right">
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${order.statusColor}`}
-                  >
-                    {order.status}
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold`}>
+                    {order.status || "-"}
                   </span>
                 </div>
               </div>
@@ -152,78 +174,44 @@ const OrderDetail = () => {
             <h2 className="text-xl font-semibold mb-4">Your Order</h2>
 
             <div className="space-y-4">
-              {order.items.map((item, index) => (
-                <div key={index} className="flex gap-4 pb-4 bg-gray-100 p-3">
-                  <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="flex-1">
-                    {item.isFlashSale && (
-                      <span className="inline-block bg-red-600 text-white text-xs font-bold px-2 py-1 rounded mb-1">
-                        FLASHSALE!
-                      </span>
-                    )}
-                    <h3 className="font-semibold text-gray-800 mb-1">
-                      {item.name}
-                    </h3>
-                    <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-2">
-                      <span>{item.quantity}pcs</span>
-                      <span>|</span>
-                      <span>{item.size}</span>
-                      <span>|</span>
-                      <span>{item.temperature}</span>
-                      <span>|</span>
-                      <span>{item.delivery}</span>
+              {order.items && order.items.length > 0 ? (
+                order.items.map((item) => (
+                  <div key={item.id} className="flex gap-4 pb-4 bg-gray-100 p-3">
+                    <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <div className="flex items-center gap-2">
-                      {item.isFlashSale && item.originalPrice && (
-                        <span className="text-xs text-red-500 line-through">
-                          IDR {item.originalPrice.toLocaleString("id-ID")}
-                        </span>
-                      )}
-                      <span className="text-lg font-bold text-[#FF8906]">
-                        IDR{" "}
-                        {(
-                          (item.isFlashSale ? item.price : item.originalPrice) *
-                          item.quantity
-                        ).toLocaleString("id-ID")}
-                      </span>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 mb-1">
+                        {item.name}
+                      </h3>
+                      <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-2">
+                        <span>{item.quantity}pcs</span>
+                        {item.size && (
+                          <>
+                            <span>|</span>
+                            <span>{item.size}</span>
+                          </>
+                        )}
+                        {item.variant && (
+                          <>
+                            <span>|</span>
+                            <span>{item.variant}</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="text-lg font-bold text-[#FF8906]">
+                        IDR {item.subtotal.toLocaleString("id-ID")}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">
-                  IDR {order.orderTotal.toLocaleString("id-ID")}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Delivery Fee</span>
-                <span className="font-semibold">
-                  IDR {order.deliveryFee.toLocaleString("id-ID")}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax (10%)</span>
-                <span className="font-semibold">
-                  IDR {Math.round(order.tax).toLocaleString("id-ID")}
-                </span>
-              </div>
-              <div className="flex justify-between text-lg font-bold pt-2">
-                <span>Total</span>
-                <span className="text-[#FF8906]">
-                  IDR {Math.round(order.total).toLocaleString("id-ID")}
-                </span>
-              </div>
+                ))
+              ) : (
+                <p>No products found.</p>
+              )}
             </div>
           </div>
         </div>

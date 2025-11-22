@@ -1,83 +1,91 @@
-import React, { useEffect, useState } from "react";
-import {
-  Plus,
-  Search,
-  Filter,
-  Edit,
-  Trash2,
-  X,
-  User,
-  MapPin,
-  Phone,
-  Truck,
-  ChevronDown,
-} from "lucide-react";
-import GroupIcon from "/images/Group.png";
-import PortIcon from "/images/u_postcard.png";
-import RepeatIcon from "/images/repeat.png";
-import Coffe from "/images/coffeHazelnut.png";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { Plus, Search } from "lucide-react";
 import Xcircle from "/images/XCircle.png";
 
 const OrderList = () => {
+  const token = useSelector((state) => state.auth.token);
+  const [orders, setOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
-  const [product, setProduct] = useState([]);
-
-  useEffect(()=>{
-    const orderList = async () =>{
-      try{
-      const response = await fetch("/data/orderList.json")
-      const data = await response.json()
-      setProduct(data);
-      }catch(err){
-        console.log("Error fetching data", err);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/history`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (data.success) {
+          setOrders(data.data || []);
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
       }
+    };
+
+    if (token) fetchOrders();
+  }, [token]);
+
+  const handleHistory = async (orderId) => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/history/${orderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setSelectedOrder(data.data);
+        setShowModal(true);
+      }
+    } catch (err) {
+      console.error("Error fetching order detail:", err);
     }
-    orderList()
-  },[])
-
-    const formatRupiah = (price) =>
-      price
-        ? "IDR " +
-          new Intl.NumberFormat("id-ID", {
-            minimumFractionDigits: 0,
-          }).format(price)
-        : "-";
-
-  const statusColors = {
-    done: "bg-green-200 text-green-800",
-    pending: "bg-red-200 text-red-800",
-    onprogress: "bg-orange-200 text-orange-600",
-    waiting: "bg-gray-200 text-gary-800",
   };
 
-  const getStatusColor = (status) =>
-    statusColors[status.toLowerCase()] || "bg-gray-100 text-gray-800";
-
-  
-
-  const handleHistory = (order) => {
-    setSelectedOrder(order), setShowModal(true);
-  };
-
-  const filteredProducts = product.filter((item) => {
+  const filteredOrders = orders.filter((order) => {
     const matchStatus =
       status === "all" ||
-      item.status.toLowerCase().replace(/\s/g, "") === status.toLowerCase();
-    const matchSearch = item.noOrder
+      order.status.toLowerCase().replace(/\s/g, "") === status.toLowerCase();
+    const matchSearch = order.invoiceNumber
       .toLowerCase()
       .includes(search.toLowerCase());
     return matchStatus && matchSearch;
   });
 
+  const formatRupiah = (price) =>
+    price
+      ? "IDR " +
+        new Intl.NumberFormat("id-ID", { minimumFractionDigits: 0 }).format(
+          price
+        )
+      : "-";
+
+  const statusColors = {
+    done: "bg-green-200 text-green-800",
+    pending: "bg-red-200 text-red-800",
+    onprogress: "bg-orange-200 text-orange-600",
+    waiting: "bg-gray-200 text-gray-800",
+  };
+
+  const getStatusColor = (status) =>
+    statusColors[status.toLowerCase()] || "bg-gray-100 text-gray-800";
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900">Order List</h1>
+
         <div className="my-4 flex flex-wrap justify-between items-end gap-4">
           <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600  px-4 py-2 rounded-lg font-semibold transition">
             <Plus size={20} /> Add Order
@@ -93,7 +101,6 @@ const OrderList = () => {
               </label>
               <select
                 id="status"
-                name="status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 className="min-w-[150px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -126,10 +133,6 @@ const OrderList = () => {
                 size={20}
               />
             </div>
-
-            <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600  px-6 py-2 rounded-lg font-semibold transition">
-              <Filter size={20} /> Filter
-            </button>
           </div>
         </div>
 
@@ -137,78 +140,39 @@ const OrderList = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-100 border-b text-gray-700 text-sm">
-                <th className="px-4 py-3">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 accent-orange-500"
-                  />
-                </th>
-                {["No.Order", "Date", "Order", "Status", "Total", "Action"].map(
-                  (th, i) => (
-                    <th key={i} className="px-6 py-3 font-semibold">
-                      {th}
-                    </th>
-                  )
-                )}
+                <th className="px-4 py-3">No.</th>
+                <th className="px-6 py-3">Invoice</th>
+                <th className="px-6 py-3">Date</th>
+                <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3">Total</th>
+                <th className="px-6 py-3">Action</th>
               </tr>
             </thead>
-
             <tbody>
-              {filteredProducts.map((item) => (
+              {filteredOrders.map((order, idx) => (
                 <tr
-                  key={item.id}
+                  key={order.id}
                   className="border-b border-gray-200 hover:bg-gray-50 transition text-sm"
                 >
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-orange-500"
-                    />
-                  </td>
-                  <td className="px-6 py-3">{item.noOrder}</td>
-                  <td className="px-6 py-3">{item.date}</td>
-
-                  <td className="px-6 py-3">
-                    <ul className="list-disc pl-5 space-y-1">
-                      {item.order.map((orderItem, idx) => (
-                        <li key={idx}>
-                          {orderItem.name} {orderItem.size} {orderItem.qty}x
-                        </li>
-                      ))}
-                    </ul>
-                  </td>
-
+                  <td className="px-4 py-3">{idx + 1}</td>
+                  <td className="px-6 py-3">{order.invoiceNumber}</td>
+                  <td className="px-6 py-3">{order.createdAt}</td>
                   <td className="px-6 py-3">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                        item.status
+                        order.status
                       )}`}
                     >
-                      {item.status}
+                      {order.status}
                     </span>
                   </td>
-
-                  <td className="px-6 py-3">{formatRupiah(item.total)}</td>
-
-                  <td className="px-6 py-3 flex gap-2">
+                  <td className="px-6 py-3">{formatRupiah(order.total)}</td>
+                  <td className="px-6 py-3">
                     <button
-                      onClick={() => handleHistory(item)}
-                      className="p-2 text-gray-500 hover:bg-gray-100 rounded transition"
-                      title="History"
+                      onClick={() => handleHistory(order.id)}
+                      className="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600"
                     >
-                      <img src={GroupIcon} alt="group-icon" className="w-7" />
-                    </button>
-                    <button
-                      className="p-2 text-blue-500 hover:bg-blue-50 rounded transition"
-                      title="Edit"
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button
-                      className="p-2 text-red-500 hover:bg-red-50 rounded transition"
-                      title="Delete"
-                    >
-                      <Trash2 size={18} />
+                      History
                     </button>
                   </td>
                 </tr>
@@ -216,135 +180,88 @@ const OrderList = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
-          <p className="text-sm text-gray-600">
-            Show {filteredProducts.length} products of {product.length} product
-          </p>
-          <div className="flex gap-2 items-center">
-            <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition">
-              Prev
-            </button>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 text-sm rounded transition ${
-                  currentPage === page
-                    ? "bg-orange-500 text-white"
-                    : "text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition">
-              Next
-            </button>
-          </div>
-        </div>
       </div>
 
       {showModal && selectedOrder && (
-        <div className="absolute right-0 top-[26px] w-[600px] bg-opacity-50 flex items-end justify-end p-4 z-50">
-          <div className="bg-white shadow-lg w-full max-w-xl max-h-screen overflow-y-auto mt-10">
-            <div className="flex justify-between items-center p-6 sticky top-0 bg-white">
-              <h2 className="text-2xl font-medium text-gray-900">
-                Order {selectedOrder.noOrder}
-              </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              ><img src={Xcircle} alt="icon-close" />
-              </button>
-            </div>
-            <div className="p-6">
-              <h1 className="text-xl font-medium">Order Information</h1>
-              <div className="flex justify-between items-center border-b border-b-gray-400 py-5">
-                <div className="flex gap-3 text-[#4F5665]">
-                  <User size={18} />
-                  <p className="text-sm">FullName</p>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <img src={Xcircle} alt="Close" className="w-6" />
+            </button>
+
+            <h2 className="text-2xl font-bold mb-4">
+              Order {selectedOrder.invoiceNumber}
+            </h2>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="font-semibold">Full Name:</p>
+                  <p>{selectedOrder.custName}</p>
                 </div>
-                <p className="font-bold">Yoga</p>
-              </div>
-              <div className="flex justify-between items-center border-b border-b-gray-400 py-5">
-                <div className="flex gap-3 text-[#4F5665]">
-                  <MapPin size={18} />
-                  <p className="text-sm">Address</p>
+                <div>
+                  <p className="font-semibold">Phone:</p>
+                  <p>{selectedOrder.custPhone}</p>
                 </div>
-                <p className="font-bold">Bekasi</p>
-              </div>
-              <div className="flex justify-between items-center border-b border-b-gray-400 py-5">
-                <div className="flex gap-3 text-[#4F5665]">
-                  <Phone size={18} />
-                  <p className="text-sm">Phone</p>
+                <div>
+                  <p className="font-semibold">Address:</p>
+                  <p>{selectedOrder.custAddress}</p>
                 </div>
-                <p className="font-bold">08123456789</p>
-              </div>
-              <div className="flex justify-between items-center border-b border-b-gray-400 py-5">
-                <div className="flex gap-3 text-[#4F5665]">
-                  <img src={PortIcon} alt="post-icon" />
-                  <p className="text-sm">Payment Method</p>
+                <div>
+                  <p className="font-semibold">Payment:</p>
+                  <p>{selectedOrder.paymentMethod}</p>
                 </div>
-                <p className="font-bold">Cash</p>
-              </div>
-              <div className="flex justify-between items-center border-b border-b-gray-400 py-5">
-                <div className="flex gap-3 text-[#4F5665]">
-                  <Truck size={18} />
-                  <p className="text-sm">Shipping</p>
+                <div>
+                  <p className="font-semibold">Shipping:</p>
+                  <p>{selectedOrder.deliveryMethod}</p>
                 </div>
-                <p className="font-bold">Dine In</p>
-              </div>
-              <div className="flex justify-between items-center border-b border-b-gray-400 py-5">
-                <div className="flex gap-3 text-[#4F5665]">
-                  <img
-                    src={RepeatIcon}
-                    className="object-cover w-5 h-5"
-                    alt="repeat-icon"
-                  />
-                  <p className="text-sm">Status</p>
+                <div>
+                  <p className="font-semibold">Status:</p>
+                  <span
+                    className={`px-2 py-1 rounded-full ${getStatusColor(
+                      selectedOrder.status
+                    )}`}
+                  >
+                    {selectedOrder.status}
+                  </span>
                 </div>
-                <button className="flex gap-2 items-center py-2 px-3 bg-gray-300">
-                  Onprogress
-                  <ChevronDown />
-                </button>
               </div>
-              <div className="flex justify-between items-center py-5">
-                <div className="flex gap-3 text-[#4F5665]">
-                  <p className="text-sm">Total Transaksi</p>
-                </div>
-                <p className="text-lg text-orange-400">{selectedOrder.total}</p>
-              </div>
-              <div className="my-3">
-                <h1 className="text-2xl">Your Order</h1>
-                <div className="my-3 flex gap-4 bg-gray-200 p-3">
-                  <div>
+
+              <h3 className="text-xl font-semibold mt-4">Products</h3>
+              <div className="space-y-3">
+                {selectedOrder.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 bg-gray-100 p-3 rounded"
+                  >
                     <img
-                      src={Coffe}
-                      alt="Coffe-image"
-                      className="w-22 h-22 object-cover"
+                      src={item.image}
+                      alt={item.name}
+                      className="w-24 h-24 object-cover rounded"
                     />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-lg">Hazernut</h3>
-                    <div className="flex gap-3 text-gray-600">
-                      <p>2pcs</p>
-                      <span>|</span>
-                      <p>Reguler</p>
-                      <span>|</span>
-                      <p>Ice</p>
-                      <span>|</span>
-                      <p>Dine In</p>
-                    </div>
-                    <div className="flex gap-4">
-                      <p className="text-red-500 line-through">IDR40.000</p>
-                      <p className="text-lg text-orange-400">IDR20.000</p>
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{item.name}</h4>
+                      <p className="text-sm">
+                        {item.quantity} pcs | {item.size || "-"} |{" "}
+                        {item.variant || "-"}
+                      </p>
+                      <p className="text-orange-500 font-bold">
+                        {formatRupiah(item.discountPrice || item.basePrice)}
+                      </p>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-              <button className="w-full my-4 px-4 py-3 bg-orange-500 hover:bg-orange-600  font-bold rounded-lg transition text-base">
-                Update
-              </button>
+
+              <div className="mt-4 flex justify-between font-bold text-lg">
+                <p>Total:</p>
+                <p className="text-orange-500">
+                  {formatRupiah(selectedOrder.total)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
