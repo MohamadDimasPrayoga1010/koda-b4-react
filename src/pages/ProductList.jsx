@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Search, Filter, Edit, Trash2, Plus } from "lucide-react";
 import ProductModal from "../components/ProductModal";
+import { apiRequest } from "../utils/api";
+import { useSelector } from "react-redux";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
+
+  const [totalProducts, setTotalProducts] = useState(0); 
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -11,33 +17,54 @@ export default function ProductList() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
 
-  useEffect(() => {
-    const productListData = async () => {
-      try {
-        const response = await fetch("/data/productListAdmin.json");
-        const data = await response.json();
+  const { token } = useSelector((state) => state.auth);
 
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          console.error("Data fetched is not an array:", data);
-          setProducts([]);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const res = await apiRequest(
+        `/admin/products?page=${currentPage}&limit=${itemsPerPage}`,
+        "GET",
+        null,
+        token
+      );
+
+      console.log(res);
+
+      if (!res || res.success === false) {
+        console.log("Fetch failed:", res.message);
+        return;
       }
+
+      const list = Array.isArray(res.data) ? res.data : [];
+
+      setTotalProducts(res.total || 0);
+
+      const mapped = list.map((p) => ({
+        id: p.id,
+        name: p.title,
+        price: p.basePrice,
+        desc: p.description,
+        size: p.sizes?.map((s) => s.name).join(", ") || "-",
+        stock: p.stock,
+        method: p.isFlashSale ? "Flash Sale" : "Regular",
+        image: p.images?.[0]?.image
+          ? p.images[0].image
+          : "https://via.placeholder.com/80",
+      }));
+
+      setProducts(mapped);
     };
 
-    productListData();
-  }, []);
+    fetchProducts();
+  }, [token, currentPage]);
 
-    const formatRupiah = (price) =>
-      price
-        ? "IDR " +
-          new Intl.NumberFormat("id-ID", {
-            minimumFractionDigits: 0,
-          }).format(price)
-        : "-";
+  const formatRupiah = (price) =>
+    price
+      ? "IDR " +
+        new Intl.NumberFormat("id-ID", {
+          minimumFractionDigits: 0,
+        }).format(price)
+      : "-";
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -250,27 +277,39 @@ export default function ProductList() {
 
           <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
             <p className="text-sm text-gray-600">
-              Show {filteredProducts.length} products of {products.length}{" "}
-              product
+              Page {currentPage} of {totalPages} — Total {totalProducts} products
             </p>
+
             <div className="flex gap-2 items-center">
-              <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition disabled:opacity-40"
+              >
                 Prev
               </button>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1 text-sm rounded transition ${
-                    currentPage === page
-                      ? "bg-orange-500 text-white"
-                      : "text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition">
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 text-sm rounded transition ${
+                      currentPage === page
+                        ? "bg-orange-500 text-white"
+                        : "text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition disabled:opacity-40"
+              >
                 Next
               </button>
             </div>
