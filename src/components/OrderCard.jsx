@@ -5,10 +5,16 @@ import Glass from "/images/glass.png";
 import RepeatImg from "/images/repeat.png";
 
 const OrderCard = ({ order }) => {
+  const orderDate = new Date(order.createdAt).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
   return (
     <div key={order.id} className="my-4 flex gap-3">
       <img
-        src={order.items?.[0]?.image || "/images/coffeHazel4.jpg"}
+        src={order.image || "/images/coffeHazel4.jpg"}
         alt="order-img"
         className="w-[111px] h-[105px] object-cover rounded-md hidden md:flex"
       />
@@ -20,7 +26,7 @@ const OrderCard = ({ order }) => {
               <img src={Glass} alt="glass-icon" className="w-5 h-5" />
               <span>No. Order</span>
             </div>
-            <span className="text-base font-bold">{order.orderId}</span>
+            <span className="text-base font-bold">{order.invoiceNumber}</span>
           </div>
 
           <div className="flex flex-col">
@@ -28,7 +34,7 @@ const OrderCard = ({ order }) => {
               <CalendarDays className="w-5 h-5" />
               <span>Date</span>
             </p>
-            <span className="text-base font-bold">{order.date}</span>
+            <span className="text-base font-bold">{orderDate}</span>
           </div>
 
           <div className="flex flex-col">
@@ -47,7 +53,13 @@ const OrderCard = ({ order }) => {
               <span>Status</span>
             </div>
             <button
-              className={`py-2 px-3 rounded-2xl ${order.statusColor} font-semibold`}
+              className={`py-2 px-3 rounded-2xl ${
+                order.status === "On Progress"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : order.status === "Sending Goods"
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-green-100 text-green-700"
+              } font-semibold`}
             >
               {order.status}
             </button>
