@@ -43,13 +43,13 @@ const ProductFilter = ({
     const max = Number(data.priceMax) >= min ? Number(data.priceMax) : min;
 
     setSelectedCategory(data.category || null);
-    setSelectedSort(data.sort || null);
+    setSelectedSort(data.sort || "");
     setPriceRange([min, max]);
 
     onSearchSubmit({
       search: data.search,
       category: data.category || null,
-      sort: data.sort || null,
+      sort: data.sort || "",
       priceRange: [min, max],
     });
   };
@@ -66,23 +66,19 @@ const ProductFilter = ({
   };
 
   const sortOptions = [
-    { name: "Buy1get1", sortby: "name", order: "ASC" },
-    { name: "Flash Sale", sortby: "name", order: "ASC" },
-    { name: "Birthday Package", sortby: "name", order: "ASC" },
-    { name: "Cheap", sortby: "baseprice", order: "ASC" },
+    { label: "Lowest starting price", sortby: "baseprice" }, 
   ];
 
-const displayCategories =
-  categoriesList.length > 0
-    ? categoriesList
-    : [
-        { id: 1, name: "Favorite Product" },
-        { id: 2, name: "Coffe" },
-        { id: 3, name: "Non Coffe" },
-        { id: 4, name: "Foods" },
-        { id: 5, name: "Add-On" },
-      ];
-
+  const displayCategories =
+    categoriesList.length > 0
+      ? categoriesList
+      : [
+          { id: 1, name: "Favorite Product" },
+          { id: 2, name: "Coffe" },
+          { id: 3, name: "Non Coffe" },
+          { id: 4, name: "Foods" },
+          { id: 5, name: "Add-On" },
+        ];
 
   return (
     <div className={`flex flex-col gap-4 bg-black rounded-lg text-white ${className}`}>
@@ -135,17 +131,17 @@ const displayCategories =
         <div className="mt-4">
           <h1 className="font-bold text-lg mb-2">Sort By</h1>
           {sortOptions.map((sort) => (
-            <div className="flex items-center gap-3 my-1" key={sort.name}>
+            <div className="flex items-center gap-3 my-1" key={sort.label}>
               <input
-                type="Checkbox"
-                value={sort.name}
-                checked={watchedSort === sort.name}
+                type="checkbox"
+                value={sort.label}
+                checked={watchedSort === sort.sortby}
                 onChange={() =>
-                  setValue("sort", watchedSort === sort.name ? "" : sort.name)
+                  setValue("sort", watchedSort === sort.sortby ? "" : sort.sortby)
                 }
                 className="w-4 h-4 accent-orange-500"
               />
-              <label>{sort.name}</label>
+              <label>{sort.label}</label>
             </div>
           ))}
         </div>
