@@ -18,7 +18,10 @@ function CardProduct({ product }) {
       e.preventDefault();
       setAlert({ type: "", message: "" });
       setTimeout(() => {
-        setAlert({ type: "error", message: "Anda harus login terlebih dahulu!" });
+        setAlert({
+          type: "error",
+          message: "Anda harus login terlebih dahulu!",
+        });
       }, 10);
 
       return;
@@ -30,8 +33,6 @@ function CardProduct({ product }) {
       setAlert({ type: "error", message: "Anda harus login terlebih dahulu!" });
       return;
     }
-
-    setAlert({ type: "success", message: "Produk berhasil ditambahkan ke cart!" });
   };
 
   const closeAlert = () => {
@@ -41,11 +42,14 @@ function CardProduct({ product }) {
   return (
     <>
       {alert.message && (
-        <AuthAlert type={alert.type} message={alert.message} onClose={closeAlert} />
+        <AuthAlert
+          type={alert.type}
+          message={alert.message}
+          onClose={closeAlert}
+        />
       )}
 
       <div className="relative shadow-md hover:shadow-lg transition-shadow overflow-visible min-h-[520px] pb-6">
-        
         {isFlashSale && (
           <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded z-10">
             FLASH SALE!
@@ -96,14 +100,14 @@ function CardProduct({ product }) {
             >
               Buy
             </Link>
-            <button
+            <Link
+              to={`/detail-product/${product.id}`} 
               onClick={handleAddCart}
               className="border border-[#FF8906] p-2 rounded-md h-10 w-10 flex items-center justify-center hover:bg-[#FFF3E0]"
             >
               <ShoppingCart className="w-5 h-5 text-[#FF8906]" />
-            </button>
+            </Link>
           </div>
-
         </div>
       </div>
     </>
