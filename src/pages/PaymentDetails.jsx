@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CartItems from "../components/CartItem";
 import { apiRequest } from "../utils/api";
 import { useSelector } from "react-redux";
@@ -7,7 +7,9 @@ import AuthAlert from "../components/AuthAlert";
 
 const PaymentDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const token = useSelector((state) => state.auth.token);
+  const buyNowItem = location.state?.item;
 
   const [cartItems, setCartItems] = useState([]);
   const [shippings, setShippings] = useState([]);
@@ -31,12 +33,22 @@ const PaymentDetails = () => {
   const taxAmount = orderTotal * 0.1;
   const grandTotal = orderTotal + deliveryFee + taxAmount;
 
+  useEffect(() => {
+  if (!token) return;
+
   const fetchData = async () => {
     try {
       const cartRes = await apiRequest("/cart", "GET", null, token);
       if (cartRes.success && Array.isArray(cartRes.data.items)) {
-        setCartItems(cartRes.data.items);
+        const transformed = cartRes.data.items.map(item => ({
+          ...item,
+          name: item.name || item.title,
+          quantity: item.quantity || 1,
+          subtotal: item.subtotal || item.price * (item.quantity || 1),
+        }));
+        setCartItems(transformed);
       }
+
       const shippingRes = await apiRequest("/shippings", "GET", null, token);
       setShippings(Array.isArray(shippingRes.data) ? shippingRes.data : []);
 
@@ -44,10 +56,9 @@ const PaymentDetails = () => {
       setPaymentMethods(Array.isArray(paymentRes.data) ? paymentRes.data : []);
 
       const userRes = await apiRequest("/profile", "GET", null, token);
-      console.log("User profile:", userRes); 
       if (userRes.success && userRes.data) {
         const profile = userRes.data;
-        setFormData((prev) => ({
+        setFormData(prev => ({
           ...prev,
           email: profile.email || prev.email,
           fullName: profile.fullname || profile.full_name || prev.fullName,
@@ -56,18 +67,19 @@ const PaymentDetails = () => {
         }));
       }
     } catch (err) {
+      console.error("Fetch data error:", err);
       setAlert({ type: "error", message: "Failed to fetch data" });
     }
   };
 
-  useEffect(() => {
-    if (token) fetchData();
-  }, [token]);
+  fetchData();
+}, [token]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (validationErrors[name]) setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (validationErrors[name]) setValidationErrors(prev => ({ ...prev, [name]: "" }));
   };
 
   const validateForm = () => {
@@ -95,8 +107,8 @@ const PaymentDetails = () => {
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
-        paymentMethodId: paymentMethods.find((p) => p.name === selectedPayment)?.id,
-        shippingId: shippings.find((s) => s.name === formData.delivery)?.id,
+        paymentMethodId: paymentMethods.find(p => p.name === selectedPayment)?.id,
+        shippingId: shippings.find(s => s.name === formData.delivery)?.id,
       };
 
       if (!payload.paymentMethodId || !payload.shippingId) {
@@ -120,6 +132,7 @@ const PaymentDetails = () => {
         navigate("/history-order");
       }, 3000);
     } catch (err) {
+      console.error("Checkout error:", err);
       setAlert({ type: "error", message: err.message || "Failed to process transaction" });
     } finally {
       setIsProcessing(false);
@@ -145,7 +158,7 @@ const PaymentDetails = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <section className="lg:col-span-2 space-y-8">
-          <CartItems cartItems={cartItems} setCartItems={setCartItems} token={token} />
+          <CartItems cartItemsProp={cartItems} />
 
           <div className="bg-white rounded-lg p-6 shadow-md">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">Payment Info & Delivery</h2>
@@ -164,7 +177,6 @@ const PaymentDetails = () => {
                 />
               </div>
 
-              {/* Full Name */}
               <div>
                 <label className="block text-base font-semibold text-[#0B132A] mb-2">Full Name</label>
                 <input
