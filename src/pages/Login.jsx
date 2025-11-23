@@ -54,7 +54,15 @@ const Login = () => {
 
         setAlert({ type: "success", message: "Login berhasil!" });
 
-        setTimeout(() => navigate("/"), 1500);
+        setTimeout(() => {
+          if (result.data.role === "admin") {
+            navigate("/dashboard");
+            console.log("LOGIN RESULT:", result);
+
+          } else {
+            navigate("/");
+          }
+        }, 1500);
       } else {
         if (result.message.includes("Email")) {
           setFormError("email", { type: "manual", message: result.message });
