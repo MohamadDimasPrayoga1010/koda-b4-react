@@ -6,7 +6,7 @@ import { apiRequest } from "../utils/api";
 import AuthAlert from "./AuthAlert";
 import { useSelector } from "react-redux";
 
-const CartItems = ({ cartItemsProp }) => {
+const CartItems = ({ cartItemsProp, refreshCart }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ type: "", message: "" });
@@ -62,7 +62,13 @@ const CartItems = ({ cartItemsProp }) => {
         setAlert({ type: "error", message: response?.message || "Failed to remove item" });
       } else {
         setAlert({ type: "success", message: "Item removed successfully" });
-        setCartItems((prev) => prev.filter((item) => item.cartItemId !== id && item.id !== id));
+        setCartItems((prev) =>
+          prev.filter((item) => item.cartItemId !== id && item.id !== id)
+        );
+
+        if (typeof refreshCart === "function") {
+          refreshCart();
+        }
       }
     } catch (error) {
       console.error("Delete cart item error:", error);
