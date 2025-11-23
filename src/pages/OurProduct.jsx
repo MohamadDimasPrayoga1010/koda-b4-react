@@ -11,9 +11,15 @@ import { apiRequest } from "../utils/api";
 const OurProduct = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || null);
-  const [selectedSort, setSelectedSort] = useState(searchParams.get("sort") || null);
+  const [searchInput, setSearchInput] = useState(
+    searchParams.get("search") || ""
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("category") || null
+  );
+  const [selectedSort, setSelectedSort] = useState(
+    searchParams.get("sort") || null
+  );
   const [priceRange, setPriceRange] = useState([
     Number(searchParams.get("minPrice")) || 0,
     Number(searchParams.get("maxPrice")) || 50000,
@@ -34,7 +40,13 @@ const OurProduct = () => {
     if (priceRange[0] > 0) params.set("minPrice", priceRange[0]);
     if (priceRange[1] < 50000) params.set("maxPrice", priceRange[1]);
     setSearchParams(params);
-  }, [searchInput, selectedCategory, selectedSort, priceRange, setSearchParams]);
+  }, [
+    searchInput,
+    selectedCategory,
+    selectedSort,
+    priceRange,
+    setSearchParams,
+  ]);
 
   const fetchCategories = useCallback(async () => {
     const res = await apiRequest("/categories");
@@ -42,27 +54,27 @@ const OurProduct = () => {
   }, []);
 
 const fetchProducts = useCallback(
-  async (filters = { search: searchInput, category: selectedCategory, sort: selectedSort, priceRange }) => {
+  async (
+    filters = {
+      search: searchInput,
+      category: selectedCategory,
+      sort: selectedSort,
+      priceRange,
+    }
+  ) => {
     setLoading(true);
+
     try {
-      const params = new URLSearchParams({
-        page,
-        limit: 50,
-        q: filters.search || "",
-        price_min: filters.priceRange?.[0] || 0,
-        price_max: filters.priceRange?.[1] || 50000,
-      });
-
+      const params = new URLSearchParams();
+      params.append("page", page);
+      params.append("limit", 50);
+      if (filters.search) params.append("q", filters.search);
       if (filters.category) params.append("cat", filters.category);
-
-      if (filters.sort) {
-        if (filters.sort === "Cheap") {
-          params.append("sortby", "baseprice");
-          params.append("order", "ASC");
-        } else {
-          params.append("sortby", "name");
-          params.append("order", "ASC");
-        }
+      params.append("price_min", filters.priceRange?.[0] || 0);
+      params.append("price_max", filters.priceRange?.[1] || 500000);
+      if (filters.sort && filters.sort !== "") {
+        params.append("sortby", filters.sort);
+        params.append("order", "ASC");
       }
 
       let res;
@@ -77,7 +89,10 @@ const fetchProducts = useCallback(
 
       if (res.success) {
         setProducts(res.data || []);
-        if (res.pagination?.totalPages) setTotalPages(res.pagination.totalPages);
+
+        if (res.pagination?.totalPages) {
+          setTotalPages(res.pagination.totalPages);
+        }
       } else {
         console.error("Failed to fetch products:", res.message);
         setProducts([]);
@@ -97,7 +112,7 @@ const fetchProducts = useCallback(
     setSearchInput(filters.search || "");
     setSelectedCategory(filters.category || null);
     setSelectedSort(filters.sort || null);
-    setPriceRange(filters.priceRange || [0, 50000]);
+    setPriceRange(filters.priceRange || [0, 500000]);
     fetchProducts(filters);
     updateURL();
   };
@@ -106,14 +121,25 @@ const fetchProducts = useCallback(
     setSearchInput("");
     setSelectedCategory(null);
     setSelectedSort(null);
-    setPriceRange([0, 50000]);
+    setPriceRange([0, 500000]);
     setSearchParams({});
-    fetchProducts({ search: "", category: null, sort: null, priceRange: [0, 50000] });
+    fetchProducts({
+      search: "",
+      category: null,
+      sort: null,
+      priceRange: [0, 500000],
+    });
   };
 
-  useEffect(() => { fetchCategories(); }, [fetchCategories]);
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
-  useEffect(() => { updateURL(); }, [updateURL]);
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+  useEffect(() => {
+    updateURL();
+  }, [updateURL]);
 
   if (loading) {
     return (
@@ -139,16 +165,28 @@ const fetchProducts = useCallback(
 
       <section className="md:hidden mx-12 relative flex items-center gap-3">
         <button onClick={() => setShowFilter(!showFilter)}>
-          <img src={FilterIcon} alt="filter-icon" className="p-3.5 bg-orange-400 rounded" />
+          <img
+            src={FilterIcon}
+            alt="filter-icon"
+            className="p-3.5 bg-orange-400 rounded"
+          />
         </button>
 
         {showFilter && (
           <>
-            <div className="fixed inset-0 bg-opacity-50 z-40" onClick={() => setShowFilter(false)}></div>
+            <div
+              className="fixed inset-0 bg-opacity-50 z-40"
+              onClick={() => setShowFilter(false)}
+            ></div>
             <div className="fixed top-0 right-0 h-full w-80 bg-black text-white z-50 shadow-lg">
               <div className="flex justify-between items-center p-4 border-b border-gray-700">
                 <h2 className="text-xl font-semibold">Filter</h2>
-                <button onClick={() => setShowFilter(false)} className="text-gray-300 hover:text-orange-400 transition">✕</button>
+                <button
+                  onClick={() => setShowFilter(false)}
+                  className="text-gray-300 hover:text-orange-400 transition"
+                >
+                  ✕
+                </button>
               </div>
               <div className="overflow-y-auto h-[calc(100%-4rem)] p-4">
                 <ProductFilter
@@ -202,12 +240,16 @@ const fetchProducts = useCallback(
                 data={products}
                 itemsPerPage={6}
                 gridCols="grid-cols-1 md:grid-cols-2"
-                renderItem={(product) => <CardProduct key={product.id} product={product} />}
+                renderItem={(product) => (
+                  <CardProduct key={product.id} product={product} />
+                )}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-center text-gray-600">
                 <p className="text-lg font-medium">Data tidak tersedia</p>
-                <p className="text-sm">Coba ubah filter atau pencarian untuk melihat produk lain.</p>
+                <p className="text-sm">
+                  Coba ubah filter atau pencarian untuk melihat produk lain.
+                </p>
               </div>
             )}
           </div>
