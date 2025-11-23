@@ -231,7 +231,7 @@ const fetchProducts = useCallback(
             setPriceRange={setPriceRange}
             onReset={handleResetFilter}
             categoriesList={categoriesList}
-            className="hidden md:flex p-8 w-sm md:h-[700px]"
+            className="hidden md:flex p-8 w-sm md:h-[800px]"
           />
 
           <div className="w-full">
