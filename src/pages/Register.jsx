@@ -1,5 +1,5 @@
-import Rectangle from "/images/Rectangle.png";
-import CoffeLogo from "/images/CoffeLogo.png";
+import Rectangle from "/images/cofeederregis.jpeg";
+import CoffeLogo from "/images/logoweb.png";
 import InputField from "../components/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -90,7 +90,7 @@ const Register = () => {
           <AuthAlert type="error" message={failedMessage} />
 
           <div>
-            <img src={CoffeLogo} alt="coffe-logo" />
+            <img src={CoffeLogo} alt="coffe-logo" className="w-16 h-16"/>
           </div>
           <h1 className="text-[#8E6447] text-2xl font-semibold mt-6">
             Register

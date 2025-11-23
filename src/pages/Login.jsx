@@ -1,4 +1,4 @@
-import CoffeLogo from "/images/CoffeLogo.png";
+import CoffeLogo from "/images/logoweb.png";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 import { useForm } from "react-hook-form";
@@ -10,7 +10,7 @@ import { Mail } from "lucide-react";
 import PasswordIcon from "/images/Password.svg";
 import GoogleIcon from "/images/google.svg";
 import FacebookIcon from "/images/facebook.svg";
-import LoginImg from "/images/LoginImg.png";
+import LoginImg from "/images/cofeederlog.jpeg";
 import AuthAlert from "../components/AuthAlert";
 import { useDispatch } from "react-redux";
 import { login as loginAction, setLoading } from "../redux/reducer/auth";
@@ -99,7 +99,7 @@ const Login = () => {
           )}
 
           <div>
-            <img src={CoffeLogo} alt="coffe-logo" />
+            <img src={CoffeLogo} alt="coffe-logo" className="w-16 h-16"/>
           </div>
 
           <h1 className="text-[#8E6447] text-2xl font-semibold mt-6">Login</h1>
