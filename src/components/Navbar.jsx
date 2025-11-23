@@ -17,6 +17,8 @@ const Navbar = () => {
 
   const { user, isLoggedIn, token } = useSelector((state) => state.auth);
 
+  const isActive = (path) => location.pathname === path;
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!isLoggedIn || !token) return;
@@ -26,13 +28,16 @@ const Navbar = () => {
 
         if (res.success) {
           const data = res.data;
+          const avatarUrl = data.image
+            ? data.image.startsWith("http")
+              ? data.image
+              : `${import.meta.env.VITE_API_URL}/${data.image}`
+            : null;
 
           dispatch(
             setUser({
               ...data,
-              avatar: data.image
-                ? `${import.meta.env.VITE_API_URL}/${data.image}`
-                : null,
+              avatar: avatarUrl,
               token,
             })
           );
@@ -47,8 +52,6 @@ const Navbar = () => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
-
-  const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
     dispatch(logoutAction());
@@ -66,9 +69,7 @@ const Navbar = () => {
               <Link
                 to="/"
                 className={`text-white transition ${
-                  isActive("/")
-                    ? "border-b border-b-[#FF8906]"
-                    : "hover:text-[#FF8906]"
+                  isActive("/") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
                 }`}
               >
                 Home
@@ -76,9 +77,7 @@ const Navbar = () => {
               <Link
                 to="/our-product"
                 className={`text-white transition ${
-                  isActive("/our-product")
-                    ? "border-b border-b-[#FF8906]"
-                    : "hover:text-[#FF8906]"
+                  isActive("/our-product") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
                 }`}
               >
                 Product
@@ -115,8 +114,8 @@ const Navbar = () => {
                 >
                   <img
                     src={
-                      user?.avatar
-                        ? user.avatar
+                      user?.image
+                        ? user.image
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                             user?.fullname || "User"
                           )}&background=FF8906&color=fff`
@@ -152,11 +151,7 @@ const Navbar = () => {
             <Link to="/payment-details">
               <img src={CartIcon} alt="cart-icon" className="w-6 h-6" />
             </Link>
-            <button
-              onClick={toggleMenu}
-              className="text-white p-2"
-              aria-label="Toggle menu"
-            >
+            <button onClick={toggleMenu} className="text-white p-2" aria-label="Toggle menu">
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
@@ -175,11 +170,7 @@ const Navbar = () => {
             <div className="p-6 flex flex-col h-full">
               <div className="flex items-center justify-between mb-8">
                 <img src={CoffeLogo} alt="coffe-logo" className="h-8" />
-                <button
-                  onClick={toggleMenu}
-                  className="text-gray-700 p-1"
-                  aria-label="Close menu"
-                >
+                <button onClick={toggleMenu} className="text-gray-700 p-1" aria-label="Close menu">
                   <X size={24} />
                 </button>
               </div>
@@ -206,9 +197,7 @@ const Navbar = () => {
                 <Link
                   to="/"
                   className={`block py-3 border-b border-gray-200 ${
-                    isActive("/")
-                      ? "text-[#FF8906] font-semibold"
-                      : "text-gray-700"
+                    isActive("/") ? "text-[#FF8906] font-semibold" : "text-gray-700"
                   }`}
                   onClick={toggleMenu}
                 >
@@ -217,9 +206,7 @@ const Navbar = () => {
                 <Link
                   to="/our-product"
                   className={`block py-3 border-b border-gray-200 ${
-                    isActive("/our-product")
-                      ? "text-[#FF8906] font-semibold"
-                      : "text-gray-700"
+                    isActive("/our-product") ? "text-[#FF8906] font-semibold" : "text-gray-700"
                   }`}
                   onClick={toggleMenu}
                 >
@@ -245,8 +232,8 @@ const Navbar = () => {
                   <div className="flex items-center gap-3 border-t border-gray-200 pt-4">
                     <img
                       src={
-                        user?.avatar
-                          ? user.avatar
+                        user?.image
+                          ? user.image
                           : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                               user?.fullname || "User"
                             )}&background=FF8906&color=fff`
@@ -255,12 +242,8 @@ const Navbar = () => {
                       className="w-8 h-8 rounded-full object-cover"
                     />
                     <div>
-                      <p className="text-gray-800 font-semibold">
-                        {user?.fullname || "User"}
-                      </p>
-                      <p className="text-gray-500 text-sm">
-                        {user?.email || ""}
-                      </p>
+                      <p className="text-gray-800 font-semibold">{user?.fullname || "User"}</p>
+                      <p className="text-gray-500 text-sm">{user?.email || ""}</p>
                     </div>
                   </div>
                   <div className="mt-4 space-y-2">
