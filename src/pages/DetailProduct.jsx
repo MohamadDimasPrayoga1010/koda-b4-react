@@ -109,63 +109,44 @@ const DetailProduct = () => {
   const auth = useSelector((state) => state.auth);
   const token = auth?.token || null;
 
-  const addToCart = async () => {
-    if (!selectedProduct) return;
+  const addToCart = async (navigateToPayment = false) => {
+  if (!selectedProduct) return;
 
-    const cartItem = {
-      productId: selectedProduct.id,
-      size_id: selectedSize || null,
-      variantId: selectedProduct.variant?.id || null,
-      quantity: quantity,
-    };
-    console.log("Cart item to send:", cartItem);
+  const cartItem = {
+    productId: selectedProduct.id,
+    size_id: selectedSize || null,
+    variantId: selectedProduct.variant?.id || null,
+    quantity: quantity,
+  };
+  console.log("Cart item to send:", cartItem);
 
-    try {
-      const response = await apiRequest("/cart", "POST", [cartItem], token);
-      if (!response.success) {
-        setAlertMessage(response.message || "Failed to add to cart");
-        setAlertType("error");
-        return;
-      }
+  try {
+    const response = await apiRequest("/cart", "POST", [cartItem], token);
+    if (!response.success) {
+      setAlertMessage(response.message || "Failed to add to cart");
+      setAlertType("error");
+      return;
+    }
 
-      console.log("Cart response:", response.data);
+    console.log("Cart response:", response.data);
+
+    if (navigateToPayment) {
+      navigate("/payment-details");
+    } else {
       setAlertMessage("Item added to cart successfully!");
       setAlertType("success");
       setTimeout(() => setAlertMessage(""), 3000); 
       setAdded(true);
       setTimeout(() => setAdded(false), 1500);
-    } catch (err) {
-      console.error("Error adding to cart:", err);
-      setAlertMessage("Network error. Please try again.");
-      setAlertType("error");
     }
-  };
+  } catch (err) {
+    console.error("Error adding to cart:", err);
+    setAlertMessage("Network error. Please try again.");
+    setAlertType("error");
+  }
+};
 
-  const handleBuyNow = () => {
-    if (!selectedProduct) return;
 
-    const currentPrice = getCurrentPrice();
-    const selectedSizeObj = selectedProduct.sizes?.find(
-      (s) => s.id === selectedSize
-    );
-
-    const item = {
-      productId: selectedProduct.id,
-      name: selectedProduct.name,
-      image: selectedProduct.image,
-      price: currentPrice,
-      originalPrice: selectedProduct.originalPrice || null,
-      isFlashSale: selectedProduct.isFlashSale || false,
-      quantity,
-      size: selectedSizeObj?.name || "Regular",
-      sizeId: selectedSize,
-      temperature: selectedTemp,
-      variant: selectedProduct.variant?.name || null,
-      delivery: "Dine In",
-      cartItemId: Date.now() + Math.random().toString(36).substr(2, 5),
-    };
-    navigate("/payment-details", { state: { item } });
-  };
 
   if (loading) {
     return (
@@ -377,14 +358,14 @@ const DetailProduct = () => {
 
           <div className="flex gap-4">
             <button
-              onClick={handleBuyNow}
+              onClick={() => addToCart(true)}
               disabled={selectedProduct.stock === 0}
               className="flex-1 bg-[#FF8906] text-white py-3 rounded font-semibold hover:bg-orange-600 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {selectedProduct.stock === 0 ? "Out of Stock" : "Buy Now"}
             </button>
             <button
-              onClick={addToCart}
+              onClick={() => addToCart(false)}
               disabled={selectedProduct.stock === 0}
               className="flex-1 border border-[#FF8906] text-[#FF8906] py-3 rounded font-semibold hover:bg-orange-50 transition flex items-center justify-center gap-2 disabled:border-gray-400 disabled:text-gray-400 disabled:cursor-not-allowed"
             >
