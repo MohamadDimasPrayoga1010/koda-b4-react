@@ -110,50 +110,51 @@ const DetailProduct = () => {
   const token = auth?.token || null;
 
   const addToCart = async (navigateToPayment = false) => {
-  if (!selectedProduct) return;
+    if (!selectedProduct) return;
 
-  const cartItem = {
-    productId: selectedProduct.id,
-    size_id: selectedSize || null,
-    variantId: selectedProduct.variant?.id || null,
-    quantity: quantity,
-  };
-  console.log("Cart item to send:", cartItem);
+    const cartItem = {
+      productId: selectedProduct.id,
+      size_id: selectedSize || null,
+      variantId: selectedProduct.variant?.id || null,
+      quantity: quantity,
+    };
+    console.log("Cart item to send:", cartItem);
 
-  try {
-    const response = await apiRequest("/cart", "POST", [cartItem], token);
-    if (!response.success) {
-      setAlertMessage(response.message || "Failed to add to cart");
+    try {
+      const response = await apiRequest("/cart", "POST", [cartItem], token);
+      if (!response.success) {
+        setAlertMessage(response.message || "Failed to add to cart");
+        setAlertType("error");
+        return;
+      }
+
+      console.log("Cart response:", response.data);
+
+      if (navigateToPayment) {
+        navigate("/payment-details");
+      } else {
+        setAlertMessage("Item added to cart successfully!");
+        setAlertType("success");
+        setTimeout(() => setAlertMessage(""), 3000);
+        setAdded(true);
+        setTimeout(() => setAdded(false), 1500);
+      }
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+      setAlertMessage("Network error. Please try again.");
       setAlertType("error");
-      return;
     }
-
-    console.log("Cart response:", response.data);
-
-    if (navigateToPayment) {
-      navigate("/payment-details");
-    } else {
-      setAlertMessage("Item added to cart successfully!");
-      setAlertType("success");
-      setTimeout(() => setAlertMessage(""), 3000); 
-      setAdded(true);
-      setTimeout(() => setAdded(false), 1500);
-    }
-  } catch (err) {
-    console.error("Error adding to cart:", err);
-    setAlertMessage("Network error. Please try again.");
-    setAlertType("error");
-  }
-};
-
-
+  };
 
   if (loading) {
     return (
-      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+      <div className="bg-gradient-to-br from-gray-50 to-amber-50/30 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading product...</p>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-amber-200 border-t-amber-700 mx-auto mb-6"></div>
+            <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-amber-100 opacity-20 mx-auto animate-ping"></div>
+          </div>
+          <p className="text-gray-600 font-medium text-lg">Loading product...</p>
         </div>
       </div>
     );
@@ -161,14 +162,14 @@ const DetailProduct = () => {
 
   if (error || !selectedProduct) {
     return (
-      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="bg-gradient-to-br from-gray-50 to-amber-50/30 min-h-screen flex items-center justify-center">
+        <div className="text-center bg-white rounded-2xl shadow-xl p-8 max-w-md mx-4">
           <h2 className="text-3xl font-bold mb-4 text-gray-800">
             {error || "Product Not Found"}
           </h2>
           <Link
             to="/our-product"
-            className="inline-block bg-[#FF8906] text-white px-6 py-3 rounded hover:bg-[#e67a05] transition"
+            className="inline-block bg-gradient-to-r from-[#8B4513] to-[#654321] text-white px-6 py-3 rounded-xl font-semibold hover:from-[#654321] hover:to-[#8B4513] transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             Back to Products
           </Link>
@@ -183,35 +184,35 @@ const DetailProduct = () => {
       : [selectedProduct.image];
 
   return (
-    <main className="bg-gray-50 min-h-screen py-8 px-6 md:px-16 my-20">
-     <AuthAlert type={alertType} message={alertMessage} />
+    <main className="bg-gradient-to-br from-gray-50 to-amber-50/30 min-h-screen py-8 px-6 md:px-16 my-20">
+      <AuthAlert type={alertType} message={alertMessage} />
 
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-6 shadow-lg">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-2xl p-6 md:p-8 shadow-xl border border-amber-100">
         <div>
-          <div className="relative mb-4">
+          <div className="relative mb-4 rounded-2xl overflow-hidden group">
             {selectedProduct.isFlashSale && (
-              <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded z-10">
+              <div className="absolute top-4 left-4 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold px-4 py-2 rounded-full z-10 shadow-lg animate-pulse">
                 FLASHSALE!
               </div>
             )}
             <img
               src={productImages[mainImage]}
               alt={selectedProduct.name}
-              className="w-full h-96 object-cover rounded-lg"
+              className="w-full h-96 object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-3">
             {productImages.map((img, idx) => (
               <img
                 key={idx}
                 src={img}
                 alt={`${selectedProduct.name} ${idx + 1}`}
                 onClick={() => setMainImage(idx)}
-                className={`w-full h-24 object-cover rounded cursor-pointer transition ${
+                className={`w-full h-24 object-cover rounded-xl cursor-pointer transition-all duration-300 ${
                   mainImage === idx
-                    ? "ring-2 ring-[#FF8906]"
-                    : "hover:opacity-75"
+                    ? "ring-4 ring-[#8B4513] shadow-lg scale-105"
+                    : "hover:opacity-75 hover:scale-105"
                 }`}
               />
             ))}
@@ -219,7 +220,7 @@ const DetailProduct = () => {
         </div>
 
         <div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800 leading-tight">
             {selectedProduct.name}
           </h1>
 
@@ -231,7 +232,7 @@ const DetailProduct = () => {
                     IDR {selectedProduct.originalPrice.toLocaleString("id-ID")}
                   </p>
                 )}
-                <p className="text-2xl font-bold text-[#FF8906]">
+                <p className="text-3xl font-black bg-gradient-to-r from-[#8B4513] to-[#654321] bg-clip-text text-transparent">
                   IDR {getCurrentPrice().toLocaleString("id-ID")}
                 </p>
               </>
@@ -241,7 +242,7 @@ const DetailProduct = () => {
                   Base Price: IDR{" "}
                   {selectedProduct.basePrice.toLocaleString("id-ID")}
                 </p>
-                <p className="text-2xl font-bold text-gray-800">
+                <p className="text-3xl font-black bg-gradient-to-r from-[#8B4513] to-[#654321] bg-clip-text text-transparent">
                   IDR {getCurrentPrice().toLocaleString("id-ID")}
                 </p>
               </div>
@@ -252,46 +253,46 @@ const DetailProduct = () => {
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                size={18}
+                size={20}
                 className={`${
                   i < Math.floor(selectedProduct.rating)
-                    ? "text-yellow-400 fill-yellow-400"
+                    ? "text-amber-500 fill-amber-500"
                     : "text-gray-300"
                 }`}
               />
             ))}
-            <span className="text-lg font-semibold">
+            <span className="text-lg font-semibold ml-1">
               {selectedProduct.rating.toFixed(1)}
             </span>
           </div>
 
           <div className="flex items-center gap-3 mb-6 text-[#4F5665]">
-            <p>200+ Review</p>
+            <p className="text-sm font-medium">200+ Review</p>
             <span className="border-l h-4 border-gray-300"></span>
-            <p>Recommendation</p>
-            <ThumbsUp size={18} className="text-[#FF8906]" />
+            <p className="text-sm font-medium">Recommendation</p>
+            <ThumbsUp size={18} className="text-[#8B4513]" />
           </div>
 
-          <p className="text-gray-600 mb-6 leading-relaxed">
+          <p className="text-gray-600 mb-6 leading-relaxed text-base">
             {selectedProduct.description}
           </p>
 
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-8 h-8 border border-[#FF8906] flex items-center justify-center font-bold hover:bg-orange-50 transition"
+              className="w-10 h-10 border-2 border-[#8B4513] rounded-lg flex items-center justify-center font-bold text-[#8B4513] hover:bg-amber-50 transition-all duration-300 hover:scale-105"
             >
               -
             </button>
-            <span className="text-lg font-semibold">{quantity}</span>
+            <span className="text-xl font-semibold min-w-[3ch] text-center">{quantity}</span>
             <button
               onClick={() => {
                 if (quantity < selectedProduct.stock) setQuantity(quantity + 1);
               }}
               disabled={quantity >= selectedProduct.stock}
-              className={`w-8 h-8 flex items-center justify-center font-bold transition ${
+              className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold transition-all duration-300 ${
                 quantity < selectedProduct.stock
-                  ? "bg-[#FF8906] text-white hover:bg-orange-600"
+                  ? "bg-gradient-to-r from-[#8B4513] to-[#654321] text-white hover:from-[#654321] hover:to-[#8B4513] hover:scale-105 shadow-md"
                   : "bg-gray-300 text-gray-600 cursor-not-allowed"
               }`}
             >
@@ -299,26 +300,28 @@ const DetailProduct = () => {
             </button>
           </div>
 
-          <div className="mb-6 text-sm text-gray-500">
+          <div className="mb-6 text-sm">
             {selectedProduct.stock > 0 ? (
-              <p>Stock tersisa: {selectedProduct.stock - quantity}</p>
+              <p className="text-gray-600 font-medium">
+                Stock tersisa: <span className="text-[#8B4513] font-bold">{selectedProduct.stock - quantity}</span>
+              </p>
             ) : (
-              <p className="text-red-500 font-medium">Stock habis</p>
+              <p className="text-red-500 font-semibold">Stock habis</p>
             )}
           </div>
 
           {selectedProduct.sizes && selectedProduct.sizes.length > 0 && (
             <div className="mb-6">
-              <p className="font-bold text-lg mb-3">Choose Size</p>
+              <p className="font-bold text-lg mb-3 text-gray-800">Choose Size</p>
               <div className="flex gap-3 flex-wrap">
                 {selectedProduct.sizes.map((size) => (
                   <button
                     key={size.id}
                     onClick={() => setSelectedSize(Number(size.id))}
-                    className={`px-4 py-2 rounded border transition ${
+                    className={`px-5 py-3 rounded-xl border-2 transition-all duration-300 ${
                       selectedSize === size.id
-                        ? "border-[#FF8906] bg-orange-50 text-[#FF8906]"
-                        : "border-gray-300 hover:border-[#FF8906]"
+                        ? "border-[#8B4513] bg-amber-50 text-[#8B4513] shadow-md scale-105"
+                        : "border-gray-300 hover:border-[#8B4513] hover:bg-amber-50/50"
                     }`}
                   >
                     <div className="flex flex-col items-center">
@@ -337,16 +340,16 @@ const DetailProduct = () => {
 
           {selectedProduct.variant?.name !== "Food" && (
             <div className="mb-8">
-              <p className="font-bold text-lg mb-3">Hot/Ice</p>
+              <p className="font-bold text-lg mb-3 text-gray-800">Hot/Ice</p>
               <div className="flex gap-3">
                 {["Ice", "Hot"].map((temp) => (
                   <button
                     key={temp}
                     onClick={() => setSelectedTemp(temp)}
-                    className={`flex-1 py-2 rounded border transition ${
+                    className={`flex-1 py-3 rounded-xl border-2 transition-all duration-300 font-semibold ${
                       selectedTemp === temp
-                        ? "border-[#FF8906] bg-orange-50 text-[#FF8906]"
-                        : "border-gray-300 hover:border-[#FF8906]"
+                        ? "border-[#8B4513] bg-amber-50 text-[#8B4513] shadow-md scale-105"
+                        : "border-gray-300 hover:border-[#8B4513] hover:bg-amber-50/50"
                     }`}
                   >
                     {temp}
@@ -360,14 +363,14 @@ const DetailProduct = () => {
             <button
               onClick={() => addToCart(true)}
               disabled={selectedProduct.stock === 0}
-              className="flex-1 bg-[#FF8906] text-white py-3 rounded font-semibold hover:bg-orange-600 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 bg-gradient-to-r from-[#8B4513] to-[#654321] text-white py-3 rounded-xl font-bold hover:from-[#654321] hover:to-[#8B4513] transition-all duration-300 shadow-lg shadow-amber-900/30 hover:shadow-xl hover:shadow-amber-900/40 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none hover:scale-[1.02] active:scale-[0.98]"
             >
               {selectedProduct.stock === 0 ? "Out of Stock" : "Buy Now"}
             </button>
             <button
               onClick={() => addToCart(false)}
               disabled={selectedProduct.stock === 0}
-              className="flex-1 border border-[#FF8906] text-[#FF8906] py-3 rounded font-semibold hover:bg-orange-50 transition flex items-center justify-center gap-2 disabled:border-gray-400 disabled:text-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 border-2 border-[#8B4513] text-[#8B4513] py-3 rounded-xl font-bold hover:bg-amber-50 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:border-gray-400 disabled:text-gray-400 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
             >
               <ShoppingCart size={20} />
               Add to Cart
@@ -375,8 +378,8 @@ const DetailProduct = () => {
           </div>
 
           {added && (
-            <div className="mt-3 text-green-600 text-center text-sm font-semibold">
-              Added to Cart!
+            <div className="mt-4 text-green-600 text-center text-sm font-bold bg-green-50 py-2 rounded-lg animate-pulse">
+              ✓ Added to Cart!
             </div>
           )}
         </div>
@@ -384,8 +387,8 @@ const DetailProduct = () => {
 
       {products.length > 0 && (
         <section className="my-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center md:text-start">
-            Recommendation <span className="text-[#8E6447]">For You</span>
+          <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center md:text-start text-gray-800">
+            Recommendation <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8E6447] to-[#6B4423]">For You</span>
           </h1>
           <Pagination
             data={products}
