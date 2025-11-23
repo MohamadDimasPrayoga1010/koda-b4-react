@@ -66,7 +66,7 @@ function CardProduct({ product }) {
 
         <div className="absolute top-[230px] left-1/2 -translate-x-1/2 w-[90%] sm:w-[85%] bg-white p-4 shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-1">
-            {product.name}
+            {product.title}
           </h3>
 
           <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
