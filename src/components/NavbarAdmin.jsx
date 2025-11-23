@@ -22,7 +22,7 @@ const NavbarAdmin = () => {
             <Link>
               <ShoppingCart className="w-5 h-5" />
             </Link>
-            <Link to="">
+            <Link to="/dashboard">
               <img
                 src={profile}
                 alt="profile-img"
