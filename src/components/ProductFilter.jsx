@@ -81,12 +81,14 @@ const ProductFilter = ({
         ];
 
   return (
-    <div className={`flex flex-col gap-4 bg-black rounded-lg text-white ${className}`}>
+    <div className={`flex flex-col gap-4 bg-gradient-to-br from-[#2C1810] to-[#1a0f0a] rounded-2xl text-white shadow-2xl border border-amber-900/30 p-6 ${className}`}>
       <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold">Filter</h1>
+        <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400">
+          Filter
+        </h1>
         <button
           type="button"
-          className="text-lg text-orange-400 hover:text-orange-300 transition cursor-pointer"
+          className="text-base text-amber-400 hover:text-amber-300 transition-colors duration-300 cursor-pointer font-semibold"
           onClick={handleReset}
         >
           Reset Filter
@@ -94,81 +96,100 @@ const ProductFilter = ({
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-        <label className="font-bold text-lg mb-2">Search</label>
-        <div className="relative mb-4">
+        <label className="font-bold text-lg mb-3 text-amber-100">Search</label>
+        <div className="relative mb-6">
           <input
             type="search"
             {...register("search")}
             placeholder="Search your product.."
-            className="bg-[#DEDEDE] h-10 pl-3 pr-10 text-[#696F79] w-full rounded"
+            className="bg-white/10 backdrop-blur-sm h-12 pl-4 pr-12 text-white placeholder:text-gray-400 w-full rounded-xl border border-amber-900/30 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-700/50 transition-all duration-300"
           />
           <button
             type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-[#FF8906] transition"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hover:text-amber-300 transition-colors duration-300 hover:scale-110"
           >
-            <Search size={20} />
+            <Search size={22} />
           </button>
         </div>
 
+        <div className="mb-6">
+          <h1 className="font-bold text-lg mb-3 text-amber-100">Category</h1>
+          <div className="space-y-2">
+            {displayCategories.map((cat) => (
+              <div 
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer" 
+                key={cat.id}
+              >
+                <input
+                  type="checkbox"
+                  value={cat.id}
+                  checked={watchedCategory == cat.id}
+                  onChange={() =>
+                    setValue("category", watchedCategory == cat.id ? "" : cat.id)
+                  }
+                  className="w-5 h-5 accent-amber-700 cursor-pointer rounded border-amber-900"
+                />
+                <label className="text-gray-200 cursor-pointer flex-1 font-medium">
+                  {cat.name}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <h1 className="font-bold text-lg mb-3 text-amber-100">Sort By</h1>
+          <div className="space-y-2">
+            {sortOptions.map((sort) => (
+              <div 
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer" 
+                key={sort.label}
+              >
+                <input
+                  type="checkbox"
+                  value={sort.label}
+                  checked={watchedSort === sort.sortby}
+                  onChange={() =>
+                    setValue("sort", watchedSort === sort.sortby ? "" : sort.sortby)
+                  }
+                  className="w-5 h-5 accent-amber-700 cursor-pointer rounded border-amber-900"
+                />
+                <label className="text-gray-200 cursor-pointer flex-1 font-medium">
+                  {sort.label}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div>
-          <h1 className="font-bold text-lg mb-2">Category</h1>
-          {displayCategories.map((cat) => (
-            <div className="flex items-center gap-3 my-1" key={cat.id}>
-              <input
-                type="checkbox"
-                value={cat.id}
-                checked={watchedCategory == cat.id}
-                onChange={() =>
-                  setValue("category", watchedCategory == cat.id ? "" : cat.id)
-                }
-                className="w-4 h-4 accent-orange-500"
-              />
-              <label>{cat.name}</label>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4">
-          <h1 className="font-bold text-lg mb-2">Sort By</h1>
-          {sortOptions.map((sort) => (
-            <div className="flex items-center gap-3 my-1" key={sort.label}>
-              <input
-                type="checkbox"
-                value={sort.label}
-                checked={watchedSort === sort.sortby}
-                onChange={() =>
-                  setValue("sort", watchedSort === sort.sortby ? "" : sort.sortby)
-                }
-                className="w-4 h-4 accent-orange-500"
-              />
-              <label>{sort.label}</label>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4">
-          <h1 className="font-bold text-lg mb-2">Price Range</h1>
-          <div className="flex gap-2">
+          <h1 className="font-bold text-lg mb-3 text-amber-100">Price Range</h1>
+          <div className="flex gap-3">
             <input
               type="number"
               {...register("priceMin")}
               min={0}
-              className="w-1/2 p-2 rounded bg-white text-black"
+              className="w-1/2 p-3 rounded-xl bg-white/10 backdrop-blur-sm text-white border border-amber-900/30 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-700/50 transition-all duration-300 placeholder:text-gray-400"
               placeholder="Min"
             />
             <input
               type="number"
               {...register("priceMax")}
               min={0}
-              className="w-1/2 p-2 rounded bg-white text-black"
+              className="w-1/2 p-3 rounded-xl bg-white/10 backdrop-blur-sm text-white border border-amber-900/30 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-700/50 transition-all duration-300 placeholder:text-gray-400"
               placeholder="Max"
             />
           </div>
         </div>
 
-        <Button type="submit" className="mt-4">
-          Apply
-        </Button>
+        <div className="mt-6">
+          <Button 
+            type="submit" 
+            className="bg-gradient-to-r from-[#8B4513] to-[#654321] hover:from-[#654321] hover:to-[#8B4513] text-white font-bold py-3 rounded-xl shadow-lg shadow-amber-900/30 hover:shadow-xl hover:shadow-amber-900/40 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] w-full"
+          >
+            Apply Filter
+          </Button>
+        </div>
       </form>
     </div>
   );
