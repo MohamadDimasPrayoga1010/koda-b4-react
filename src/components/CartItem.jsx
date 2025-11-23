@@ -6,31 +6,54 @@ import { apiRequest } from "../utils/api";
 import AuthAlert from "./AuthAlert";
 import { useSelector } from "react-redux";
 
-const CartItems = () => {
+const CartItems = ({ cartItemsProp }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ type: "", message: "" });
 
   const token = useSelector((state) => state.auth?.token);
 
-  const fetchCartItems = async () => {
-    setLoading(true);
-    try {
-      const response = await apiRequest("/cart", "GET", null, token);
-      if (!response || response.success === false) {
-        setAlert({ type: "error", message: response?.message || "Failed to fetch cart" });
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      setLoading(true);
+      try {
+        if (cartItemsProp && cartItemsProp.length > 0) {
+          const transformed = cartItemsProp.map(item => ({
+            ...item,
+            name: item.name || item.title,
+            quantity: item.quantity || 1,
+            subtotal: item.subtotal || item.price * (item.quantity || 1),
+          }));
+          setCartItems(transformed);
+        } else if (token) {
+          const response = await apiRequest("/cart", "GET", null, token);
+          if (!response || response.success === false) {
+            setAlert({ type: "error", message: response?.message || "Failed to fetch cart" });
+            setCartItems([]);
+          } else {
+            const items = Array.isArray(response.data.items) ? response.data.items : [];
+            const transformed = items.map(item => ({
+              ...item,
+              name: item.name || item.title,
+              quantity: item.quantity || 1,
+              subtotal: item.subtotal || item.price * (item.quantity || 1),
+            }));
+            setCartItems(transformed);
+          }
+        } else {
+          setCartItems([]);
+        }
+      } catch (error) {
+        console.error("Fetch cart error:", error);
+        setAlert({ type: "error", message: "Failed to fetch cart" });
         setCartItems([]);
-      } else {
-        setCartItems(Array.isArray(response.data.items) ? response.data.items : []);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Fetch cart error:", error);
-      setAlert({ type: "error", message: "Failed to fetch cart" });
-      setCartItems([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchCartItems();
+  }, [cartItemsProp, token]);
 
   const handleRemoveItem = async (id) => {
     try {
@@ -39,7 +62,7 @@ const CartItems = () => {
         setAlert({ type: "error", message: response?.message || "Failed to remove item" });
       } else {
         setAlert({ type: "success", message: "Item removed successfully" });
-        setCartItems((prev) => prev.filter((item) => item.id !== id));
+        setCartItems((prev) => prev.filter((item) => item.cartItemId !== id && item.id !== id));
       }
     } catch (error) {
       console.error("Delete cart item error:", error);
@@ -48,12 +71,6 @@ const CartItems = () => {
   };
 
   const totalPrice = cartItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
-
-  useEffect(() => {
-    if (token) {
-      fetchCartItems();
-    }
-  }, [token]);
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-md">
@@ -85,13 +102,13 @@ const CartItems = () => {
           <div className="space-y-4">
             {cartItems.map((item) => (
               <div
-                key={item.id}
+                key={item.cartItemId || item.id}
                 className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
               >
                 {item?.image ? (
                   <img
                     src={item.image}
-                    alt={item.title}
+                    alt={item.name}
                     className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-md flex-shrink-0"
                   />
                 ) : (
@@ -101,7 +118,7 @@ const CartItems = () => {
                 )}
 
                 <div className="flex-1 space-y-2">
-                  <h3 className="text-lg font-bold text-gray-800">{item.title || "Unknown Item"}</h3>
+                  <h3 className="text-lg font-bold text-gray-800">{item.name || "Unknown Item"}</h3>
                   <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                     <span>{item.quantity || 0} pcs</span>
                     {item.size && (
@@ -119,19 +136,14 @@ const CartItems = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {item.originalPrice && (
-                      <p className="text-sm text-red-500 line-through">
-                        IDR {item.originalPrice.toLocaleString("id-ID")}
-                      </p>
-                    )}
                     <p className="text-lg font-bold text-[#FF8906]">
-                      IDR {(item.subtotal || 0).toLocaleString("id-ID")}
+                      IDR {((item.subtotal !== undefined ? item.subtotal : item.price * (item.quantity || 1))).toLocaleString("id-ID")}
                     </p>
                   </div>
                 </div>
 
                 <button
-                  onClick={() => handleRemoveItem(item.id)}
+                  onClick={() => handleRemoveItem(item.cartItemId || item.id)}
                   className="flex-shrink-0 text-gray-400 hover:text-red-500 transition"
                 >
                   <img src={Xcircle} alt="close-icon" />
