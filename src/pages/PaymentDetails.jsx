@@ -33,13 +33,11 @@ const PaymentDetails = () => {
   const taxAmount = orderTotal * 0.1;
   const grandTotal = orderTotal + deliveryFee + taxAmount;
 
-  useEffect(() => {
-  if (!token) return;
-
-  const fetchData = async () => {
+  const refreshCart = async () => {
+    if (!token) return;
     try {
       const cartRes = await apiRequest("/cart", "GET", null, token);
-      if (cartRes.success && Array.isArray(cartRes.data.items)) {
+      if (cartRes && cartRes.success && Array.isArray(cartRes.data.items)) {
         const transformed = cartRes.data.items.map(item => ({
           ...item,
           name: item.name || item.title,
@@ -47,34 +45,45 @@ const PaymentDetails = () => {
           subtotal: item.subtotal || item.price * (item.quantity || 1),
         }));
         setCartItems(transformed);
-      }
-
-      const shippingRes = await apiRequest("/shippings", "GET", null, token);
-      setShippings(Array.isArray(shippingRes.data) ? shippingRes.data : []);
-
-      const paymentRes = await apiRequest("/payment-methods", "GET", null, token);
-      setPaymentMethods(Array.isArray(paymentRes.data) ? paymentRes.data : []);
-
-      const userRes = await apiRequest("/profile", "GET", null, token);
-      if (userRes.success && userRes.data) {
-        const profile = userRes.data;
-        setFormData(prev => ({
-          ...prev,
-          email: profile.email || prev.email,
-          fullName: profile.fullname || profile.full_name || prev.fullName,
-          phone: profile.phone || profile.phone_number || prev.phone,
-          address: profile.address || prev.address,
-        }));
+      } else {
+        setCartItems([]);
       }
     } catch (err) {
-      console.error("Fetch data error:", err);
-      setAlert({ type: "error", message: "Failed to fetch data" });
+      console.error("refreshCart error:", err);
+      setCartItems([]);
     }
   };
 
-  fetchData();
-}, [token]);
+  useEffect(() => {
+    if (!token) return;
 
+    const fetchOtherData = async () => {
+      try {
+        const shippingRes = await apiRequest("/shippings", "GET", null, token);
+        setShippings(Array.isArray(shippingRes.data) ? shippingRes.data : []);
+
+        const paymentRes = await apiRequest("/payment-methods", "GET", null, token);
+        setPaymentMethods(Array.isArray(paymentRes.data) ? paymentRes.data : []);
+
+        const userRes = await apiRequest("/profile", "GET", null, token);
+        if (userRes.success && userRes.data) {
+          const profile = userRes.data;
+          setFormData(prev => ({
+            ...prev,
+            email: profile.email || prev.email,
+            fullName: profile.fullname || profile.full_name || prev.fullName,
+            phone: profile.phone || profile.phone_number || prev.phone,
+            address: profile.address || prev.address,
+          }));
+        }
+      } catch (err) {
+        console.error("Fetch other data error:", err);
+        setAlert({ type: "error", message: "Failed to fetch data" });
+      }
+    };
+    refreshCart();
+    fetchOtherData();
+  }, [token]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,7 +131,8 @@ const PaymentDetails = () => {
 
       setOrderId(res.data?.invoiceNumber || "N/A");
       setPaymentSuccess(true);
-      setCartItems([]);
+      await refreshCart();
+
       setFormData({ email: "", fullName: "", phone: "", address: "", delivery: "" });
       setSelectedPayment("");
       setValidationErrors({});
@@ -158,8 +168,7 @@ const PaymentDetails = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <section className="lg:col-span-2 space-y-8">
-          <CartItems cartItemsProp={cartItems} />
-
+          <CartItems cartItemsProp={cartItems} refreshCart={refreshCart} />
           <div className="bg-white rounded-lg p-6 shadow-md">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">Payment Info & Delivery</h2>
             <form className="space-y-6">
@@ -286,7 +295,7 @@ const PaymentDetails = () => {
 
               <div className="mt-6">
                 <p className="text-sm text-gray-600 mb-3">We Accept</p>
-                <div className="grid grid-cols-3 gap-3">
+                <form className="grid grid-cols-3 gap-3">
                   {paymentMethods.map((method) => (
                     <label
                       key={method.id}
@@ -306,7 +315,7 @@ const PaymentDetails = () => {
                     </label>
                   ))}
                   {validationErrors.payment && <p className="text-red-500 text-sm mt-1 col-span-3">{validationErrors.payment}</p>}
-                </div>
+                </form>
               </div>
             </div>
           </div>
