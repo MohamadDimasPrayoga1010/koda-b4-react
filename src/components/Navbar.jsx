@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import CoffeLogo from "/images/Frame.png";
+import CoffeLogo from "../../public/images/logoweb.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchIcon from "/images/Search.png";
 import CartIcon from "/images/ShoppingCart.png";
@@ -158,7 +158,6 @@ const Navbar = () => {
         </nav>
       </header>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <>
           <div
