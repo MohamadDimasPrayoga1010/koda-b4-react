@@ -3,12 +3,14 @@ import { Image } from "lucide-react";
 import Xcircle from "/images/XCircle.png";
 import { apiRequest } from "../utils/api";
 import { useSelector } from "react-redux";
+import Loading from "../components/Loading";
 
 export default function ProductModal({ mode, formData, setFormData, onClose, onSave }) {
   const { token } = useSelector((state) => state.auth);
   const [categories, setCategories] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [variants, setVariants] = useState([]);
+  const [loading, setLoading] = useState(false); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,8 +75,21 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
     });
   };
 
+  const handleSave = async () => {
+    try {
+      setLoading(true); 
+      await onSave();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false); 
+    }
+  };
+
   return (
     <div className="absolute right-0 top-[26px] w-[600px] flex items-end justify-end p-4 z-50">
+      <Loading show={loading} text={mode === "edit" ? "Updating product..." : "Saving product..."} fullScreen={true} />
+
       <div className="bg-white shadow-lg w-full max-w-xl max-h-screen overflow-y-auto mt-10">
         <div className="flex justify-between items-center p-6 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-bold text-gray-900">
@@ -252,7 +267,7 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
 
         <div className="p-6 sticky bottom-0 bg-white">
           <button
-            onClick={onSave}
+            onClick={handleSave} 
             className="w-full px-4 py-3 bg-orange-500 hover:bg-orange-600 font-bold rounded-lg transition text-base"
           >
             {mode === "edit" ? "Update Product" : "Save Product"}
