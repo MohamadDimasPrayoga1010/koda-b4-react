@@ -5,6 +5,7 @@ import { User, Mail, Phone, Lock, MapPin, CircleUser } from "lucide-react";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 import AuthAlert from "../components/AuthAlert";
+import Loading from "../components/Loading";
 import { apiRequest } from "../utils/api";
 import { setUser } from "../redux/reducer/auth";
 
@@ -17,6 +18,7 @@ const Profile = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [alert, setAlert] = useState({ type: "success", message: "" });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -65,9 +67,10 @@ const Profile = () => {
     }
   };
 
-
   const onSubmit = async (formData) => {
     try {
+      setLoading(true); 
+
       const payload = new FormData();
 
       payload.append("fullname", formData.fullname);
@@ -111,11 +114,15 @@ const Profile = () => {
       }
     } catch (err) {
       setAlert({ type: "error", message: "An error occurred while updating profile" });
+    } finally {
+      setLoading(false); 
     }
   };
 
   return (
     <main className="my-30 md:mx-26">
+      <Loading show={loading} text="Updating profile..." fullScreen={true} />
+
       <h1 className="text-5xl text-[#0B0909]">Profile</h1>
 
       {alert.message && <AuthAlert type={alert.type} message={alert.message} />}
