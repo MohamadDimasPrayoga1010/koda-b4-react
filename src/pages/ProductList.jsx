@@ -207,7 +207,8 @@ export default function ProductList() {
         `/admin/products/${id}`,
         "DELETE",
         null,
-        token
+        token,
+        true
       );
 
       if (res.success) {
