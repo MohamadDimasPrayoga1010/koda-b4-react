@@ -58,12 +58,12 @@ const HistoryOrder = () => {
   }, [token, filterStatus, selectedMonth]);
 
   return (
-    <main className="my-25 px-4 md:px-16">
-      <div className="flex items-center sm:gap-4 my-9">
-        <h1 className="text-3xl md:text-5xl font-semibold text-center sm:text-left">
+    <main className="my-25 px-4 md:px-16 bg-gradient-to-br from-[#f8f5f0] to-[#faf8f5] min-h-screen">
+      <div className="flex items-center sm:gap-4 my-9 animate-fadeIn">
+        <h1 className="text-3xl md:text-5xl font-bold text-center sm:text-left bg-gradient-to-r from-[#654321] to-[#8b6239] bg-clip-text text-transparent">
           History Order
         </h1>
-        <span className="mt-3 sm:mt-0 w-10 h-10 bg-[#E8E8E8] flex items-center justify-center rounded mx-auto sm:mx-0">
+        <span className="mt-3 sm:mt-0 w-10 h-10 bg-gradient-to-br from-[#654321] to-[#8b6239] text-white flex items-center justify-center rounded-full shadow-md font-semibold mx-auto sm:mx-0 transform hover:scale-110 transition-transform duration-300">
           {orders.length}
         </span>
       </div>
@@ -71,25 +71,27 @@ const HistoryOrder = () => {
       <div className="flex flex-col lg:flex-row gap-8">
         <section className="flex-1 w-full lg:max-w-[700px]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 bg-[#E8E8E899] p-2 rounded-md">
+            <div className="flex flex-wrap justify-center md:justify-start gap-2 bg-gradient-to-r from-[#654321]/10 to-[#8b6239]/10 p-2 rounded-xl shadow-sm backdrop-blur-sm border border-[#654321]/20">
               {status.map((btn) => (
                 <button
                   key={btn.key}
                   onClick={() => setFilterStatus(btn.key)}
                   className={`${
-                    filterStatus === btn.key ? "bg-white" : ""
-                  } p-2 px-4 text-sm font-normal rounded-md hover:bg-white/50 transition`}
+                    filterStatus === btn.key 
+                      ? "bg-gradient-to-r from-[#654321] to-[#8b6239] text-white shadow-md scale-105" 
+                      : "bg-white/80 text-[#654321] hover:bg-white hover:shadow-sm"
+                  } p-2 px-4 text-sm font-semibold rounded-lg transition-all duration-300 transform hover:scale-105`}
                 >
                   {btn.label}
                 </button>
               ))}
             </div>
 
-            <div className="bg-[#E8E8E899] p-2 md:p-3 rounded-md">
+            <div className="bg-gradient-to-r from-[#654321]/10 to-[#8b6239]/10 p-2 md:p-3 rounded-xl shadow-sm backdrop-blur-sm border border-[#654321]/20">
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full border-none bg-transparent text-sm cursor-pointer"
+                className="w-full border-none bg-transparent text-sm cursor-pointer text-[#654321] font-semibold focus:outline-none"
               >
                 {months.map((m) => (
                   <option key={m.key} value={m.key}>
@@ -101,40 +103,48 @@ const HistoryOrder = () => {
           </div>
 
           {orders.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 mb-2">No orders found</p>
+            <div className="text-center py-12 bg-gradient-to-br from-white to-[#faf8f5] rounded-2xl shadow-lg border border-[#654321]/10 transform hover:scale-[1.02] transition-transform duration-300">
+              <div className="mb-4 text-6xl">📦</div>
+              <p className="text-[#654321] mb-4 text-lg font-semibold">No orders found</p>
+              <p className="text-[#8b6239] mb-6 text-sm px-4">Start your shopping journey with us!</p>
               <Link to="/our-product">
-                <button className="bg-[#FF8906] text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition">
+                <button className="bg-gradient-to-r from-[#654321] to-[#8b6239] text-white px-8 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                   Browse Products
                 </button>
               </Link>
             </div>
           ) : (
-            <Pagination
-              data={orders}
-              itemsPerPage={4}
-              renderItem={(order) => <OrderCard key={order.id} order={order} />}
-              gridCols="grid-cols-1"
-            />
+            <div className="animate-fadeIn">
+              <Pagination
+                data={orders}
+                itemsPerPage={4}
+                renderItem={(order) => <OrderCard key={order.id} order={order} />}
+                gridCols="grid-cols-1"
+              />
+            </div>
           )}
         </section>
 
         <section className="w-full lg:w-[480px]">
-          <div className="p-4 border border-[#E8E8E8] rounded-lg text-center lg:text-left">
-            <img
-              src={Message}
-              alt="message-icon"
-              className="my-4 mx-auto lg:mx-0 w-14 md:w-16"
-            />
-            <p className="text-lg text-[#4F5665] font-semibold mb-2">
+          <div className="p-6 bg-gradient-to-br from-white to-[#faf8f5] rounded-2xl text-center lg:text-left shadow-xl border border-[#654321]/10 transform hover:scale-[1.02] transition-all duration-300">
+            <div className="bg-gradient-to-br from-[#654321]/10 to-[#8b6239]/10 w-20 h-20 rounded-2xl flex items-center justify-center my-4 mx-auto lg:mx-0 shadow-md">
+              <img
+                src={Message}
+                alt="message-icon"
+                className="w-10 h-10"
+              />
+            </div>
+            <p className="text-xl text-[#654321] font-bold mb-3">
               Send Us Message
             </p>
-            <p className="text-sm text-[#4F5665] mb-4">
+            <p className="text-sm text-[#8b6239] mb-6 leading-relaxed">
               If you're unable to find an answer or find your product quickly,
               please describe your problem and tell us. We will give you a
               solution.
             </p>
-            <Button className="w-full">Send Message</Button>
+            <Button className="w-full bg-gradient-to-r from-[#654321] to-[#8b6239] text-white font-semibold py-3 rounded-xl hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+              Send Message
+            </Button>
           </div>
         </section>
       </div>
