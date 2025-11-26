@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import CoffeImg from "/images/ourproduct.png";
+import CoffeImg from "/images/ourcoffeder.jpeg";
 import CardProduct from "../components/CardProduct";
 import Pagination from "../components/Pagination";
 import { useSearchParams } from "react-router-dom";

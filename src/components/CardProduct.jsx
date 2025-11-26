@@ -24,6 +24,7 @@ function CardProduct({ product }) {
       }, 10);
       return;
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddCart = () => {
@@ -31,6 +32,7 @@ function CardProduct({ product }) {
       setAlert({ type: "error", message: "Anda harus login terlebih dahulu!" });
       return;
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const closeAlert = () => {

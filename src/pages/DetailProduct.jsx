@@ -132,6 +132,7 @@ const DetailProduct = () => {
 
       if (navigateToPayment) {
         navigate("/payment-details");
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         setAlertMessage("Item added to cart successfully!");
         setAlertType("success");
@@ -154,7 +155,9 @@ const DetailProduct = () => {
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-amber-200 border-t-amber-700 mx-auto mb-6"></div>
             <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-amber-100 opacity-20 mx-auto animate-ping"></div>
           </div>
-          <p className="text-gray-600 font-medium text-lg">Loading product...</p>
+          <p className="text-gray-600 font-medium text-lg">
+            Loading product...
+          </p>
         </div>
       </div>
     );
@@ -284,7 +287,9 @@ const DetailProduct = () => {
             >
               -
             </button>
-            <span className="text-xl font-semibold min-w-[3ch] text-center">{quantity}</span>
+            <span className="text-xl font-semibold min-w-[3ch] text-center">
+              {quantity}
+            </span>
             <button
               onClick={() => {
                 if (quantity < selectedProduct.stock) setQuantity(quantity + 1);
@@ -303,7 +308,10 @@ const DetailProduct = () => {
           <div className="mb-6 text-sm">
             {selectedProduct.stock > 0 ? (
               <p className="text-gray-600 font-medium">
-                Stock tersisa: <span className="text-[#8B4513] font-bold">{selectedProduct.stock - quantity}</span>
+                Stock tersisa:{" "}
+                <span className="text-[#8B4513] font-bold">
+                  {selectedProduct.stock - quantity}
+                </span>
               </p>
             ) : (
               <p className="text-red-500 font-semibold">Stock habis</p>
@@ -312,7 +320,9 @@ const DetailProduct = () => {
 
           {selectedProduct.sizes && selectedProduct.sizes.length > 0 && (
             <div className="mb-6">
-              <p className="font-bold text-lg mb-3 text-gray-800">Choose Size</p>
+              <p className="font-bold text-lg mb-3 text-gray-800">
+                Choose Size
+              </p>
               <div className="flex gap-3 flex-wrap">
                 {selectedProduct.sizes.map((size) => (
                   <button
@@ -388,7 +398,10 @@ const DetailProduct = () => {
       {products.length > 0 && (
         <section className="my-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center md:text-start text-gray-800">
-            Recommendation <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8E6447] to-[#6B4423]">For You</span>
+            Recommendation{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8E6447] to-[#6B4423]">
+              For You
+            </span>
           </h1>
           <Pagination
             data={products}
