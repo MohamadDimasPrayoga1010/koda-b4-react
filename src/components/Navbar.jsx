@@ -11,6 +11,7 @@ import { apiRequest } from "../utils/api";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -18,6 +19,14 @@ const Navbar = () => {
   const { user, isLoggedIn, token } = useSelector((state) => state.auth);
 
   const isActive = (path) => location.pathname === path;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -61,56 +70,82 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#0B0909]/80 py-5 px-6 md:px-16 lg:px-32">
+      <header 
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          scrolled 
+            ? "bg-[#1A0F0A]/95 backdrop-blur-md shadow-lg py-3" 
+            : "bg-gradient-to-b from-[#1A0F0A]/90 to-transparent py-5"
+        } px-6 md:px-16 lg:px-32`}
+      >
         <nav className="flex justify-between items-center">
-          <div className="flex items-center gap-3 md:gap-5">
-            <img src={CoffeLogo} alt="coffe-logo" className="h-8 md:h-10" />
-            <div className="hidden md:flex gap-8">
+          <div className="flex items-center gap-3 md:gap-8">
+            <img 
+              src={CoffeLogo} 
+              alt="coffe-logo" 
+              className="h-9 md:h-11 drop-shadow-lg hover:scale-105 transition-transform duration-300" 
+            />
+            <div className="hidden md:flex gap-8 lg:gap-10">
               <Link
                 to="/"
-                className={`text-white transition ${
-                  isActive("/") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
+                className={`text-[#F5E6D3] font-medium transition-all duration-300 relative group ${
+                  isActive("/") 
+                    ? "text-[#D4A574]" 
+                    : "hover:text-[#D4A574]"
                 }`}
               >
                 Home
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-[#D4A574] to-[#8B6F47] transition-all duration-300 ${
+                  isActive("/") ? "w-full" : "w-0 group-hover:w-full"
+                }`}></span>
               </Link>
               <Link
                 to="/our-product"
-                className={`text-white transition ${
-                  isActive("/our-product") ? "border-b border-b-[#FF8906]" : "hover:text-[#FF8906]"
+                className={`text-[#F5E6D3] font-medium transition-all duration-300 relative group ${
+                  isActive("/our-product") 
+                    ? "text-[#D4A574]" 
+                    : "hover:text-[#D4A574]"
                 }`}
               >
                 Product
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-[#D4A574] to-[#8B6F47] transition-all duration-300 ${
+                  isActive("/our-product") ? "w-full" : "w-0 group-hover:w-full"
+                }`}></span>
               </Link>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-4 relative">
-            <Link to="/our-product">
+          <div className="hidden md:flex items-center gap-5 relative">
+            <Link 
+              to="/our-product"
+              className="p-2 hover:bg-[#3D2817]/30 rounded-full transition-all duration-300 hover:scale-110"
+            >
               <img src={SearchIcon} alt="search-icon" className="w-5 h-5" />
             </Link>
-            <Link to="/payment-details">
+            <Link 
+              to="/payment-details"
+              className="p-2 hover:bg-[#3D2817]/30 rounded-full transition-all duration-300 hover:scale-110"
+            >
               <img src={CartIcon} alt="cart-icon" className="w-5 h-5" />
             </Link>
 
             {!isLoggedIn ? (
-              <>
+              <div className="flex gap-3">
                 <Link to="/login">
-                  <button className="py-3 px-4 border border-white text-white rounded hover:bg-white hover:text-black transition">
+                  <button className="py-2.5 px-5 border-2 border-[#D4A574] text-[#F5E6D3] rounded-lg font-medium hover:bg-[#D4A574] hover:text-[#1A0F0A] transition-all duration-300 hover:shadow-lg hover:shadow-[#D4A574]/30">
                     SignIn
                   </button>
                 </Link>
                 <Link to="/register">
-                  <button className="py-3 px-4 bg-[#FF8906] text-black rounded hover:bg-[#e67a05] transition">
+                  <button className="py-2.5 px-5 bg-gradient-to-r from-[#D4A574] to-[#8B6F47] text-white rounded-lg font-medium hover:from-[#8B6F47] hover:to-[#D4A574] transition-all duration-300 hover:shadow-lg hover:shadow-[#D4A574]/40 hover:scale-105">
                     SignUp
                   </button>
                 </Link>
-              </>
+              </div>
             ) : (
               <div className="relative">
                 <button
                   onClick={toggleDropdown}
-                  className="flex items-center gap-2 text-white hover:text-[#FF8906]"
+                  className="flex items-center gap-2 text-[#F5E6D3] hover:text-[#D4A574] transition-all duration-300 p-2 rounded-lg hover:bg-[#3D2817]/30"
                 >
                   <img
                     src={
@@ -118,26 +153,29 @@ const Navbar = () => {
                         ? user.image
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                             user?.fullname || "User"
-                          )}&background=FF8906&color=fff`
+                          )}&background=D4A574&color=fff`
                     }
                     alt="profile"
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-9 h-9 rounded-full object-cover border-2 border-[#D4A574] shadow-md"
                   />
-                  <ChevronDown size={18} />
+                  <ChevronDown 
+                    size={18} 
+                    className={`transition-transform duration-300 ${showDropdown ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50">
+                  <div className="absolute right-0 mt-3 w-48 bg-[#2A1810] border border-[#D4A574]/20 rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in">
                     <Link
                       to="/profile"
                       onClick={() => setShowDropdown(false)}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                      className="block px-4 py-3 text-[#F5E6D3] hover:bg-[#3D2817] transition-all duration-200 border-b border-[#D4A574]/10"
                     >
                       Profile
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                      className="w-full text-left px-4 py-3 text-[#F5E6D3] hover:bg-[#3D2817] transition-all duration-200"
                     >
                       Logout
                     </button>
@@ -148,10 +186,17 @@ const Navbar = () => {
           </div>
 
           <div className="flex md:hidden items-center gap-4">
-            <Link to="/payment-details">
+            <Link 
+              to="/payment-details"
+              className="p-2 hover:bg-[#3D2817]/30 rounded-full transition-all duration-300"
+            >
               <img src={CartIcon} alt="cart-icon" className="w-6 h-6" />
             </Link>
-            <button onClick={toggleMenu} className="text-white p-2" aria-label="Toggle menu">
+            <button 
+              onClick={toggleMenu} 
+              className="text-[#F5E6D3] p-2 hover:bg-[#3D2817]/30 rounded-lg transition-all duration-300" 
+              aria-label="Toggle menu"
+            >
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
@@ -161,42 +206,48 @@ const Navbar = () => {
       {isMenuOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden animate-fade-in"
             onClick={toggleMenu}
           ></div>
 
-          <div className="fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-lg md:hidden animate-slide-in">
+          <div className="fixed top-0 left-0 h-full w-80 bg-gradient-to-b from-[#2A1810] to-[#1A0F0A] z-50 shadow-2xl md:hidden animate-slide-in">
             <div className="p-6 flex flex-col h-full">
-              <div className="flex items-center justify-between mb-8">
-                <img src={CoffeLogo} alt="coffe-logo" className="h-8" />
-                <button onClick={toggleMenu} className="text-gray-700 p-1" aria-label="Close menu">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#D4A574]/20">
+                <img src={CoffeLogo} alt="coffe-logo" className="h-9 drop-shadow-lg" />
+                <button 
+                  onClick={toggleMenu} 
+                  className="text-[#F5E6D3] p-2 hover:bg-[#3D2817] rounded-lg transition-all duration-300" 
+                  aria-label="Close menu"
+                >
                   <X size={24} />
                 </button>
               </div>
 
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">
+                <h3 className="text-sm font-semibold text-[#D4A574] mb-3 uppercase tracking-wider">
                   Search Product
                 </h3>
                 <div className="relative">
                   <img
                     src={SearchIcon}
                     alt="search"
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 opacity-60"
                   />
                   <input
                     type="text"
                     placeholder="Find Product"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#FF8906]"
+                    className="w-full pl-10 pr-4 py-3 bg-[#3D2817] border border-[#D4A574]/30 rounded-lg text-sm text-[#F5E6D3] placeholder-[#8B7355] focus:outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/20 transition-all duration-300"
                   />
                 </div>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-6 space-y-1">
                 <Link
                   to="/"
-                  className={`block py-3 border-b border-gray-200 ${
-                    isActive("/") ? "text-[#FF8906] font-semibold" : "text-gray-700"
+                  className={`block py-3 px-4 rounded-lg transition-all duration-300 ${
+                    isActive("/") 
+                      ? "bg-gradient-to-r from-[#D4A574]/20 to-transparent text-[#D4A574] font-semibold border-l-4 border-[#D4A574]" 
+                      : "text-[#F5E6D3] hover:bg-[#3D2817] hover:text-[#D4A574]"
                   }`}
                   onClick={toggleMenu}
                 >
@@ -204,8 +255,10 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/our-product"
-                  className={`block py-3 border-b border-gray-200 ${
-                    isActive("/our-product") ? "text-[#FF8906] font-semibold" : "text-gray-700"
+                  className={`block py-3 px-4 rounded-lg transition-all duration-300 ${
+                    isActive("/our-product") 
+                      ? "bg-gradient-to-r from-[#D4A574]/20 to-transparent text-[#D4A574] font-semibold border-l-4 border-[#D4A574]" 
+                      : "text-[#F5E6D3] hover:bg-[#3D2817] hover:text-[#D4A574]"
                   }`}
                   onClick={toggleMenu}
                 >
@@ -214,48 +267,48 @@ const Navbar = () => {
               </div>
 
               {!isLoggedIn ? (
-                <div className="space-y-3 flex flex-col gap-1 mt-auto">
+                <div className="space-y-3 flex flex-col gap-2 mt-auto">
                   <Link to="/login" onClick={toggleMenu}>
-                    <button className="w-full py-3 px-4 border border-[#FF8906] text-[#FF8906] rounded-lg font-medium hover:bg-[#FF8906] hover:text-white transition">
+                    <button className="w-full py-3 px-4 border-2 border-[#D4A574] text-[#D4A574] rounded-lg font-medium hover:bg-[#D4A574] hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#D4A574]/30">
                       SignIn
                     </button>
                   </Link>
                   <Link to="/register" onClick={toggleMenu}>
-                    <button className="w-full py-3 px-4 bg-[#FF8906] text-white rounded-lg font-medium hover:bg-[#e67a05] transition">
+                    <button className="w-full py-3 px-4 bg-gradient-to-r from-[#D4A574] to-[#8B6F47] text-white rounded-lg font-medium hover:from-[#8B6F47] hover:to-[#D4A574] transition-all duration-300 hover:shadow-lg hover:shadow-[#D4A574]/40">
                       SignUp
                     </button>
                   </Link>
                 </div>
               ) : (
                 <div className="mt-auto">
-                  <div className="flex items-center gap-3 border-t border-gray-200 pt-4">
+                  <div className="flex items-center gap-3 border-t border-[#D4A574]/20 pt-4 pb-4">
                     <img
                       src={
                         user?.image
                           ? user.image
                           : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                               user?.fullname || "User"
-                            )}&background=FF8906&color=fff`
+                            )}&background=D4A574&color=fff`
                       }
                       alt="profile"
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-[#D4A574] shadow-md"
                     />
                     <div>
-                      <p className="text-gray-800 font-semibold">{user?.fullname || "User"}</p>
-                      <p className="text-gray-500 text-sm">{user?.email || ""}</p>
+                      <p className="text-[#F5E6D3] font-semibold">{user?.fullname || "User"}</p>
+                      <p className="text-[#8B7355] text-sm">{user?.email || ""}</p>
                     </div>
                   </div>
-                  <div className="mt-4 space-y-2">
+                  <div className="space-y-2">
                     <Link
                       to="/profile"
                       onClick={toggleMenu}
-                      className="block py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                      className="block py-3 px-4 text-[#F5E6D3] hover:bg-[#3D2817] rounded-lg transition-all duration-300 hover:text-[#D4A574]"
                     >
                       Profile
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                      className="w-full text-left py-3 px-4 text-[#F5E6D3] hover:bg-[#3D2817] rounded-lg transition-all duration-300 hover:text-[#D4A574]"
                     >
                       Logout
                     </button>
