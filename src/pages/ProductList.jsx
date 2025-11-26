@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Search, Filter, Edit, Trash2, Plus } from "lucide-react";
+import { Search, Filter, Edit, Trash2, Plus, Package } from "lucide-react";
 import ProductModal from "../components/ProductModal";
 import AuthAlert from "../components/AuthAlert";
 import { apiRequest } from "../utils/api";
@@ -106,6 +106,7 @@ export default function ProductList() {
       formData.selectedVariants?.forEach((id) =>
         payload.append("variant_id", Number(id))
       );
+       setAlert({ message: "Add Product successfully", type: "success" });
 
       const newImages = formData.productImages.filter(
         (file) => file instanceof File
@@ -243,12 +244,17 @@ export default function ProductList() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#FAF8F5] to-white p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Product List</h1>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <Package className="w-8 h-8 text-[#D4A574]" />
+            <h1 className="text-4xl font-bold text-[#1A0F0A]">Product List</h1>
+          </div>
+          <div className="h-1.5 w-28 bg-gradient-to-r from-[#D4A574] to-transparent rounded-full"></div>
         </div>
-        <div className="flex justify-between gap-4 mb-6">
+
+        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
           <button
             onClick={() => {
               setIsEditing(false);
@@ -264,54 +270,54 @@ export default function ProductList() {
               });
               setShowModal(true);
             }}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition"
+            className="flex items-center gap-2 bg-gradient-to-r from-[#D4A574] to-[#8B6F47] hover:from-[#8B6F47] hover:to-[#D4A574] text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
           >
             <Plus size={20} /> Add Product
           </button>
 
-          <div className="flex gap-2 relative w-full md:w-auto">
-            <div className="relative w-full">
+          <div className="flex gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:w-80">
               <input
                 type="text"
                 placeholder="Enter Product Name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full pl-4 pr-12 py-3 border-2 border-[#D4A574]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A574] focus:border-[#D4A574] transition-all duration-300"
               />
               <Search
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B7355]"
                 size={20}
               />
             </div>
-            <button className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition">
+            <button className="flex items-center gap-2 bg-white border-2 border-[#D4A574]/30 hover:bg-[#F5E6D3] text-[#6B5744] px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:border-[#D4A574]">
               <Filter size={20} /> Filter
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-[#D4A574]/10">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-100 border-b">
-                  <th className="px-4 py-2 text-left">
+                <tr className="bg-gradient-to-r from-[#F5E6D3] to-[#FAF8F5] border-b-2 border-[#D4A574]/20">
+                  <th className="px-4 py-4 text-left">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 accent-orange-500"
+                      className="w-4 h-4 accent-[#D4A574] rounded"
                     />
                   </th>
                   {[
                     "Image",
                     "Product Name",
                     "Price",
-                    "Desc",
+                    "Description",
                     "Product Size",
                     "Stock",
                     "Action",
                   ].map((th, i) => (
                     <th
                       key={i}
-                      className="px-6 py-4 text-left text-sm font-semibold text-gray-700"
+                      className="px-6 py-4 text-left text-sm font-bold text-[#6B5744]"
                     >
                       {th}
                     </th>
@@ -319,42 +325,52 @@ export default function ProductList() {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((product, idx) => (
                   <tr
                     key={product.id}
-                    className="border-b border-gray-200 hover:bg-gray-50 transition"
+                    className={`border-b border-[#D4A574]/10 hover:bg-[#FAF8F5] transition-all duration-200 ${
+                      idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF8F5]/30'
+                    }`}
                   >
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-4">
                       <input
                         type="checkbox"
-                        className="w-4 h-4 accent-orange-500"
+                        className="w-4 h-4 accent-[#D4A574] rounded"
                       />
                     </td>
-                    <td className="px-6 py-4 text-center text-2xl">
+                    <td className="px-6 py-4">
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-12 h-12 object-cover mx-auto"
+                        className="w-14 h-14 object-cover rounded-lg border-2 border-[#D4A574]/20 shadow-md"
                       />
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                    <td className="px-6 py-4 text-sm text-[#1A0F0A] font-semibold">
                       {product.name}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-[#6B5744] font-medium">
                       {formatRupiah(product.price)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-[#8B7355] max-w-xs truncate">
                       {product.desc}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-[#6B5744] font-medium">
                       {product.sizeText}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                      {product.stock}
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
+                        product.stock > 10 
+                          ? 'bg-green-100 text-green-700 border border-green-300'
+                          : product.stock > 0
+                          ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                          : 'bg-red-100 text-red-700 border border-red-300'
+                      }`}>
+                        {product.stock}
+                      </span>
                     </td>
                     <td className="px-6 py-4 flex gap-2">
                       <button
-                        className="p-2 text-blue-500 hover:bg-blue-50 rounded transition"
+                        className="p-2.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-all duration-300 hover:scale-110"
                         onClick={() => {
                           setIsEditing(true);
                           setEditingProductId(product.id);
@@ -374,7 +390,7 @@ export default function ProductList() {
                         <Edit size={18} />
                       </button>
                       <button
-                        className="p-2 text-red-500 hover:bg-red-50 rounded transition"
+                        className="p-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110"
                         onClick={() => confirmDeleteProduct(product.id)}
                       >
                         <Trash2 size={18} />
@@ -386,15 +402,15 @@ export default function ProductList() {
             </table>
           </div>
 
-          <div className="flex justify-between items-center px-6 py-4 bg-gray-50 border-t">
-            <p className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages} — Total {totalProducts} products
+          <div className="flex flex-col md:flex-row justify-between items-center px-6 py-5 bg-white border-t-2 border-[#D4A574]/10">
+            <p className="text-sm text-[#6B5744] font-medium mb-3 md:mb-0">
+              Page <span className="font-bold text-[#8B6F47]">{currentPage}</span> of <span className="font-bold text-[#8B6F47]">{totalPages}</span> — Total <span className="font-bold text-[#8B6F47]">{totalProducts}</span> products
             </p>
             <div className="flex gap-2 items-center">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition disabled:opacity-40"
+                className="px-4 py-2 text-sm text-[#6B5744] hover:bg-[#F5E6D3] rounded-lg transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed font-semibold"
               >
                 Prev
               </button>
@@ -403,10 +419,10 @@ export default function ProductList() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 text-sm rounded transition ${
+                    className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 font-semibold ${
                       currentPage === page
-                        ? "bg-orange-500 text-white"
-                        : "text-gray-600 hover:bg-gray-200"
+                        ? "bg-gradient-to-r from-[#D4A574] to-[#8B6F47] text-white shadow-md"
+                        : "text-[#6B5744] hover:bg-[#F5E6D3]"
                     }`}
                   >
                     {page}
@@ -416,7 +432,7 @@ export default function ProductList() {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition disabled:opacity-40"
+                className="px-4 py-2 text-sm text-[#6B5744] hover:bg-[#F5E6D3] rounded-lg transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed font-semibold"
               >
                 Next
               </button>
@@ -447,27 +463,27 @@ export default function ProductList() {
       )}
 
       {confirmDelete.show && (
-        <div className="fixed inset-0 flex items-center justify-center bg-opacity-40 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-            <p>Are you sure you want to delete this product?</p>
-            <div className="flex justify-end gap-2 mt-6">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-[450px] border-2 border-[#D4A574]/20">
+            <h2 className="text-2xl font-bold mb-4 text-[#1A0F0A]">Confirm Delete</h2>
+            <p className="text-[#6B5744] mb-6">Are you sure you want to delete this product? This action cannot be undone.</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() =>
+                  setConfirmDelete({ show: false, productId: null })
+                }
+                className="px-6 py-2.5 bg-white border-2 border-[#D4A574]/30 text-[#6B5744] rounded-xl hover:bg-[#F5E6D3] transition-all duration-300 font-semibold"
+              >
+                No
+              </button>
               <button
                 onClick={() => {
                   handleDeleteProduct(confirmDelete.productId);
                   setConfirmDelete({ show: false, productId: null });
                 }}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                className="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
               >
-                Yes
-              </button>
-              <button
-                onClick={() =>
-                  setConfirmDelete({ show: false, productId: null })
-                }
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
-              >
-                No
+                Yes, Delete
               </button>
             </div>
           </div>
