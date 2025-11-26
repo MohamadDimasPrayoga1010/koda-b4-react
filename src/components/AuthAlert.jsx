@@ -8,7 +8,7 @@ import { CheckCircle, XCircle, X } from "lucide-react";
  * @param {string} props.message - Pesan yang akan ditampilkan pada alert.
  * @returns {JSX.Element | null} Elemen alert, atau `null` jika tidak ada pesan.
  */
-const AuthAlert = ({ type = "success", message, duration = 3000, onClose }) => {
+const AuthAlert = ({ type = "success", message, duration = 5000, onClose }) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {

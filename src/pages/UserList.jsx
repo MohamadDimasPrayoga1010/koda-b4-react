@@ -176,7 +176,7 @@ const UserList = () => {
       if (selectedUser.file) {
         formData.append("image", selectedUser.file);
       }
-
+      setAlert({ type: "success", message: "Add User Success" });
       let res;
       if (isEditing) {
         res = await apiRequest(
@@ -197,13 +197,8 @@ const UserList = () => {
         });
         return;
       }
-      setAlert({
-        message: isEditing
-          ? "User updated successfully"
-          : "User added successfully",
-        type: "success",
-      });
-      setIsModalOpen(false);
+      setAlert({ type: "success", message: "Update User Success" });
+     setIsModalOpen(false)
       if (isEditing) {
         fetchUsers(currentPage, search);
       } else {
@@ -212,7 +207,10 @@ const UserList = () => {
       }
     } catch (err) {
       console.error("handleSaveUser error:", err);
-      setAlert({ message: res?.message || "Save user failed", type: "error" });
+      setAlert({
+        message: err?.response?.data?.message || "Save user failed",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -311,7 +309,7 @@ const UserList = () => {
                 <tr
                   key={item.id}
                   className={`border-b border-[#D4A574]/10 hover:bg-[#FAF8F5] transition-all duration-200 text-sm ${
-                    idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF8F5]/30'
+                    idx % 2 === 0 ? "bg-white" : "bg-[#FAF8F5]/30"
                   }`}
                 >
                   <td className="px-4 py-4">
@@ -372,7 +370,13 @@ const UserList = () => {
 
         <div className="flex flex-wrap justify-between items-center px-6 py-5 bg-white border-2 border-t-0 border-[#D4A574]/10 rounded-b-2xl shadow-lg">
           <p className="text-sm text-[#6B5744] font-medium">
-            Show <span className="font-bold text-[#8B6F47]">{filteredUsers.length}</span> users of <span className="font-bold text-[#8B6F47]">{users.length}</span> total
+            Show{" "}
+            <span className="font-bold text-[#8B6F47]">
+              {filteredUsers.length}
+            </span>{" "}
+            users of{" "}
+            <span className="font-bold text-[#8B6F47]">{users.length}</span>{" "}
+            total
           </p>
 
           <div className="flex gap-2 items-center mt-4 md:mt-0">
@@ -461,7 +465,9 @@ const UserList = () => {
 
               <div className="space-y-4">
                 <div className="flex flex-col gap-2 relative">
-                  <label className="font-semibold text-sm text-[#6B5744]">Full Name</label>
+                  <label className="font-semibold text-sm text-[#6B5744]">
+                    Full Name
+                  </label>
                   <input
                     type="text"
                     value={selectedUser.fullname ?? ""}
@@ -474,39 +480,60 @@ const UserList = () => {
                     className="w-full pl-11 pr-4 py-3 border-2 border-[#D4A574]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A574] focus:border-[#D4A574] transition-all"
                     placeholder="Enter full name"
                   />
-                  <User className="absolute top-[45px] left-3 text-[#8B7355]" size={18} />
+                  <User
+                    className="absolute top-[45px] left-3 text-[#8B7355]"
+                    size={18}
+                  />
                 </div>
 
                 <div className="flex flex-col gap-2 relative">
-                  <label className="font-semibold text-sm text-[#6B5744]">Email</label>
+                  <label className="font-semibold text-sm text-[#6B5744]">
+                    Email
+                  </label>
                   <input
                     type="text"
                     value={selectedUser.email ?? ""}
                     onChange={(e) =>
-                      setSelectedUser({ ...selectedUser, email: e.target.value })
+                      setSelectedUser({
+                        ...selectedUser,
+                        email: e.target.value,
+                      })
                     }
                     className="w-full pl-11 pr-4 py-3 border-2 border-[#D4A574]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A574] focus:border-[#D4A574] transition-all"
                     placeholder="Enter email"
                   />
-                  <Mail className="absolute top-[45px] left-3 text-[#8B7355]" size={18} />
+                  <Mail
+                    className="absolute top-[45px] left-3 text-[#8B7355]"
+                    size={18}
+                  />
                 </div>
 
                 <div className="flex flex-col gap-2 relative">
-                  <label className="font-semibold text-sm text-[#6B5744]">Phone</label>
+                  <label className="font-semibold text-sm text-[#6B5744]">
+                    Phone
+                  </label>
                   <input
                     type="text"
                     value={selectedUser.phone ?? ""}
                     onChange={(e) =>
-                      setSelectedUser({ ...selectedUser, phone: e.target.value })
+                      setSelectedUser({
+                        ...selectedUser,
+                        phone: e.target.value,
+                      })
                     }
                     className="w-full pl-11 pr-4 py-3 border-2 border-[#D4A574]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A574] focus:border-[#D4A574] transition-all"
                     placeholder="Enter phone number"
                   />
-                  <Phone className="absolute top-[45px] left-3 text-[#8B7355]" size={18} />
+                  <Phone
+                    className="absolute top-[45px] left-3 text-[#8B7355]"
+                    size={18}
+                  />
                 </div>
 
                 <div className="flex flex-col gap-2 relative">
-                  <label className="font-semibold text-sm text-[#6B5744]">Password</label>
+                  <label className="font-semibold text-sm text-[#6B5744]">
+                    Password
+                  </label>
 
                   <input
                     type={showPassword ? "text" : "password"}
@@ -537,7 +564,9 @@ const UserList = () => {
                 </div>
 
                 <div className="flex flex-col gap-2 relative">
-                  <label className="font-semibold text-sm text-[#6B5744]">Address</label>
+                  <label className="font-semibold text-sm text-[#6B5744]">
+                    Address
+                  </label>
                   <input
                     type="text"
                     value={selectedUser.address ?? ""}
@@ -550,7 +579,10 @@ const UserList = () => {
                     className="w-full pl-11 pr-4 py-3 border-2 border-[#D4A574]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4A574] focus:border-[#D4A574] transition-all"
                     placeholder="Enter address"
                   />
-                  <MapPin className="absolute top-[45px] left-3 text-[#8B7355]" size={18} />
+                  <MapPin
+                    className="absolute top-[45px] left-3 text-[#8B7355]"
+                    size={18}
+                  />
                 </div>
 
                 {!isEditing && (
@@ -598,9 +630,12 @@ const UserList = () => {
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="text-red-600" size={28} />
               </div>
-              <h2 className="text-2xl font-bold mb-3 text-[#1A0F0A]">Delete User</h2>
+              <h2 className="text-2xl font-bold mb-3 text-[#1A0F0A]">
+                Delete User
+              </h2>
               <p className="text-[#6B5744]">
-                Are you sure you want to delete this user? This action cannot be undone.
+                Are you sure you want to delete this user? This action cannot be
+                undone.
               </p>
             </div>
             <div className="flex gap-3">
