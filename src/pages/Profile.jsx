@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { User, Mail, Phone, Lock, MapPin, CircleUser } from "lucide-react";
+import { User, Mail, Phone, Lock, MapPin, CircleUser, Camera, Calendar } from "lucide-react";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 import AuthAlert from "../components/AuthAlert";
@@ -120,36 +120,44 @@ const Profile = () => {
   };
 
   return (
-    <main className="my-30 md:mx-26">
+    <main className="my-30 md:mx-26 px-4 md:px-0">
       <Loading show={loading} text="Updating profile..." fullScreen={true} />
-
-      <h1 className="text-5xl text-[#0B0909]">Profile</h1>
+      <div className="mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-[#1A0F0A] mb-2">Profile</h1>
+        <div className="h-1.5 w-20 bg-gradient-to-r from-[#D4A574] to-transparent rounded-full"></div>
+      </div>
 
       {alert.message && <AuthAlert type={alert.type} message={alert.message} />}
 
-      <section className="my-7 flex gap-3">
-        <div className="border border-[#E8E8E8] w-[280px] h-[343px] p-6">
-          <div className="flex flex-col items-center space-y-4">
+      <section className="my-7 flex flex-col lg:flex-row gap-6">
+        <div className="bg-white border-2 border-[#D4A574]/20 rounded-2xl shadow-xl w-full lg:w-[320px] p-8 hover:shadow-2xl transition-all duration-300">
+          <div className="flex flex-col items-center space-y-6">
             <div className="text-center">
-              <p className="text-lg font-semibold text-[#0B132A]">
+              <p className="text-xl font-bold text-[#1A0F0A] mb-1">
                 {user?.fullname || "User"}
               </p>
-              <p className="text-sm text-gray-500">{user?.email || ""}</p>
+              <p className="text-sm text-[#8B7355]">{user?.email || ""}</p>
             </div>
 
-            <div className="w-25 h-25 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-              {avatarPreview ? (
-                <img
-                  src={avatarPreview}
-                  alt="avatar"
-                  className="w-16 h-16 object-cover rounded-full"
-                />
-              ) : (
-                <CircleUser className="w-16 h-16 text-gray-400" />
-              )}
+            <div className="relative group">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#F5E6D3] to-[#D4A574]/30 flex items-center justify-center overflow-hidden border-4 border-[#D4A574] shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <CircleUser className="w-20 h-20 text-[#8B6F47]" />
+                )}
+              </div>
+              
+              <div className="absolute bottom-0 right-0 bg-gradient-to-r from-[#D4A574] to-[#8B6F47] p-3 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-transform duration-300" onClick={handleButtonClick}>
+                <Camera className="w-5 h-5 text-white" />
+              </div>
             </div>
 
-            <div>
+            <div className="w-full">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -157,19 +165,32 @@ const Profile = () => {
                 onChange={handleFileChange}
                 accept="image/*"
               />
-              <Button className="w-full" onClick={handleButtonClick}>
+              <Button 
+                className="w-full bg-gradient-to-r from-[#D4A574] to-[#8B6F47] hover:from-[#8B6F47] hover:to-[#D4A574] text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300" 
+                onClick={handleButtonClick}
+              >
                 Upload New Photo
               </Button>
             </div>
 
-            <p className="text-base text-[#4F5665] text-center">
-              Since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
-            </p>
+            <div className="w-full pt-4 border-t border-[#D4A574]/20">
+              <div className="flex items-center justify-center gap-2 text-[#6B5744]">
+                <Calendar className="w-4 h-4 text-[#8B6F47]" />
+                <p className="text-sm font-medium">
+                  Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="border border-[#E8E8E8] w-[780px]">
-          <form onSubmit={handleSubmit(onSubmit)} className="w-full p-6 space-y-4">
+        <div className="bg-white border-2 border-[#D4A574]/20 rounded-2xl shadow-xl flex-1 hover:shadow-2xl transition-all duration-300">
+          <form onSubmit={handleSubmit(onSubmit)} className="w-full p-6 md:p-8 space-y-5">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-[#1A0F0A] mb-2">Personal Information</h2>
+              <p className="text-sm text-[#8B7355]">Update your profile details below</p>
+            </div>
+
             <InputField
               label="Full Name"
               type="text"
@@ -226,9 +247,9 @@ const Profile = () => {
 
             <button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition mt-6"
+              className="w-full bg-gradient-to-r from-[#D4A574] to-[#8B6F47] hover:from-[#8B6F47] hover:to-[#D4A574] text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] mt-8"
             >
-              Submit
+              Save Changes
             </button>
           </form>
         </div>
