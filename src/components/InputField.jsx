@@ -26,7 +26,7 @@ const InputField = ({
   ...rest
 }) => {
   return (
-    <form>
+    <div>
       <label className="block text-base font-semibold text-[#0B132A] mb-2">
         {label}
       </label>
@@ -60,7 +60,7 @@ const InputField = ({
         )}
       </div>
       {error && <p className="mt-1 text-sm text-red-600">{error.message}</p>}
-    </form>
+    </div>
   );
 };
 
