@@ -177,6 +177,13 @@ const OrderDetail = () => {
             </div>
 
             <div className="mt-8 pt-6 border-t-2 border-[#654321]/20">
+              <div className="flex justify-between items-center bg-gradient-to-r from-[#654321]/10 to-[#8b6239]/10 p-5 rounded-xl mb-3">
+                <p className="text-[#654321] font-semibold text-lg">Shipping Fee</p>
+                <p className="text-[#654321] font-bold text-lg">
+                  IDR {order.shippingPrice?.toLocaleString("id-ID") || 0}
+                </p>
+              </div>
+
               <div className="flex justify-between items-center bg-gradient-to-r from-[#654321]/10 to-[#8b6239]/10 p-5 rounded-xl">
                 <p className="text-[#654321] font-semibold text-lg">Total Transaction</p>
                 <p className="text-3xl font-bold bg-gradient-to-r from-[#654321] to-[#8b6239] bg-clip-text text-transparent">
