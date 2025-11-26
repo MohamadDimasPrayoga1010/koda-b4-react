@@ -1,5 +1,5 @@
 
-import CoffeLogo from "/images/CoffeLogo.png";
+import CoffeLogo from "/images/logoweb.png";
 import { Link} from "react-router-dom";
 import SearchIcon from "/images/Search.png";
 import CartIcon from "/images/ShoppingCart.png";
