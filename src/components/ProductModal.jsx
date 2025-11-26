@@ -268,7 +268,7 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
         <div className="p-6 sticky bottom-0 bg-white">
           <button
             onClick={handleSave} 
-            className="w-full px-4 py-3 bg-orange-500 hover:bg-orange-600 font-bold rounded-lg transition text-base"
+            className="w-full px-4 py-3 bg-amber-700 hover:bg-amber-900 font-bold rounded-lg transition text-base text-white"
           >
             {mode === "edit" ? "Update Product" : "Save Product"}
           </button>
