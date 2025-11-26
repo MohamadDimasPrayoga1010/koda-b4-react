@@ -33,7 +33,7 @@ const InputPayment = () => {
   };
 
   return (
-    <div className="w-full  bg-white   rounded-lg p-8 shadow-lg">
+    <form className="w-full  bg-white   rounded-lg p-8 shadow-lg">
       <div className="mb-6">
         <label className="block text-sm font-bold text-gray-800 mb-2">
           Email
@@ -131,7 +131,7 @@ const InputPayment = () => {
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -227,7 +227,7 @@ const Navbar = () => {
                 <h3 className="text-sm font-semibold text-[#D4A574] mb-3 uppercase tracking-wider">
                   Search Product
                 </h3>
-                <div className="relative">
+                <form className="relative">
                   <img
                     src={SearchIcon}
                     alt="search"
@@ -238,7 +238,7 @@ const Navbar = () => {
                     placeholder="Find Product"
                     className="w-full pl-10 pr-4 py-3 bg-[#3D2817] border border-[#D4A574]/30 rounded-lg text-sm text-[#F5E6D3] placeholder-[#8B7355] focus:outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/20 transition-all duration-300"
                   />
-                </div>
+                </form>
               </div>
 
               <div className="mb-6 space-y-1">

@@ -90,7 +90,7 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
     <div className="absolute right-0 top-[26px] w-[600px] flex items-end justify-end p-4 z-50">
       <Loading show={loading} text={mode === "edit" ? "Updating product..." : "Saving product..."} fullScreen={true} />
 
-      <div className="bg-white shadow-lg w-full max-w-xl max-h-screen overflow-y-auto mt-10">
+      <form className="bg-white shadow-lg w-full max-w-xl max-h-screen overflow-y-auto mt-10">
         <div className="flex justify-between items-center p-6 sticky top-0 bg-white z-10">
           <h2 className="text-lg font-bold text-gray-900">
             {mode === "edit" ? "Edit Product" : "Add Product"}
@@ -273,7 +273,7 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
             {mode === "edit" ? "Update Product" : "Save Product"}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
