@@ -35,10 +35,14 @@ const Login = () => {
 
   useEffect(() => {
     if (location.state?.message) {
-      setAlert({ type: "success", message: location.state.message });
-      window.history.replaceState({}, document.title);
+      setAlert({ type: "warning", message: location.state.message });
+      navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location]);
+    else if (location.state?.successMessage) {
+      setAlert({ type: "success", message: location.state.successMessage });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   const onSubmit = async (data) => {
     dispatch(setLoading(true));
@@ -58,7 +62,6 @@ const Login = () => {
           if (result.data.role === "admin") {
             navigate("/dashboard");
             console.log("LOGIN RESULT:", result);
-
           } else {
             navigate("/");
           }
@@ -146,7 +149,7 @@ const Login = () => {
 
           <div className="text-center mt-5">
             <p className="text-gray-600 text-sm">
-              Not Have An Account?
+              Not Have An Account?{" "}
               <Link
                 to="/register"
                 className="text-orange-500 hover:text-orange-600 font-medium transition"
