@@ -3,7 +3,7 @@ import CoffeLogo from "../../public/images/logoweb.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchIcon from "/images/Search.png";
 import CartIcon from "/images/ShoppingCart.png";
-import { X, Menu, ChevronDown } from "lucide-react";
+import { X, Menu, ChevronDown, LogOut, AlertCircle } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout as logoutAction, setUser } from "../redux/reducer/auth";
 import { apiRequest } from "../utils/api";
@@ -11,6 +11,7 @@ import { apiRequest } from "../utils/api";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -62,10 +63,20 @@ const Navbar = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
-  const handleLogout = () => {
-    dispatch(logoutAction());
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
     setShowDropdown(false);
+    setIsMenuOpen(false);
+  };
+
+  const handleLogoutConfirm = () => {
+    dispatch(logoutAction());
+    setShowLogoutModal(false);
     navigate("/login");
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
   };
 
   return (
@@ -174,9 +185,10 @@ const Navbar = () => {
                       Profile
                     </Link>
                     <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-3 text-[#F5E6D3] hover:bg-[#3D2817] transition-all duration-200"
+                      onClick={handleLogoutClick}
+                      className="w-full text-left px-4 py-3 text-[#F5E6D3] hover:bg-[#3D2817] transition-all duration-200 flex items-center gap-2"
                     >
+                      <LogOut size={16} />
                       Logout
                     </button>
                   </div>
@@ -307,14 +319,57 @@ const Navbar = () => {
                       Profile
                     </Link>
                     <button
-                      onClick={handleLogout}
-                      className="w-full text-left py-3 px-4 text-[#F5E6D3] hover:bg-[#3D2817] rounded-lg transition-all duration-300 hover:text-[#D4A574]"
+                      onClick={handleLogoutClick}
+                      className="w-full text-left py-3 px-4 text-[#F5E6D3] hover:bg-[#3D2817] rounded-lg transition-all duration-300 hover:text-[#D4A574] flex items-center gap-2"
                     >
+                      <LogOut size={16} />
                       Logout
                     </button>
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </>
+      )}
+      {showLogoutModal && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in"
+            onClick={handleLogoutCancel}
+          >
+            <div 
+              className="bg-gradient-to-b from-[#2A1810] to-[#1A0F0A] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-[#D4A574]/20 animate-scale-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-[#D4A574]/10 rounded-full flex items-center justify-center">
+                  <AlertCircle size={32} className="text-[#D4A574]" />
+                </div>
+              </div>
+
+              <h3 className="text-2xl font-bold text-center text-[#F5E6D3] mb-2">
+                Confirm Logout
+              </h3>
+              <p className="text-center text-[#8B7355] mb-6">
+                Are you sure you want to logout from your account?
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleLogoutCancel}
+                  className="flex-1 py-3 px-4 border-2 border-[#D4A574]/50 text-[#F5E6D3] rounded-lg font-medium hover:bg-[#3D2817] hover:border-[#D4A574] transition-all duration-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogoutConfirm}
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-medium hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-red-900/40 flex items-center justify-center gap-2"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </>
