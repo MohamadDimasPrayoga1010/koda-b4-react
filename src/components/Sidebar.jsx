@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Handbag, Users, LogOut, AlertCircle, X } from "lucide-react";
+import { Handbag, Users, LogOut, AlertCircle, X, Tag } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout as logoutAction } from "../redux/reducer/auth";
 import DashboardIcon from "/images/dashboard.png";
@@ -11,38 +11,44 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const menuItems = [
-    {
-      name: "Dashboard",
-      icon: <img src={DashboardIcon} alt="icon" className="w-5 h-5" />,
-      path: "/dashboard",
-      action: null,
-    },
-    {
-      name: "Product",
-      icon: <img src={ProductIcon} alt="icon" className="w-5 h-5" />,
-      path: "/product-list",
-      action: null,
-    },
-    { 
-      name: "Order", 
-      icon: <Handbag className="w-5 h-5" />, 
-      path: "/order-list",
-      action: null,
-    },
-    { 
-      name: "User", 
-      icon: <Users className="w-5 h-5" />, 
-      path: "/user-list",
-      action: null,
-    },
-    {
-      name: "Keluar",
-      icon: <LogOut className="w-5 h-5" />,
-      path: null,
-      action: "logout",
-    },
-  ];
+const menuItems = [
+  {
+    name: "Dashboard",
+    icon: <img src={DashboardIcon} alt="icon" className="w-5 h-5" />,
+    path: "/dashboard",
+    action: null,
+  },
+  {
+    name: "Product",
+    icon: <img src={ProductIcon} alt="icon" className="w-5 h-5" />,
+    path: "/product-list",
+    action: null,
+  },
+  {
+    name: "Category",  
+    icon: <Tag className="w-5 h-5" />, 
+    path: "/category-list",
+    action: null,
+  },
+  { 
+    name: "Order", 
+    icon: <Handbag className="w-5 h-5" />, 
+    path: "/order-list",
+    action: null,
+  },
+  { 
+    name: "User", 
+    icon: <Users className="w-5 h-5" />, 
+    path: "/user-list",
+    action: null,
+  },
+  {
+    name: "Keluar",
+    icon: <LogOut className="w-5 h-5" />,
+    path: null,
+    action: "logout",
+  },
+];
 
   const handleLogoutClick = (e) => {
     e.preventDefault();
