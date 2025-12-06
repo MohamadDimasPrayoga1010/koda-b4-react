@@ -28,6 +28,7 @@ const OurProduct = () => {
   const [categoriesList, setCategoriesList] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showFilter, setShowFilter] = useState(false);
@@ -49,64 +50,79 @@ const OurProduct = () => {
   ]);
 
   const fetchCategories = useCallback(async () => {
-    const res = await apiRequest("/categories");
-    if (res.success) setCategoriesList(res.data || []);
+    setLoadingCategories(true);
+    try {
+      const res = await apiRequest("/category", "GET");  
+      if (res && res.success) {
+        const sortedCategories = (res.data || []).sort((a, b) => 
+          a.name.localeCompare(b.name)
+        );
+        setCategoriesList(sortedCategories);
+      } else {
+        console.error("Failed to fetch categories:", res?.message);
+        setCategoriesList([]);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setCategoriesList([]);
+    } finally {
+      setLoadingCategories(false);
+    }
   }, []);
 
-const fetchProducts = useCallback(
-  async (
-    filters = {
-      search: searchInput,
-      category: selectedCategory,
-      sort: selectedSort,
-      priceRange,
-    }
-  ) => {
-    setLoading(true);
-
-    try {
-      const params = new URLSearchParams();
-      params.append("page", page);
-      params.append("limit", 50);
-      if (filters.search) params.append("q", filters.search);
-      if (filters.category) params.append("cat", filters.category);
-      params.append("price_min", filters.priceRange?.[0] || 0);
-      params.append("price_max", filters.priceRange?.[1] || 500000);
-      if (filters.sort && filters.sort !== "") {
-        params.append("sortby", filters.sort);
-        params.append("order", "ASC");
+  const fetchProducts = useCallback(
+    async (
+      filters = {
+        search: searchInput,
+        category: selectedCategory,
+        sort: selectedSort,
+        priceRange,
       }
+    ) => {
+      setLoading(true);
 
-      let res;
       try {
-        res = await apiRequest(`/products?${params.toString()}`, "GET");
-      } catch (apiError) {
-        console.error("API request failed:", apiError);
-        setProducts([]);
-        setLoading(false);
-        return;
-      }
-
-      if (res.success) {
-        setProducts(res.data || []);
-
-        if (res.pagination?.totalPages) {
-          setTotalPages(res.pagination.totalPages);
+        const params = new URLSearchParams();
+        params.append("page", page);
+        params.append("limit", 50);
+        if (filters.search) params.append("q", filters.search);
+        if (filters.category) params.append("cat", filters.category);
+        params.append("price_min", filters.priceRange?.[0] || 0);
+        params.append("price_max", filters.priceRange?.[1] || 500000);
+        if (filters.sort && filters.sort !== "") {
+          params.append("sortby", filters.sort);
+          params.append("order", "ASC");
         }
-      } else {
-        console.error("Failed to fetch products:", res.message);
-        setProducts([]);
-      }
-    } catch (err) {
-      console.error("Unexpected error fetching products:", err);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  },
-  [page, searchInput, selectedCategory, selectedSort, priceRange]
-);
 
+        let res;
+        try {
+          res = await apiRequest(`/products?${params.toString()}`, "GET");
+        } catch (apiError) {
+          console.error("API request failed:", apiError);
+          setProducts([]);
+          setLoading(false);
+          return;
+        }
+
+        if (res.success) {
+          setProducts(res.data || []);
+
+          if (res.pagination?.totalPages) {
+            setTotalPages(res.pagination.totalPages);
+          }
+        } else {
+          console.error("Failed to fetch products:", res.message);
+          setProducts([]);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching products:", err);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page, searchInput, selectedCategory, selectedSort, priceRange]
+  );
 
   const handleSearch = (filters) => {
     setSearchInput(filters.search || "");
@@ -134,19 +150,21 @@ const fetchProducts = useCallback(
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
   useEffect(() => {
     updateURL();
   }, [updateURL]);
 
-  if (loading) {
+  if (loading && loadingCategories) {
     return (
-      <div className="col-span-full flex items-center justify-center py-12">
+      <div className="col-span-full flex items-center justify-center py-12 min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading products...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -231,11 +249,18 @@ const fetchProducts = useCallback(
             setPriceRange={setPriceRange}
             onReset={handleResetFilter}
             categoriesList={categoriesList}
-            className="hidden md:flex p-8 w-sm md:h-[800px]"
+            className="hidden md:flex p-8 w-sm md:h-full"
           />
 
           <div className="w-full">
-            {products.length > 0 ? (
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading products...</p>
+                </div>
+              </div>
+            ) : products.length > 0 ? (
               <Pagination
                 data={products}
                 itemsPerPage={6}

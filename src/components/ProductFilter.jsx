@@ -69,17 +69,6 @@ const ProductFilter = ({
     { label: "Lowest starting price", sortby: "baseprice" }, 
   ];
 
-  const displayCategories =
-    categoriesList.length > 0
-      ? categoriesList
-      : [
-          { id: 1, name: "Favorite Product" },
-          { id: 2, name: "Coffe" },
-          { id: 3, name: "Non Coffe" },
-          { id: 4, name: "Foods" },
-          { id: 5, name: "Add-On" },
-        ];
-
   return (
     <div className={`flex flex-col gap-4 bg-gradient-to-br from-[#2C1810] to-[#1a0f0a] rounded-2xl text-white shadow-2xl border border-amber-900/30 p-6 ${className}`}>
       <div className="flex justify-between items-center">
@@ -115,25 +104,32 @@ const ProductFilter = ({
         <div className="mb-6">
           <h1 className="font-bold text-lg mb-3 text-amber-100">Category</h1>
           <div className="space-y-2">
-            {displayCategories.map((cat) => (
-              <div 
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer" 
-                key={cat.id}
-              >
-                <input
-                  type="checkbox"
-                  value={cat.id}
-                  checked={watchedCategory == cat.id}
-                  onChange={() =>
-                    setValue("category", watchedCategory == cat.id ? "" : cat.id)
-                  }
-                  className="w-5 h-5 accent-amber-700 cursor-pointer rounded border-amber-900"
-                />
-                <label className="text-gray-200 cursor-pointer flex-1 font-medium">
-                  {cat.name}
-                </label>
+            {categoriesList.length > 0 ? (
+              categoriesList.map((cat) => (
+                <div 
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer" 
+                  key={cat.id}
+                >
+                  <input
+                    type="checkbox"
+                    value={cat.id}
+                    checked={watchedCategory == cat.id}
+                    onChange={() =>
+                      setValue("category", watchedCategory == cat.id ? "" : cat.id)
+                    }
+                    className="w-5 h-5 accent-amber-700 cursor-pointer rounded border-amber-900"
+                  />
+                  <label className="text-gray-200 cursor-pointer flex-1 font-medium">
+                    {cat.name}
+                  </label>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-400">
+                <p className="text-sm">No categories available</p>
+                <p className="text-xs mt-1">Categories will appear here once added</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
