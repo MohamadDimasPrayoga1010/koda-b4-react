@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import {
   Plus,
@@ -30,6 +30,14 @@ const OrderList = () => {
   const [alert, setAlert] = useState({ type: "success", message: "" });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteOrderId, setDeleteOrderId] = useState(null);
+  const topRef = useRef(null);
+
+  useEffect(() => {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   const fetchOrders = async () => {
     const query = `?page=${currentPage}&limit=10&search=${search}`;
@@ -119,6 +127,7 @@ const OrderList = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FAF8F5] to-white p-8">
+      <div ref={topRef}></div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-[#1A0F0A] mb-2">Order List</h1>
