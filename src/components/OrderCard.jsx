@@ -21,7 +21,6 @@ const OrderCard = ({ order }) => {
     }
   };
 
-  const totalWithShipping = order.total + (order.shippingFee || 0);
 
   return (
     <div key={order.id} className="my-4 flex flex-col sm:flex-row gap-4 group animate-fadeIn">
@@ -68,7 +67,7 @@ const OrderCard = ({ order }) => {
               <span>Total</span>
             </p>
             <span className="text-sm sm:text-base font-bold bg-gradient-to-r from-[#654321] to-[#8b6239] bg-clip-text text-transparent ml-9 sm:ml-10">
-              IDR {Math.round(totalWithShipping).toLocaleString("id-ID")}
+              IDR {Number(order.total).toLocaleString("id-ID")}
             </span>
           </div>
 
