@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Search, Filter, Edit, Trash2, Plus, Package } from "lucide-react";
 import ProductModal from "../components/ProductModal";
 import AuthAlert from "../components/AuthAlert";
@@ -33,6 +33,20 @@ export default function ProductList() {
     show: false,
     productId: null,
   });
+
+  const topRef = useRef(null);
+
+  const scrollToTop = () => {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      try {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -91,8 +105,49 @@ export default function ProductList() {
           price
         )
       : "-";
+
   const handleSaveProduct = async () => {
     try {
+      if (!formData.productName.trim()) {
+        setAlert({ message: "Product name is required", type: "error" });
+        return;
+      }
+
+      if (!formData.description.trim()) {
+        setAlert({ message: "Description is required", type: "error" });
+        return;
+      }
+
+      if (formData.description.trim().length < 10) {
+        setAlert({ message: "Description must be at least 10 characters", type: "error" });
+        return;
+      }
+
+      if (!formData.productPrice || Number(formData.productPrice) <= 0) {
+        setAlert({ message: "Price must be greater than 0", type: "error" });
+        return;
+      }
+
+      if (formData.stock === "" || Number(formData.stock) < 0) {
+        setAlert({ message: "Stock cannot be negative", type: "error" });
+        return;
+      }
+
+      if (isEditing && Number(formData.stock) < 1) {
+        setAlert({ message: "Stock must be at least 1 when updating", type: "error" });
+        return;
+      }
+
+      if (!formData.categoryId) {
+        setAlert({ message: "Please select a category", type: "error" });
+        return;
+      }
+
+      if (!isEditing && (!formData.productImages || formData.productImages.length === 0)) {
+        setAlert({ message: "At least 1 image is required", type: "error" });
+        return;
+      }
+
       const payload = new FormData();
       payload.append("title", formData.productName);
       payload.append("basePrice", formData.productPrice);
@@ -106,7 +161,6 @@ export default function ProductList() {
       formData.selectedVariants?.forEach((id) =>
         payload.append("variant_id", Number(id))
       );
-       setAlert({ message: "Add Product successfully", type: "success" });
 
       const newImages = formData.productImages.filter(
         (file) => file instanceof File
@@ -126,6 +180,7 @@ export default function ProductList() {
 
         if (res.success) {
           setAlert({ message: "Product updated successfully", type: "success" });
+          scrollToTop();
 
           setProducts((prev) =>
             prev.map((p) =>
@@ -155,6 +210,7 @@ export default function ProductList() {
 
         if (res.success) {
           setAlert({ message: "Product added successfully", type: "success" });
+          scrollToTop();
 
           const newProduct = {
             id: res.data.id,
@@ -214,6 +270,7 @@ export default function ProductList() {
 
       if (res.success) {
         setAlert({ message: "Product deleted successfully", type: "success" });
+        scrollToTop();
         setProducts((prev) => prev.filter((p) => p.id !== id));
         setTotalProducts((prevTotal) => prevTotal - 1);
         setCurrentPage((prevPage) => {
@@ -245,6 +302,8 @@ export default function ProductList() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FAF8F5] to-white p-8">
+      <div ref={topRef} className="absolute top-0 left-0" />
+      
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -409,7 +468,10 @@ export default function ProductList() {
             <div className="flex gap-2 items-center">
               <button
                 disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
+                onClick={() => {
+                  setCurrentPage((p) => p - 1);
+                  scrollToTop();
+                }}
                 className="px-4 py-2 text-sm text-[#6B5744] hover:bg-[#F5E6D3] rounded-lg transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed font-semibold"
               >
                 Prev
@@ -418,7 +480,10 @@ export default function ProductList() {
                 (page) => (
                   <button
                     key={page}
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => {
+                      setCurrentPage(page);
+                      scrollToTop();
+                    }}
                     className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 font-semibold ${
                       currentPage === page
                         ? "bg-gradient-to-r from-[#D4A574] to-[#8B6F47] text-white shadow-md"
@@ -431,7 +496,10 @@ export default function ProductList() {
               )}
               <button
                 disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
+                onClick={() => {
+                  setCurrentPage((p) => p + 1);
+                  scrollToTop();
+                }}
                 className="px-4 py-2 text-sm text-[#6B5744] hover:bg-[#F5E6D3] rounded-lg transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed font-semibold"
               >
                 Next
