@@ -122,6 +122,21 @@ const Navbar = () => {
                   isActive("/our-product") ? "w-full" : "w-0 group-hover:w-full"
                 }`}></span>
               </Link>
+              {isLoggedIn && (
+                <Link
+                  to="/history-order"
+                  className={`text-[#F5E6D3] font-medium transition-all duration-300 relative group ${
+                    isActive("/history-order") 
+                      ? "text-[#D4A574]" 
+                      : "hover:text-[#D4A574]"
+                  }`}
+                >
+                  History
+                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-[#D4A574] to-[#8B6F47] transition-all duration-300 ${
+                    isActive("/history-order") ? "w-full" : "w-0 group-hover:w-full"
+                  }`}></span>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -276,6 +291,19 @@ const Navbar = () => {
                 >
                   Product
                 </Link>
+                {isLoggedIn && (
+                  <Link
+                    to="/history-order"
+                    className={`block py-3 px-4 rounded-lg transition-all duration-300 ${
+                      isActive("/history-order") 
+                        ? "bg-gradient-to-r from-[#D4A574]/20 to-transparent text-[#D4A574] font-semibold border-l-4 border-[#D4A574]" 
+                        : "text-[#F5E6D3] hover:bg-[#3D2817] hover:text-[#D4A574]"
+                    }`}
+                    onClick={toggleMenu}
+                  >
+                    History
+                  </Link>
+                )}
               </div>
 
               {!isLoggedIn ? (
