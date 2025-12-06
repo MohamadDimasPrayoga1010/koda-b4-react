@@ -6,13 +6,20 @@ import { CheckCircle, XCircle, X } from "lucide-react";
  * @param {Object} props - Properti komponen.
  * @param {"success" | "error"} [props.type="success"] - Jenis alert yang akan ditampilkan.
  * @param {string} props.message - Pesan yang akan ditampilkan pada alert.
+ * @param {number} [props.duration=5000] - Durasi alert dalam milidetik.
+ * @param {Function} props.onClose - Callback ketika alert ditutup.
  * @returns {JSX.Element | null} Elemen alert, atau `null` jika tidak ada pesan.
  */
 const AuthAlert = ({ type = "success", message, duration = 5000, onClose }) => {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!message) return;
+    if (!message) {
+      setVisible(false);
+      return;
+    }
+
+    setVisible(true);
 
     const timer = setTimeout(() => {
       setVisible(false);
@@ -20,7 +27,7 @@ const AuthAlert = ({ type = "success", message, duration = 5000, onClose }) => {
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [message, duration, onClose]);
+  }, [message, duration, onClose, type]); 
 
   if (!message || !visible) return null;
 
@@ -33,8 +40,8 @@ const AuthAlert = ({ type = "success", message, duration = 5000, onClose }) => {
   const Icon = isSuccess ? CheckCircle : XCircle;
 
   return (
-    <div className={`fixed top-5 right-5 z-5000 shadow-lg p-4 rounded-lg flex items-start gap-3 animate-slide-in ${containerClass}`}>
-      <Icon className="w-5 h-5" />
+    <div className={`fixed top-5 right-5 z-[9999] shadow-lg p-4 rounded-lg flex items-start gap-3 animate-slide-in ${containerClass}`}>
+      <Icon className="w-5 h-5 flex-shrink-0" />
 
       <p className="font-medium max-w-xs">{message}</p>
 
@@ -43,7 +50,7 @@ const AuthAlert = ({ type = "success", message, duration = 5000, onClose }) => {
           setVisible(false);
           if (onClose) onClose();
         }}
-        className="ml-2 text-gray-700 hover:text-gray-900"
+        className="ml-2 text-gray-700 hover:text-gray-900 flex-shrink-0"
       >
         <X className="w-4 h-4" />
       </button>
