@@ -33,7 +33,7 @@ const AuthAlert = ({ type = "success", message, duration = 5000, onClose }) => {
   const Icon = isSuccess ? CheckCircle : XCircle;
 
   return (
-    <div className={`fixed top-5 right-5 z-50 shadow-lg p-4 rounded-lg flex items-start gap-3 animate-slide-in ${containerClass}`}>
+    <div className={`fixed top-5 right-5 z-5000 shadow-lg p-4 rounded-lg flex items-start gap-3 animate-slide-in ${containerClass}`}>
       <Icon className="w-5 h-5" />
 
       <p className="font-medium max-w-xs">{message}</p>
