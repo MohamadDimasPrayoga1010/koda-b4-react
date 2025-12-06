@@ -11,6 +11,7 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
   const [sizes, setSizes] = useState([]);
   const [variants, setVariants] = useState([]);
   const [loading, setLoading] = useState(false); 
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +34,9 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleSizeToggle = (sizeId) => {
@@ -164,8 +168,15 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
               value={formData.productName}
               onChange={handleInputChange}
               placeholder="Enter Product Name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                errors.productName 
+                  ? "border-red-500 focus:ring-red-500" 
+                  : "border-gray-300 focus:ring-orange-500"
+              }`}
             />
+            {errors.productName && (
+              <p className="text-red-500 text-xs mt-1">{errors.productName}</p>
+            )}
           </div>
 
           <div>
@@ -196,8 +207,15 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
               value={formData.productPrice}
               onChange={handleInputChange}
               placeholder="Enter Product Price"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                errors.productPrice 
+                  ? "border-red-500 focus:ring-red-500" 
+                  : "border-gray-300 focus:ring-orange-500"
+              }`}
             />
+            {errors.productPrice && (
+              <p className="text-red-500 text-xs mt-1">{errors.productPrice}</p>
+            )}
           </div>
 
           <div>
@@ -208,8 +226,15 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
               onChange={handleInputChange}
               placeholder="Enter Product Description"
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                errors.description 
+                  ? "border-red-500 focus:ring-red-500" 
+                  : "border-gray-300 focus:ring-orange-500"
+              }`}
             />
+            {errors.description && (
+              <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+            )}
           </div>
 
           <div>
@@ -260,13 +285,21 @@ export default function ProductModal({ mode, formData, setFormData, onClose, onS
               value={formData.stock || ""}
               onChange={handleInputChange}
               placeholder="Enter stock quantity"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                errors.stock 
+                  ? "border-red-500 focus:ring-red-500" 
+                  : "border-gray-300 focus:ring-orange-500"
+              }`}
             />
+            {errors.stock && (
+              <p className="text-red-500 text-xs mt-1">{errors.stock}</p>
+            )}
           </div>
         </div>
 
         <div className="p-6 sticky bottom-0 bg-white">
           <button
+            type="button"
             onClick={handleSave} 
             className="w-full px-4 py-3 bg-amber-700 hover:bg-amber-900 font-bold rounded-lg transition text-base text-white"
           >
