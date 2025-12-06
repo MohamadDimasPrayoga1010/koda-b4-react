@@ -37,7 +37,7 @@ const UserList = () => {
   const limit = 10;
   const searchDebounceRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState({ message: "", type: "success" });
+  const [alert, setAlert] = useState({ message: "", type: "success", show: false });
   const [deleteUserId, setDeleteUserId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -50,7 +50,8 @@ const UserList = () => {
       const res = await apiRequest(endpoint, "GET", null, token);
 
       if (!res || res.success === false) {
-        setAlert({ message: "Fullname and email are required", type: "error" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setAlert({ message: "Failed to fetch users", type: "error", show: true });
         return;
       }
 
@@ -72,10 +73,13 @@ const UserList = () => {
       setCurrentPage(pagination.page || res.page || page);
     } catch (err) {
       console.error("fetchUsers error:", err);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setAlert({ message: "Error fetching users", type: "error", show: true });
     }
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     fetchUsers(currentPage, search);
   }, [currentPage]);
 
@@ -140,15 +144,18 @@ const UserList = () => {
       console.log("Response:", res);
 
       if (!res || res.success === false) {
-        setAlert({ message: "Failed to delete user", type: "error" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setAlert({ message: "Failed to delete user", type: "error", show: true });
         return;
       }
-      setAlert({ message: "User deleted successfully", type: "success" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setAlert({ message: "User deleted successfully", type: "success", show: true });
 
       fetchUsers(currentPage, search);
     } catch (err) {
       console.error("handleDelete error:", err);
-      setAlert({ message: "Delete request failed", type: "error" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setAlert({ message: "Delete request failed", type: "error", show: true });
     } finally {
       setIsDeleteModalOpen(false);
       setDeleteUserId(null);
@@ -159,8 +166,46 @@ const UserList = () => {
     try {
       if (!selectedUser) return;
 
-      if (!selectedUser.fullname?.trim() || !selectedUser.email?.trim()) {
-        setAlert({ message: "Fullname and email are required", type: "error" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (!selectedUser.fullname?.trim()) {
+        setAlert({ message: "Fullname wajib diisi", type: "error", show: true });
+        return;
+      } else if (selectedUser.fullname.trim().length < 3) {
+        setAlert({ message: "Fullname minimal 3 karakter", type: "error", show: true });
+        return;
+      }
+
+      if (!selectedUser.email?.trim()) {
+        setAlert({ message: "Email wajib diisi", type: "error", show: true });
+        return;
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(selectedUser.email)) {
+          setAlert({ message: "Format email tidak valid", type: "error", show: true });
+          return;
+        }
+      }
+
+      if (!isEditing) {
+        if (!selectedUser.password?.trim()) {
+          setAlert({ message: "Password wajib diisi", type: "error", show: true });
+          return;
+        } else if (selectedUser.password.trim().length < 6) {
+          setAlert({ message: "Password minimal 6 karakter", type: "error", show: true });
+          return;
+        }
+      }
+
+      if (selectedUser.phone && selectedUser.phone.trim().length > 0 && selectedUser.phone.trim().length < 10) {
+        setAlert({ message: "Phone minimal 10 karakter", type: "error", show: true });
+        return;
+      }
+
+      if (!selectedUser.role?.trim()) {
+        setAlert({ message: "Role wajib diisi", type: "error", show: true });
+        return;
+      } else if (!["admin", "user"].includes(selectedUser.role)) {
+        setAlert({ message: "Role harus salah satu dari: admin, user", type: "error", show: true });
         return;
       }
 
@@ -176,7 +221,7 @@ const UserList = () => {
       if (selectedUser.file) {
         formData.append("image", selectedUser.file);
       }
-      setAlert({ type: "success", message: "Add User Success" });
+
       let res;
       if (isEditing) {
         res = await apiRequest(
@@ -191,14 +236,33 @@ const UserList = () => {
       }
 
       if (!res || res.success === false) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+ 
+        let errorMessage = "Save user failed";
+        
+        if (res?.errors) {
+          const errorMessages = Object.values(res.errors).join(", ");
+          errorMessage = errorMessages;
+        } else if (res?.message) {
+          errorMessage = res.message;
+        }
+        
         setAlert({
-          message: res?.message || "Save user failed",
+          message: errorMessage,
           type: "error",
+          show: true
         });
         return;
       }
-      setAlert({ type: "success", message: "Update User Success" });
-     setIsModalOpen(false)
+      
+      setIsModalOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setAlert({ 
+        type: "success", 
+        message: isEditing ? "User berhasil diupdate" : "User berhasil ditambahkan", 
+        show: true 
+      });
+      
       if (isEditing) {
         fetchUsers(currentPage, search);
       } else {
@@ -207,9 +271,23 @@ const UserList = () => {
       }
     } catch (err) {
       console.error("handleSaveUser error:", err);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      
+      let errorMessage = "Save user failed";
+      
+      if (err?.response?.data?.errors) {
+        const errorMessages = Object.values(err.response.data.errors).join(", ");
+        errorMessage = errorMessages;
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+      
       setAlert({
-        message: err?.response?.data?.message || "Save user failed",
+        message: errorMessage,
         type: "error",
+        show: true
       });
     } finally {
       setLoading(false);
@@ -243,8 +321,8 @@ const UserList = () => {
         />
         <AuthAlert
           type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert({ message: "", type: "success" })}
+          message={alert.show ? alert.message : ""}
+          onClose={() => setAlert({ message: "", type: "success", show: false })}
         />
 
         <div className="my-6 flex flex-wrap justify-between items-end gap-4">
@@ -256,7 +334,7 @@ const UserList = () => {
           </button>
 
           <div className="flex flex-wrap items-end gap-4">
-            <div className="relative w-full md:w-[280px]">
+            <form className="relative w-full md:w-[280px]">
               <label className="block text-sm font-semibold text-[#6B5744] mb-2">
                 Search User
               </label>
@@ -271,7 +349,7 @@ const UserList = () => {
                 className="absolute right-4 top-11 text-[#8B7355]"
                 size={20}
               />
-            </div>
+            </form>
 
             <button className="flex items-center gap-2 bg-white border-2 border-[#D4A574]/30 hover:bg-[#F5E6D3] text-[#6B5744] px-6 py-2.5 rounded-xl font-semibold transition-all duration-300">
               <Filter size={20} /> Filter
@@ -370,12 +448,12 @@ const UserList = () => {
 
         <div className="flex flex-wrap justify-between items-center px-6 py-5 bg-white border-2 border-t-0 border-[#D4A574]/10 rounded-b-2xl shadow-lg">
           <p className="text-sm text-[#6B5744] font-medium">
-            Show{" "}
+            Show
             <span className="font-bold text-[#8B6F47]">
               {filteredUsers.length}
-            </span>{" "}
-            users of{" "}
-            <span className="font-bold text-[#8B6F47]">{users.length}</span>{" "}
+            </span>
+            users of
+            <span className="font-bold text-[#8B6F47]">{users.length}</span>
             total
           </p>
 
@@ -595,6 +673,7 @@ const UserList = () => {
                       {["user", "admin"].map((role) => (
                         <button
                           key={role}
+                          type="button"
                           onClick={() =>
                             setSelectedUser({ ...selectedUser, role })
                           }
@@ -613,6 +692,7 @@ const UserList = () => {
               </div>
 
               <button
+                type="button"
                 onClick={handleSaveUser}
                 className="w-full bg-gradient-to-r from-[#D4A574] to-[#8B6F47] hover:from-[#8B6F47] hover:to-[#D4A574] text-white font-bold py-4 mt-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
               >
