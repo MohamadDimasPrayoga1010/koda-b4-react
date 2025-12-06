@@ -19,6 +19,7 @@ import ProductList from "./pages/ProductList";
 import OrderList from "./pages/OrderList";
 import UserList from "./pages/UserList";
 import PrivateRoute from "./components/PrivateRoute";
+import CategoryList from "./pages/CategoryList";
 
 const router = createBrowserRouter([
   {
@@ -95,6 +96,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute allowedRoles={["admin"]}>
             <UserList />
+          </PrivateRoute>
+        ) 
+      },
+       { 
+        path: "/category-list", 
+        element: (
+          <PrivateRoute allowedRoles={["admin"]}>
+            <CategoryList />
           </PrivateRoute>
         ) 
       },
