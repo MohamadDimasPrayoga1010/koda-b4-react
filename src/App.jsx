@@ -12,13 +12,13 @@ import OrderDetail from "./pages/OrderDetail";
 import Profile from "./pages/Profile";
 import MainLayoutAdmin from "./layout/MainLayoutAdmin";
 import Dashboard from "./pages/Dashboard";
-// import { AuthProvider } from "./context/AuthContext";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import ProductList from "./pages/ProductList";
 import OrderList from "./pages/OrderList";
 import UserList from "./pages/UserList";
+import PrivateRoute from "./components/PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -28,21 +28,78 @@ const router = createBrowserRouter([
       { path: "/", element: <HomaPage /> },
       { path: "/our-product", element: <OurProduct /> },
       { path: "/detail-product/:slug", element: <DetailProduct /> },
-      { path: "/payment-details", element: <PaymentDetails /> },
-      { path: "/history-order", element: <HistoryOrder /> },
-      { path: "/order-detail/:id", element: <OrderDetail /> },
-      { path: "profile", element: <Profile /> },
+      { 
+        path: "/payment-details", 
+        element: (
+          <PrivateRoute>
+            <PaymentDetails />
+          </PrivateRoute>
+        ) 
+      },
+      { 
+        path: "/history-order", 
+        element: (
+          <PrivateRoute>
+            <HistoryOrder />
+          </PrivateRoute>
+        ) 
+      },
+      { 
+        path: "/order-detail/:id", 
+        element: (
+          <PrivateRoute>
+            <OrderDetail />
+          </PrivateRoute>
+        ) 
+      },
+      { 
+        path: "profile", 
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ) 
+      },
     ],
   },
   {
-  path: "/",
-  element: <MainLayoutAdmin />,
-  children: [
-    { path: "/dashboard", element: <Dashboard /> },
-  {path:"/product-list" ,element: <ProductList />},
-{path: "/order-list", element: <OrderList />},
-{path: "/user-list", element: <UserList />}],
-},
+    path: "/",
+    element: <MainLayoutAdmin />,
+    children: [
+      { 
+        path: "/dashboard", 
+        element: (
+          <PrivateRoute allowedRoles={["admin"]}>
+            <Dashboard />
+          </PrivateRoute>
+        ) 
+      },
+      { 
+        path: "/product-list", 
+        element: (
+          <PrivateRoute allowedRoles={["admin"]}>
+            <ProductList />
+          </PrivateRoute>
+        ) 
+      },
+      { 
+        path: "/order-list", 
+        element: (
+          <PrivateRoute allowedRoles={["admin"]}>
+            <OrderList />
+          </PrivateRoute>
+        ) 
+      },
+      { 
+        path: "/user-list", 
+        element: (
+          <PrivateRoute allowedRoles={["admin"]}>
+            <UserList />
+          </PrivateRoute>
+        ) 
+      },
+    ],
+  },
   { path: "/register", element: <Register /> },
   { path: "/login", element: <Login /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
@@ -52,9 +109,7 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        {/* <AuthProvider> */}
-          <RouterProvider router={router} />
-        {/* </AuthProvider> */}
+        <RouterProvider router={router} />
       </PersistGate>
     </Provider>
   );
