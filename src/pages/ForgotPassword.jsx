@@ -14,7 +14,6 @@ const emailSchema = yup.object().shape({
   email: yup.string().email("Invalid email format").required("Email is required"),
 });
 
-
 const otpSchema = yup.object().shape({
   otp: yup
     .string()
@@ -31,21 +30,36 @@ const otpSchema = yup.object().shape({
 });
 
 const ForgotPassword = () => {
-  const [otp, setOtp] = useState("email"); 
+  const [step, setStep] = useState("email");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [failedMessage, setFailedMessage] = useState("");
   const navigate = useNavigate();
 
+  const emailForm = useForm({
+    resolver: yupResolver(emailSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const otpForm = useForm({
+    resolver: yupResolver(otpSchema),
+    defaultValues: {
+      otp: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const currentForm = step === "email" ? emailForm : otpForm;
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
-    resolver: yupResolver(otp === "email" ? emailSchema : otpSchema),
-  });
+  } = currentForm;
 
   const handleEmailSubmit = async (data) => {
     setIsLoading(true);
@@ -53,19 +67,21 @@ const ForgotPassword = () => {
     setFailedMessage("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/auth/forgot-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.email }),
+        }
+      );
 
       const result = await response.json();
 
       if (response.ok && result.success) {
         setSuccessMessage(result.message || "OTP has been sent to your email");
-        setEmail(data.email); 
-        setOtp("otp");
-        reset();
+        setEmail(data.email);
+        setStep("otp");
       } else {
         setFailedMessage(result.message || "Failed to send OTP");
       }
@@ -83,20 +99,25 @@ const ForgotPassword = () => {
     setFailedMessage("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/reset-password`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: data.otp,
-          password: data.password,
-          email: email, 
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/auth/reset-password`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: data.otp,
+            password: data.password,
+            email: email,
+          }),
+        }
+      );
 
       const result = await response.json();
 
       if (response.ok && result.success) {
-        setSuccessMessage(result.message || "Password has been reset successfully");
+        setSuccessMessage(
+          result.message || "Password has been reset successfully"
+        );
         reset();
         setTimeout(() => navigate("/login"), 2000);
       } else {
@@ -125,16 +146,18 @@ const ForgotPassword = () => {
             Fill out the form correctly
           </h1>
           <p className="text-[#4F5665] text-base font-normal my-6">
-            {otp === "email"
+            {step === "email"
               ? "We will send an OTP to your email"
               : "Enter OTP and your new password"}
           </p>
 
           <form
-            onSubmit={handleSubmit(otp === "email" ? handleEmailSubmit : handleOtpSubmit)}
+            onSubmit={handleSubmit(
+              step === "email" ? handleEmailSubmit : handleOtpSubmit
+            )}
             className="space-y-4"
           >
-            {otp === "email" && (
+            {step === "email" && (
               <InputField
                 type="email"
                 name="email"
@@ -146,7 +169,7 @@ const ForgotPassword = () => {
               />
             )}
 
-            {otp === "otp" && (
+            {step === "otp" && (
               <>
                 <InputField
                   type="text"
@@ -175,10 +198,24 @@ const ForgotPassword = () => {
               </>
             )}
 
-            <Button className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Processing..." : "Submit"}
             </Button>
           </form>
+
+          {step === "otp" && (
+            <button
+              type="button"
+              onClick={() => {
+                setStep("email");
+                setSuccessMessage("");
+                setFailedMessage("");
+              }}
+              className="mt-4 text-[#8E6447] underline text-sm"
+            >
+              Back to email
+            </button>
+          )}
         </div>
       </div>
     </main>
