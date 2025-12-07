@@ -33,16 +33,12 @@ const Login = () => {
     resolver: yupResolver(loginSchema),
   });
 
-  useEffect(() => {
-    if (location.state?.message) {
-      setAlert({ type: "warning", message: location.state.message });
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-    else if (location.state?.successMessage) {
-      setAlert({ type: "success", message: location.state.successMessage });
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location, navigate]);
+useEffect(() => {
+  if (location.state?.successMessage) {
+    setAlert({ type: "success", message: location.state.successMessage });
+    navigate(location.pathname, { replace: true, state: {} });
+  }
+}, [location, navigate]);
 
   const onSubmit = async (data) => {
     dispatch(setLoading(true));
