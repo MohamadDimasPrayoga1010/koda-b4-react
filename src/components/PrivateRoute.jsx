@@ -7,17 +7,9 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
   const location = useLocation();
 
   if (!token || !isLoggedIn) {
-    const isLoggingOut = sessionStorage.getItem('isLoggingOut') === 'true';
-
-    const shouldShowMessage = !isLoggingOut;
-    
     return (
       <Navigate 
         to="/login" 
-        state={{ 
-          from: location,
-          message: shouldShowMessage ? "Anda harus login terlebih dahulu" : undefined
-        }}
         replace 
       />
     );

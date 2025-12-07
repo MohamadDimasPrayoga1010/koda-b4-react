@@ -69,11 +69,11 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
-  const handleLogoutConfirm = () => {
-    dispatch(logoutAction());
-    setShowLogoutModal(false);
-    navigate("/login");
-  };
+const handleLogoutConfirm = () => {
+  dispatch(logoutAction());
+  setShowLogoutModal(false);
+  navigate("/login", { replace: true, state: {} });
+};
 
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
