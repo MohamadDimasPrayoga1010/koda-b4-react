@@ -52,6 +52,11 @@ const ProductFilter = ({
       sort: data.sort || "",
       priceRange: [min, max],
     });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   };
 
   const handleReset = () => {
@@ -63,6 +68,11 @@ const ProductFilter = ({
       priceMax: 50000,
     });
     onReset();
+    
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   };
 
   const sortOptions = [
